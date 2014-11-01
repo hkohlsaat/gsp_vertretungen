@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+    <!-- Strings regarding the app in general -->
+    <string name="app_name">Streber</string>
+    
+    <!-- Strings regarding actions -->
+    <string name="action_settings">Einstellungen</string>
+    
+    <!-- Strings regarding activity -->
+    <string name="hello">Hello Streber!</string>
+
+</resources>
