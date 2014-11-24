@@ -1,7 +1,9 @@
 <resources>
 
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Default screen margin, per the Android Design guidelines. -->
+    <dimen name="activity_margin">16dp</dimen>
+    
+    <!-- Dimens regarding landing section -->
+    <dimen name="margin_bottom_headline">16dp</dimen>
 
 </resources>

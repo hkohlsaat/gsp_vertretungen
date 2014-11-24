@@ -7,7 +7,15 @@
     <!-- Strings regarding actions -->
     <string name="action_settings">Einstellungen</string>
     
-    <!-- Strings regarding activity -->
-    <string name="hello">Hello Streber!</string>
-
+    <!-- Strings regarding landing section -->
+    <string name="welcome">Willkommen</string>
+    <string name="intro">Diese freshe App zeigt Euch den brandaktuellen Vertretungsplan und Euren echtzeit Stundenplan.</string>
+    <string name="data_insert">Der Vertretungsplan wird von der Webseite heruntergeladen. Dafür müsst Ihr zunächst Eure Zugangsdaten angeben. Sie werden nur auf diesem Gerät gespeichert und lediglich für die Anmeldung bei gsp-ploen.de/iserv verwendet.</string>
+    <string name="username">Dein Nutzername</string>
+    <string name="password">Dein Passwort</string>
+    <string name="login">Login</string>
+    <string name="network_fail">Es ist ein unerwartetes Problem aufgetreten. Bitte versuche es später noch einmal.</string>
+    <string name="login_fail">Leider sind die eingegebenen Daten falsch. Bitte überprüfe Deinen Nutzernamen und gib Dein Passwort noch einmal ein.</string>
+    <string name="no_network">Das Gerät hat momentan keine Netzwerkverbindung. Der Login wird bei Internetzugang versucht.</string>
+    
 </resources>
