@@ -18,13 +18,13 @@
         android:theme="@style/AppTheme"
         android:name="org.aweture.wonk.Application" >
         
-        <activity android:name="org.aweture.wonk.landing.Activity" >
+        <activity android:name="org.aweture.wonk.landing.Activity" />
+        <activity android:name="org.aweture.wonk.overview.Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="org.aweture.wonk.overview.Activity" />
         
         <service android:name="org.aweture.wonk.background.UpdateService" />
         <receiver android:name="org.aweture.wonk.background.UpdateReceiver" />

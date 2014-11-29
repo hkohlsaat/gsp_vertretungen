@@ -3,6 +3,8 @@
 	
     <!-- Strings regarding the app in general -->
     <string name="app_name">Streber</string>
+    <string name="substitutions_plan">Vertretungsplan</string>
+    <string name="timetable">Stundenplan</string>
     
     <!-- Strings regarding actions -->
     <string name="action_settings">Einstellungen</string>

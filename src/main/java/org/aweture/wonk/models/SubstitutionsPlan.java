@@ -8,7 +8,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.aweture.wonk.storage.SimpleData;
-import org.aweture.wonk.storage.WonkContract;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,8 +15,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
@@ -140,30 +137,28 @@ public class SubstitutionsPlan {
 
 			String periodContent = cells.item(1).getTextContent();
 			
+			Substitution substitution = new Substitution();
+			
 			for (String period : getPeriods(periodContent)) {
 				int periodNr = Integer.parseInt(period);
 				String substTeacher = cells.item(2).getTextContent();
 				String instdTeacher = cells.item(3).getTextContent();
 				String instdSubject = cells.item(4).getTextContent();
 				String kind = cells.item(5).getTextContent();
-				kind = kind == null ? "" : kind;
 				String text = cells.item(7).getTextContent();
-				text = text == null ? "" : text.replaceAll("regul.r", "regulär");
 				
-				ContentValues values = new ContentValues();
-				values.put(WonkContract.SubstitutionEntry.DATE, planDate);
-				values.put(WonkContract.SubstitutionEntry.CLASS, className);
-				values.put(WonkContract.SubstitutionEntry.PERIOD_NUMBER, periodNr);
-				values.put(WonkContract.SubstitutionEntry.SUBST_TEACHER, substTeacher);
-				values.put(WonkContract.SubstitutionEntry.INSTD_TEACHER, instdTeacher);
-				values.put(WonkContract.SubstitutionEntry.INSTD_SUBJECT, instdSubject);
-				values.put(WonkContract.SubstitutionEntry.KIND, kind);
-				values.put(WonkContract.SubstitutionEntry.TEXT, text);
+				substitution.setDate(planDate);
+				substitution.setClassName(className);
+				substitution.setPeriod(periodNr);
+				substitution.setSubstTeacher(substTeacher);
+				substitution.setInstdTeacher(instdTeacher);
+				substitution.setInstdSubject(instdSubject);
+				substitution.setKind(kind);
+				substitution.setText(text);
+				substitution.save(context);
 				
 				if (DEBUG) Log.d(TAG, planDate + "\t" + className + "\t" + periodNr + "\t" + substTeacher + "\t\t" + instdTeacher + "\t\t" + instdSubject + "\t\t" + kind + "\t" + text);
 				
-				ContentResolver cr = context.getContentResolver();
-				cr.insert(WonkContract.SubstitutionEntry.CONTENT_URI, values);
 			}
 		}
 	}

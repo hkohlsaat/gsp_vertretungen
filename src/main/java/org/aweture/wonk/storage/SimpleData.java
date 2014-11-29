@@ -3,6 +3,8 @@ package org.aweture.wonk.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class SimpleData {
 
@@ -19,7 +21,7 @@ public class SimpleData {
 	
 	private SimpleData(Context context) {
 		String name = this.getClass().getName();
-		sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 	
 	public static SimpleData getInstance(Context context) {
@@ -36,8 +38,10 @@ public class SimpleData {
 		setUserdataInserted(true);
 	}
 	public void setUserdataInserted(boolean isInserted) {
+		Log.d("SimpleData", Boolean.toString(isInserted));
 		Editor editor = sharedPreferences.edit();
-		editor.putBoolean(KEY_USERDATA_INSERTED, isInserted).apply();
+		editor.putBoolean(KEY_USERDATA_INSERTED, isInserted);
+		editor.apply();
 	}
 	
 	public String getUsername(String defaultString) {
