@@ -58,7 +58,7 @@ public class IServManager21 implements IServManager {
 		BufferedOutputStream out = null;
 		
 		try {
-			String loginString =  "login_act=" + loginData.name + "&login_pwd=" + loginData;
+			String loginString =  "login_act=" + loginData.name + "&login_pwd=" + loginData.password;
 			byte[] loginBytes = loginString.getBytes("utf-8");
 			
 			// Open a connection to the IDesk and set it up.

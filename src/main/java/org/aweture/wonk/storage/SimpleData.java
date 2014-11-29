@@ -11,6 +11,7 @@ public class SimpleData {
 	private static final String KEY_PASSWORD = "password";
 	private static final String KEY_UPDATE_INTERVAL = "update_interval";
 	private static final String KEY_UPDATE_INTERVAL_RETRY = "retry_update_interval";
+	private static final String KEY_SUBSTITUTIONS_PLAN_CREATION = "substitutions_plan_creation";
 	
 	private static SimpleData singletonInstance;
 	
@@ -69,5 +70,13 @@ public class SimpleData {
 	public void setRetryUpdateDelay(long delay) {
 		Editor editor = sharedPreferences.edit();
 		editor.putLong(KEY_UPDATE_INTERVAL_RETRY, delay).apply();
+	}
+	
+	public String getTimeOfSubstitutionsPlanCreation(String defaultString) {
+		return sharedPreferences.getString(KEY_SUBSTITUTIONS_PLAN_CREATION, defaultString);
+	}
+	public void setTimeOfSubstitutionsPlanCreation(String creationTime) {
+		Editor editor = sharedPreferences.edit();
+		editor.putString(KEY_SUBSTITUTIONS_PLAN_CREATION, creationTime).apply();
 	}
 }

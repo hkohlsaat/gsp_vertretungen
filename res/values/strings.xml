@@ -16,6 +16,6 @@
     <string name="login">Login</string>
     <string name="network_fail">Es ist ein unerwartetes Problem aufgetreten. Bitte versuche es später noch einmal.</string>
     <string name="login_fail">Leider sind die eingegebenen Daten falsch. Bitte überprüfe Deinen Nutzernamen und gib Dein Passwort noch einmal ein.</string>
-    <string name="no_network">Das Gerät hat momentan keine Netzwerkverbindung. Der Login wird bei Internetzugang versucht.</string>
+    <string name="no_network">Das Gerät hat momentan keine Netzwerkverbindung. Bitte versuche es bei Netzwerkzugang erneut.</string>
     
 </resources>

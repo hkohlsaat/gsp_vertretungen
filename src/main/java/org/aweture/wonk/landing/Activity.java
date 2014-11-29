@@ -11,12 +11,8 @@ import org.aweture.wonk.storage.SimpleData;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -52,9 +48,6 @@ public class Activity extends android.app.Activity {
 			login.execute(new String[]{username, password});
 		} else {
 			showDialog(R.string.no_network, false, "NoNetwork");
-			IntentFilter connectivityChangedFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-			BroadcastReceiver receiver = new ConnectivityReceiver();
-			registerReceiver(receiver, connectivityChangedFilter);
 		}
 		
 		SimpleData data = SimpleData.getInstance(this);
@@ -137,22 +130,4 @@ public class Activity extends android.app.Activity {
 			return builder.create();
 		}
 	}
-	
-	private class ConnectivityReceiver extends BroadcastReceiver {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Application application = (Application) getApplication();
-			if (application.hasConnectivity()) {
-				unregisterReceiver(this);
-				
-				SimpleData data = SimpleData.getInstance(context);
-				String username = data.getUsername("");
-				String password = data.getPassword("");
-				LoginJob login = new LoginJob();
-				login.execute(new String[]{username, password});
-			}
-		}
-	}
-	
 }
