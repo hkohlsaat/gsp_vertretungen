@@ -4,7 +4,8 @@ import org.aweture.wonk.Application;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
-import org.aweture.wonk.models.SubstitutionsPlan;
+import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.SubstitutionsStore;
 import org.aweture.wonk.storage.SimpleData;
 import org.aweture.wonk.storage.WonkContract;
 
@@ -98,8 +99,11 @@ public class UpdateService extends IntentService {
 	}
 	
 	private void saveSubstitutionsPlan(String plan) throws Exception {
-		SubstitutionsPlan substitutionsPlan = new SubstitutionsPlan(plan);
-		substitutionsPlan.save(getApplicationContext());
+		IServHtmlTable iServHtmlTable = new IServHtmlTable(plan);
+		Plan[] plans = iServHtmlTable.toPlans();
+		Context context = getApplicationContext();
+		SubstitutionsStore substitutionsStore = SubstitutionsStore.getInstance(context);
+		substitutionsStore.savePlans(plans);
 	}
 	
 	private void scheduleNextUpdate(boolean normally) {

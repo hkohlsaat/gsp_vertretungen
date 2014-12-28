@@ -110,13 +110,7 @@ public class IServManager21 implements IServManager {
 		scanner.close();
 		conn.disconnect();
 		
-		// Cut a useless passage, which is no valid xml moreover. 
-		int headStart = plan.indexOf("<head>");
-		int headEnd = plan.indexOf("</head>") + 7;
-		plan.delete(headStart, headEnd);
-
-		// Cut even more invalid parts and return the result. 
-		return plan.toString().replaceAll("<br>", "").replaceFirst("</CENTER>", "</CENTER></body>");
+		return plan.toString();
 	}
 	
 	

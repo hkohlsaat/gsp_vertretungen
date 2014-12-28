@@ -36,6 +36,3 @@ proguard/
 .project
 .settings/
 /target/
-
-# secret information
-src/main/java/org/aweture/wonk/models/Teacher.java

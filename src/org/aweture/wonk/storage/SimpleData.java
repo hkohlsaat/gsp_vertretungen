@@ -21,7 +21,7 @@ public class SimpleData {
 	
 	private SimpleData(Context context) {
 		String name = this.getClass().getName();
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
 	}
 	
 	public static SimpleData getInstance(Context context) {

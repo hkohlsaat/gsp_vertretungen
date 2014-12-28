@@ -25,6 +25,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="org.aweture.wonk.substitutions.Activity"
+            android:theme="@style/AppBaseCompatTheme"
+            android:label="@string/substitutions_plan" />
         
         <service android:name="org.aweture.wonk.background.UpdateService" />
         <receiver android:name="org.aweture.wonk.background.UpdateReceiver" />

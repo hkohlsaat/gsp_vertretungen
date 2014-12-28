@@ -1,6 +1,7 @@
 package org.aweture.wonk.overview;
 
 import org.aweture.wonk.R;
+import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.storage.SimpleData;
 
 import android.content.Intent;
@@ -16,12 +17,13 @@ public class Activity extends android.app.Activity {
 		super.onCreate(savedInstanceState);
 		
 		SimpleData data = SimpleData.getInstance(this);
-		if (data.isUserdataInserted(false)) {
+		if (!data.isUserdataInserted(false)) {
 			Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
 			startActivity(intent);
 			finish();
 		} else {
 			setContentView(R.layout.activity_overview);
+			startService(new Intent(this, UpdateService.class));
 		}
 	}
 	
@@ -31,7 +33,7 @@ public class Activity extends android.app.Activity {
 	}
 	
 	public void showSubstitutions(View view) {
-		Toast.makeText(this, "Substitutions", Toast.LENGTH_SHORT).show();
+		startActivity(new Intent(this, org.aweture.wonk.substitutions.Activity.class));
 	}
 	
 	public void showTimetable(View view) {
