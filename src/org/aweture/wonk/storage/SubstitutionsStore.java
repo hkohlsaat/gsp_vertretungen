@@ -1,4 +1,4 @@
-package org.aweture.wonk.models;
+package org.aweture.wonk.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.aweture.wonk.models.Class;
+import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.Substitution;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -78,6 +81,8 @@ public class SubstitutionsStore {
 			XmlPullParser parser = Xml.newPullParser();
 	        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 	        parser.setInput(inputStream, null);
+	        // Move to root element.
+	        parser.nextTag();
 	        
 	        List<Plan> planList = new ArrayList<Plan>();
 	        
@@ -85,7 +90,7 @@ public class SubstitutionsStore {
 	        	Plan plan = readPlan(parser);
 	        	planList.add(plan);
 	        }
-	        planList.toArray(new Plan[planList.size()]);
+	        plans = planList.toArray(new Plan[planList.size()]);
 		} catch (IOException | XmlPullParserException e) {
 			Log.e(LOG_TAG, Log.getStackTraceString(e));
 		}
@@ -143,9 +148,11 @@ public class SubstitutionsStore {
 	
 	private String plansToXml(Plan[] plans) {
 		StringBuilder builder = new StringBuilder();
+		builder.append("<root>\n");
 		for (Plan plan : plans) {
 			builder.append(planToXml(plan));
 		}
+		builder.append("</root>");
 		return builder.toString();
 	}
 

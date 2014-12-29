@@ -31,9 +31,6 @@
         
         <service android:name="org.aweture.wonk.background.UpdateService" />
         <receiver android:name="org.aweture.wonk.background.UpdateReceiver" />
-        <provider android:name="org.aweture.wonk.storage.WonkProvider"
-            android:authorities="org.aweture.android.wonk"
-            android:exported="false" />
     </application>
 
 </manifest>

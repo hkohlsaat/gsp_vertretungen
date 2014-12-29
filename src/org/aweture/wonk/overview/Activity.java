@@ -1,7 +1,6 @@
 package org.aweture.wonk.overview;
 
 import org.aweture.wonk.R;
-import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.storage.SimpleData;
 
 import android.content.Intent;
@@ -23,7 +22,7 @@ public class Activity extends android.app.Activity {
 			finish();
 		} else {
 			setContentView(R.layout.activity_overview);
-			startService(new Intent(this, UpdateService.class));
+			//startService(new Intent(this, UpdateService.class));
 		}
 	}
 	

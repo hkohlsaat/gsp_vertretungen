@@ -5,9 +5,8 @@ import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.models.SubstitutionsStore;
 import org.aweture.wonk.storage.SimpleData;
-import org.aweture.wonk.storage.WonkContract;
+import org.aweture.wonk.storage.SubstitutionsStore;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -89,7 +88,6 @@ public class UpdateService extends IntentService {
 	private boolean update(IServManager iServManager) {
 		try {
 			String plan = iServManager.downloadSubstitutionPlan();
-			getContentResolver().delete(WonkContract.SubstitutionEntry.CONTENT_URI, null, null);
 			saveSubstitutionsPlan(plan);
 		} catch (Exception e) {
 			Log.e(TAG, Log.getStackTraceString(e));

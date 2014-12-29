@@ -1,25 +1,22 @@
 package org.aweture.wonk.substitutions;
 
 import org.aweture.wonk.R;
-import org.aweture.wonk.storage.WonkContract;
+import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.SubstitutionsStore;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 public class Activity extends android.support.v7.app.ActionBarActivity {
 	
-	private static final int LOADER_ID = 1;
-	
-	ViewPager viewPager;
-	TabStrip tabStrip;
+	private ViewPager viewPager;
+	private TabStrip tabStrip;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,63 +28,40 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		tabStrip = (TabStrip) findViewById(R.id.tabStrip);
 		tabStrip.setViewPager(viewPager);
 		
+		PlanLoader loader = new PlanLoader();
+		loader.execute();
 	}
 	
-	@Override
-	public void onStart() {
-		super.onStart();
-		LoaderManager loaderManager = getSupportLoaderManager();
-		loaderManager.initLoader(LOADER_ID, null, new CursorLoaderCallbacks());
-	}
-	
-	@Override
-	protected void onStop() {
-		super.onStop();
-		LoaderManager loaderManager = getSupportLoaderManager();
-		loaderManager.destroyLoader(LOADER_ID);
-	}
-	
-	private class CursorLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-
-		@Override
-		public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-			Uri queryUri = WonkContract.SubstitutionEntry.CONTENT_URI;
-			String[] projection = new String[]{WonkContract.SubstitutionEntry.DATE + " as _id", WonkContract.SubstitutionEntry.DATE};
-			ContentResolver cr = getContentResolver();
-			return new CursorLoader(Activity.this, queryUri, projection, null, null, null);
-		}
-
-		@Override
-		public void onLoadFinished(Loader<Cursor> arg0, Cursor c) {
-			if (c != null) {
-				Fragment[] fragments = new Fragment[c.getCount()];
-				c.moveToFirst();
-				for (int i = 0; c.moveToNext(); i++) {
-					fragments[i] = new SubstitutionsFragment();
-				}
-				FragmentPagerAdapter fpa = new FragmentPagerAdapter(getSupportFragmentManager(), fragments);
-				viewPager.setAdapter(fpa);
-				tabStrip.setTabsFromPagerAdapter(fpa);
-			}
-		}
-
-		@Override
-		public void onLoaderReset(Loader<Cursor> arg0) {
-		}
+	private void dataLoaded(Plan[] plans) {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentPagerAdapter adapter = new FragmentPagerAdapter(fm, plans);
+		viewPager.setAdapter(adapter);
+		tabStrip.setTabsFromPagerAdapter(adapter);
+		
+		View loadingPlaceholder = findViewById(R.id.progressPlaceholder);
+		LinearLayout container = (LinearLayout) findViewById(R.id.container);
+		container.removeView(loadingPlaceholder);
 	}
 	
 	private class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
 		
-		private Fragment[] fragments;
+		private SubstitutionsFragment[] fragments;
 		
-		public FragmentPagerAdapter(FragmentManager fm, Fragment[] fragments) {
+		public FragmentPagerAdapter(FragmentManager fm, Plan[] plans) {
 			super(fm);
-			this.fragments = fragments;
+			fragments = new SubstitutionsFragment[plans.length];
+			Log.d(this.getClass().getSimpleName(), plans.length + " plans");
+			for (int i = 0; i < plans.length; i++) {
+				Plan plan = plans[i];
+				SubstitutionsFragment fragment = new SubstitutionsFragment();
+				fragment.setPlan(plan);
+				fragments[i] = fragment;
+			}
 		}
 
 		@Override
-		public Fragment getItem(int arg0) {
-			return fragments[arg0];
+		public Fragment getItem(int index) {
+			return fragments[index];
 		}
 
 		@Override
@@ -97,8 +71,26 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		@Override
 		public CharSequence getPageTitle(int position) {
-			return "Tab " + position;
+			SubstitutionsFragment fragment = fragments[position];
+			Plan plan = fragment.getPlan();
+			String date = plan.getDate();
+			return date;
 		}
 		
+	}
+	
+	private class PlanLoader extends AsyncTask<Void, Void, Plan[]> {
+
+		@Override
+		protected Plan[] doInBackground(Void... params) {
+			SubstitutionsStore dataStore = SubstitutionsStore.getInstance(Activity.this);
+			Plan[] plans = dataStore.getCurrentPlans();
+			return plans;
+		}
+		
+		@Override
+		protected void onPostExecute(Plan[] plans) {
+			dataLoaded(plans);
+		}
 	}
 }
