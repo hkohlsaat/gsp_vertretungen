@@ -27,6 +27,16 @@ public class Subjects {
 		populateSubjectsMap(context);
 	}
 	
+	public Subject getSubject(String abbreviation) {
+		Subject subject = subjects.get(abbreviation);
+		if (subject == null) {
+			subject = new Subject();
+			subject.setName(abbreviation);
+			subject.setAbbreviation(abbreviation);
+		}
+		return subject;
+	}
+	
 	
 	private void populateSubjectsMap(Context context) {
 		try (InputStream inputStream = context.getAssets().open("subjects.xml")) {
@@ -34,6 +44,7 @@ public class Subjects {
 	        XmlPullParser parser = Xml.newPullParser();
 	        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 	        parser.setInput(inputStream, null);
+	        parser.nextTag();
 	        
 	        while (parser.nextTag() == XmlPullParser.START_TAG){
 	        	String abbreviation = parser.getAttributeValue(null, ATTRIBUTE_SHORT);

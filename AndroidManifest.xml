@@ -16,7 +16,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="org.aweture.wonk.Application" >
+        android:name="org.aweture.wonk.Application"
+        android:supportsRtl="false" >
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
         <activity android:name="org.aweture.wonk.overview.Activity">
@@ -30,7 +31,6 @@
             android:label="@string/substitutions_plan" />
         
         <service android:name="org.aweture.wonk.background.UpdateService" />
-        <receiver android:name="org.aweture.wonk.background.UpdateReceiver" />
     </application>
 
 </manifest>

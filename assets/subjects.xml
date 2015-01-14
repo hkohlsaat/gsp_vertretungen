@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subjects>
+<subject short="Bi" name="Biologie" />
+<subject short="Ch" name="Chemie" />
+<subject short="D" name="Deutsch" />
+<subject short="E" name="Englisch" />
+<subject short="Ek" name="Erdkunde" />
+<subject short="F2/3" name="Französisch" />
+<subject short="F2" name="Französisch" />
+<subject short="F3" name="Französisch" />
+<subject short="G" name="Geschichte" />
+<subject short="KfD" name="Deutsch" />
+<subject short="KfE" name="Englisch" />
+<subject short="KfM" name="Mathe" />
+<subject short="kRel" name="kath. Religion" />
+<subject short="Ku" name="Kunst" />
+<subject short="L2/3" name="Latein" />
+<subject short="L2" name="Latein" />
+<subject short="L3" name="Latein" />
+<subject short="LQ" name="LionsQuest" />
+<subject short="M" name="Mathe" />
+<subject short="MFö" name="Mathe (Förder.)" />
+<subject short="Mu" name="Musik" />
+<subject short="MZ" name="Musik" />
+<subject short="Ph" name="Physik" />
+<subject short="Phil" name="Philosophie" />
+<subject short="Rel" name="Religion" />
+<subject short="Spo" name="Sport" />
+<subject short="WP" name="Wirtschaft/Politik" />
+</subjects>

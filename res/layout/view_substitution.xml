@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<TextView
+		android:id="@+id/periodTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="right|center_vertical"
+		android:textSize="@dimen/text_size" />
+	
+	<TextView
+		android:id="@+id/subjectTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="left|center_vertical"
+		android:textSize="@dimen/text_size" />
+	
+	<TextView
+	    android:id="@+id/instdOfTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="right|center_vertical"
+		android:textSize="@dimen/text_size"
+		android:text="@string/instead_of" />
+	
+	<TextView
+		android:id="@+id/instdTeacherTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="left|center_vertical"
+		android:textSize="@dimen/text_size" />
+	
+	<TextView
+		android:id="@+id/kindTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="right|center_vertical"
+		android:textSize="@dimen/text_size" />
+	
+	<TextView
+		android:id="@+id/substTeacherTextView"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/row_height"
+		
+		android:gravity="left|center_vertical"
+		android:textSize="@dimen/text_size" />
+	
+	<TextView
+	    android:id="@+id/infoTextView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="@dimen/row_height"
+	    
+		android:gravity="right|center_vertical"
+		android:textSize="@dimen/text_size"
+		android:text="@string/info" />
+	
+	<TextView
+		android:id="@+id/textTextView"
+	    android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:minHeight="@dimen/row_height"
+		
+		android:gravity="left|center_vertical"
+		android:textSize="@dimen/text_size" />
+
+</merge>

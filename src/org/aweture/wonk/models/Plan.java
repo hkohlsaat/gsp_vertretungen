@@ -6,13 +6,16 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class Plan extends HashMap<Class, List<Substitution>> {
 	
-	private String date;
+	private Date date;
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
+	}
+	public void setDate(String date) {
+		this.date = new Date(date);
 	}
 }

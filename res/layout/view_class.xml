@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.aweture.wonk.substitutions.ClassView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/classView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
-
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    
     <TextView
         android:id="@+id/className"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/class_headline_margin_left"
-        android:text="5c"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/accent" />
 
@@ -23,9 +17,4 @@
         android:layout_marginRight="@dimen/class_headline_margin"
         android:background="@color/accent" />
 
-    <org.aweture.wonk.substitutions.SubstitutionsView
-        android:id="@+id/substitutionsList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</org.aweture.wonk.substitutions.ClassView>
+</merge>

@@ -128,7 +128,7 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 			indicator.left = leftTextView.getLeft();
 			indicator.right = leftTextView.getRight();
 			int heigt = indicator.height();
-			indicator.bottom = getHeight();
+			indicator.bottom = getHeight() - 1;
 			indicator.top = indicator.bottom - heigt;
 			
 			if (positionOffset != 0) {

@@ -58,6 +58,16 @@ public class SubstitutionsStore {
 		return plans;
 	}
 	
+	public synchronized Plan getPlanByDate(String date) {
+		for (Plan plan : plans) {
+			if (plan.getDate().toString().equals(date)) {
+				return plan;
+			}
+		}
+		String message = "There is no date = \"" + date + "\" in the available plans.";
+		throw new IllegalArgumentException(message);
+	}
+	
 	public synchronized void savePlans(Plan[] plans) {
 		this.plans = plans;
 		if (plans != null) {
@@ -158,7 +168,7 @@ public class SubstitutionsStore {
 
 	private String planToXml(Plan plan) {
 		StringBuilder builder = new StringBuilder();
-		String date = plan.getDate();
+		String date = plan.getDate().toString();
 		builder.append("<" + TAG_PLAN + attr(ATTRIBUTE_DATE, date) + ">\n");
 		Set<Class> classes = plan.keySet();
 		for (Class currentClass : classes) {

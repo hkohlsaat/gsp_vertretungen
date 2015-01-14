@@ -3,6 +3,9 @@
     <!-- Default screen margin, per the Android Design guidelines. -->
     <dimen name="activity_margin">16dp</dimen>
     
+    <!-- Default text size -->
+    <dimen name="text_size">18sp</dimen>
+    
     <!-- Dimens regarding landing section -->
     <dimen name="margin_bottom_headline">16dp</dimen>
     
@@ -12,5 +15,10 @@
     <!-- Dimens regarding substitution section -->
     <dimen name="class_headline_margin">8dp</dimen>
     <dimen name="class_headline_margin_left">16dp</dimen>
+    <dimen name="class_substitution_item_margin">16dp</dimen>
+    
+    <dimen name="row_height">48dp</dimen>
+    <dimen name="colum_gab">12dp</dimen>
+    <dimen name="row_margin_left">48dp</dimen>
     
 </resources>

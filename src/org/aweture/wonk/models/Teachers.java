@@ -45,6 +45,7 @@ public class Teachers {
 	        XmlPullParser parser = Xml.newPullParser();
 	        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 	        parser.setInput(inputStream, null);
+	        parser.nextTag();
 	        
 	        while (parser.nextTag() == XmlPullParser.START_TAG){
 	        	String shortName = parser.getAttributeValue(null, ATTRIBUTE_SHORT);

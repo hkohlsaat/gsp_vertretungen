@@ -15,9 +15,6 @@ libs/
 project.properties
 proguard-project.txt
 
-# assets
-assets
-
 # Gradle files
 .gradle/
 build/

@@ -84,7 +84,18 @@ public class IServHtmlTable {
 	private String getDate(Node currentPlan) {
 		String rawDate = currentPlan.getTextContent();
 		String[] parts = rawDate.split(" ");
-		return parts[0];
+		String[] digits = parts[0].split("\\.");
+		StringBuilder builder = new StringBuilder();
+		if (digits[0].length() == 1) {
+			builder.append(0);
+		}
+		builder.append(digits[0] + ".");
+		if (digits[1].length() == 1) {
+			builder.append(0);
+		}
+		builder.append(digits[1] + ".");
+		builder.append(digits[2]);
+		return builder.toString();
 	}
 	
 	private void transferSubstitutions(Plan plan, NodeList currentPart) {
@@ -101,12 +112,12 @@ public class IServHtmlTable {
 		NodeList cells = ((Element) row).getElementsByTagName("td");
 		
 		String compactClassName = cells.item(0).getTextContent();
-		if (compactClassName != null) {
+		if (compactClassName != null && !compactClassName.matches("(SLR)|(Ltg)")) {
 			String[] classNames = filterClassNames(compactClassName);
 			String periodsString = cells.item(1).getTextContent();
 			int[] periods = filterPeriods(periodsString);
 			String substTeacher = cells.item(2).getTextContent();
-			if (substTeacher.matches("(---)|\\?|\\+"))
+			if (substTeacher.matches("(---)|\\?+|\\+"))
 				substTeacher = "";
 			String instdTeacher = cells.item(3).getTextContent();
 			String instdSubject = cells.item(4).getTextContent();
@@ -147,7 +158,7 @@ public class IServHtmlTable {
 		List<String> classNames = new ArrayList<String>();
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"5", "6", "7", "8", "9", "10"}, "a?b?c?d?e?");
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"11", "12", "13"}, "g?n?s?");
-		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?L?W?");
+		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?N?S?L?W?");
 		if (!compactClassName.isEmpty()) {
 			Log.w(IServHtmlTable.class.getSimpleName(), "Class names not fully solved: " + compactClassName);
 		}
