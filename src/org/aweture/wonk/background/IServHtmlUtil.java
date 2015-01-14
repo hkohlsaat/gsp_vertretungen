@@ -24,12 +24,19 @@ import org.xml.sax.SAXException;
 
 import android.util.Log;
 
-public class IServHtmlTable {
+/**
+ * Utility class to transform the at times messy html returned
+ * by the server into an array of {@link Plan}s.
+ * 
+ * @author Hannes Kohlsaat
+ *
+ */
+public class IServHtmlUtil {
 	
 	private String plan;
 	private Plan[] plans;
 	
-	public IServHtmlTable(String plan) {
+	public IServHtmlUtil(String plan) {
 		this.plan = plan;
 	}
 	
@@ -72,13 +79,26 @@ public class IServHtmlTable {
 		plans = new Plan[planCount];
 		// Fill the Plan[].
 		for (int i = 1; i < planCount * 2; i += 2) {
+			// Get as of time.
+			Node asOfTimeNode = nodeList.item(i - 1);
+			String asOfTime = getAsOfTime(asOfTimeNode);
+			
+			// Get regarding date.
 			Element currentElement = (Element) nodeList.item(i);
 			String date = getDate(currentElement.getElementsByTagName("div").item(0));
+			
+			// Create Plan and set data.
 			Plan plan = new Plan();
+			plan.setAsOfTime(asOfTime);
 			plan.setDate(date);
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;
 		}
+	}
+	
+	private String getAsOfTime(Node node) {
+		String rawAsOfTime = node.getTextContent();
+		return rawAsOfTime.substring(7);
 	}
 	
 	private String getDate(Node currentPlan) {
@@ -160,7 +180,7 @@ public class IServHtmlTable {
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"11", "12", "13"}, "g?n?s?");
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?N?S?L?W?");
 		if (!compactClassName.isEmpty()) {
-			Log.w(IServHtmlTable.class.getSimpleName(), "Class names not fully solved: " + compactClassName);
+			Log.w(IServHtmlUtil.class.getSimpleName(), "Class names not fully solved: " + compactClassName);
 		}
 		return classNames.toArray(new String[classNames.size()]);
 	}

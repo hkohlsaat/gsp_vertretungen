@@ -39,6 +39,7 @@ public class SubstitutionsStore {
 	
 	private Context context;
 	private Plan[] plans;
+	private List<OnSubstitutesSavedListener> saveListeners;
 	
 	public static SubstitutionsStore getInstance(Context context) {
 		if (instance == null) {
@@ -49,6 +50,7 @@ public class SubstitutionsStore {
 	
 	private SubstitutionsStore(Context context) {
 		this.context = context;
+		saveListeners = new ArrayList<OnSubstitutesSavedListener>();
 	}
 	
 	public synchronized Plan[] getCurrentPlans() {
@@ -69,7 +71,9 @@ public class SubstitutionsStore {
 	}
 	
 	public synchronized void savePlans(Plan[] plans) {
+		Plan[] oldPlans = this.plans;
 		this.plans = plans;
+		
 		if (plans != null) {
 			try (OutputStream outputStream = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
 
@@ -82,6 +86,44 @@ public class SubstitutionsStore {
 			} catch (IOException e) {
 				Log.e(LOG_TAG, Log.getStackTraceString(e));
 			}
+
+			if (plans.length > 0 && !sameAsOfTime(oldPlans, plans)) {
+				// Inform listeners.
+				// The array list is copied to prevent exceptions in case a listener wants
+				// to remove itself while iterating over the listeners.
+				List<OnSubstitutesSavedListener> listeners = new ArrayList<OnSubstitutesSavedListener>(saveListeners);
+				for (OnSubstitutesSavedListener listener : listeners) {
+					listener.onNewSubstitutesSaved(plans.length);
+				}
+			}
+		}
+	}
+	
+	private boolean sameAsOfTime(Plan[] plans1, Plan[] plans2) {
+		if (plans1 == null && plans2 != null) {
+			return false;
+		} else if (plans1 != null && plans2 == null) {
+			return false;
+		} else if (plans1 != null && plans2 != null) {
+			if (plans1.length > 0 && plans2.length > 0) {
+				return plans1[0].getAsOfTime().equals(plans2[0].getAsOfTime());
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	
+	public void registerOnSubstitutesSavedListener(OnSubstitutesSavedListener listener) {
+		if (!saveListeners.contains(listener)) {
+			saveListeners.add(listener);
+		}
+	}
+	
+	public void removeOnSubstitutesSavedListener(OnSubstitutesSavedListener listener) {
+		if (saveListeners.contains(listener)) {
+			saveListeners.remove(listener);
 		}
 	}
 

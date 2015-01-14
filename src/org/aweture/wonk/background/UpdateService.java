@@ -16,7 +16,7 @@ import android.content.Intent;
 import android.util.Log;
 
 public class UpdateService extends IntentService {
-	private static final String TAG = UpdateService.class.getSimpleName();
+	private static final String LOG_TAG = UpdateService.class.getSimpleName();
 
 	private static final long DEFAULT_DELAY_NORMAL = 5 * AlarmManager.INTERVAL_HOUR;
 	private static final long DEFAULT_DELAY_RETRY = AlarmManager.INTERVAL_HOUR;
@@ -24,7 +24,7 @@ public class UpdateService extends IntentService {
 	public static final String EXTRA_NORMAL_INTERVAL = "normal_interval";
 
 	public UpdateService() {
-		super(TAG);
+		super(LOG_TAG);
 	}
 	
 	public static void startToUpdate(Context context) {
@@ -90,14 +90,14 @@ public class UpdateService extends IntentService {
 			String plan = iServManager.downloadSubstitutionPlan();
 			saveSubstitutionsPlan(plan);
 		} catch (Exception e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			Log.e(LOG_TAG, Log.getStackTraceString(e));
 			return false;
 		}
 		return true;
 	}
 	
 	private void saveSubstitutionsPlan(String plan) throws Exception {
-		IServHtmlTable iServHtmlTable = new IServHtmlTable(plan);
+		IServHtmlUtil iServHtmlTable = new IServHtmlUtil(plan);
 		Plan[] plans = iServHtmlTable.toPlans();
 		Context context = getApplicationContext();
 		SubstitutionsStore substitutionsStore = SubstitutionsStore.getInstance(context);

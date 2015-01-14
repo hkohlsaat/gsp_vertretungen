@@ -1,18 +1,24 @@
 package org.aweture.wonk.substitutions;
 
 import org.aweture.wonk.R;
+import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.OnSubstitutesSavedListener;
 import org.aweture.wonk.storage.SubstitutionsStore;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class Activity extends android.support.v7.app.ActionBarActivity {
+public class Activity extends android.support.v7.app.ActionBarActivity implements OnSubstitutesSavedListener {
 	
 	private ViewPager viewPager;
 	private TabStrip tabStrip;
@@ -29,6 +35,33 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
     	PlanLoader loader = new PlanLoader();
     	loader.execute();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.substitutes, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		startService(new Intent(this, UpdateService.class));
+		return true;
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		SubstitutionsStore dataStore = SubstitutionsStore.getInstance(this);
+		dataStore.registerOnSubstitutesSavedListener(this);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		SubstitutionsStore dataStore = SubstitutionsStore.getInstance(this);
+		dataStore.removeOnSubstitutesSavedListener(this);
 	}
 	
 	private class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
@@ -84,5 +117,12 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			LinearLayout container = (LinearLayout) findViewById(R.id.container);
 			container.removeView(loadingPlaceholder);
 		}
+	}
+
+	@Override
+	public void onNewSubstitutesSaved(int planCount) {
+		FragmentPagerAdapter adapter = (FragmentPagerAdapter) viewPager.getAdapter();
+		adapter.planCount = planCount;
+		adapter.notifyDataSetChanged();
 	}
 }

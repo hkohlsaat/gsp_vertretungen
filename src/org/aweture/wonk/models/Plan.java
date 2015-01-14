@@ -7,6 +7,7 @@ import java.util.List;
 public class Plan extends HashMap<Class, List<Substitution>> {
 	
 	private Date date;
+	private String asOfTime;
 
 	public Date getDate() {
 		return date;
@@ -17,5 +18,13 @@ public class Plan extends HashMap<Class, List<Substitution>> {
 	}
 	public void setDate(String date) {
 		this.date = new Date(date);
+	}
+	
+	public String getAsOfTime() {
+		return asOfTime;
+	}
+
+	public void setAsOfTime(String asOfTime) {
+		this.asOfTime = asOfTime;
 	}
 }

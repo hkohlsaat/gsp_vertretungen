@@ -7,7 +7,7 @@
     <string name="timetable">Stundenplan</string>
     
     <!-- Strings regarding actions -->
-    <string name="action_settings">Einstellungen</string>
+    <string name="action_update">Aktualisieren</string>
     
     <!-- Strings regarding landing section -->
     <string name="welcome">Willkommen</string>

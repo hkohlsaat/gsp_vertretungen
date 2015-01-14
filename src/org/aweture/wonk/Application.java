@@ -10,5 +10,4 @@ public class Application extends android.app.Application {
 		NetworkInfo networkInfo = cm.getActiveNetworkInfo();
 		return networkInfo != null && networkInfo.isConnected();
 	}
-	
 }
