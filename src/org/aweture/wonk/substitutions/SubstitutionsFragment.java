@@ -128,24 +128,4 @@ public class SubstitutionsFragment extends Fragment {
 			}
 		}
 	}
-	
-	public class ClickCoordinator {
-		private Expandable expandable;
-		
-		private ClickCoordinator() {}
-		
-		public void reportClick(Expandable reporter) {
-			if (expandable == null) {
-				expandable = reporter;
-				expandable.expand();
-			} else if (expandable == reporter) {
-				expandable.collapse();
-				expandable = null;
-			} else if (expandable != reporter) {
-				expandable.collapse();
-				expandable = reporter;
-				expandable.expand();
-			}
-		}
-	}
 }

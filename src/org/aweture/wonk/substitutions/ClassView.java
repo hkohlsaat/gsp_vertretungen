@@ -87,8 +87,7 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	private SubstitutionView getUndisplayedSubstitutionView() {
 		SubstitutionView view = itemOverflow.poll();
 		if (view == null) {
-			view = new SubstitutionView(getContext());
-			view.setExpansionCoordinator(expansionCoordinator);
+			view = new SubstitutionView(getContext(), expansionCoordinator);
 		}
 		return view;
 	}

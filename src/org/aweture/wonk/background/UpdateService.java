@@ -1,10 +1,14 @@
 package org.aweture.wonk.background;
 
+import java.io.IOException;
+
 import org.aweture.wonk.Application;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.DownloadInformationIntent;
+import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
 import org.aweture.wonk.storage.SimpleData;
 import org.aweture.wonk.storage.SubstitutionsStore;
 
@@ -13,6 +17,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class UpdateService extends IntentService {
@@ -86,14 +91,43 @@ public class UpdateService extends IntentService {
 	}
 	
 	private boolean update(IServManager iServManager) {
+		// Inform about update start.
+		reportUpdateStart();
 		try {
 			String plan = iServManager.downloadSubstitutionPlan();
+			// Inform about update completeness.
+			reportUpdateComplete();
+			
 			saveSubstitutionsPlan(plan);
+		} catch (IOException e) {
+			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			// This catch-clause will only get executed when the download procedure
+			// failed. Inform about update abortion.
+			reportUpdateAborted();
+			return false;
 		} catch (Exception e) {
 			Log.e(LOG_TAG, Log.getStackTraceString(e));
 			return false;
 		}
 		return true;
+	}
+	
+	private void reportUpdateStart() {
+		DownloadInformationIntent intent = new DownloadInformationIntent();
+		intent.setState(DownloadStates.DOWNLOAD_STARTING);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+	
+	private void reportUpdateAborted() {
+		DownloadInformationIntent intent = new DownloadInformationIntent();
+		intent.setState(DownloadStates.DOWNLOAD_ABORTED);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+	
+	private void reportUpdateComplete() {
+		DownloadInformationIntent intent = new DownloadInformationIntent();
+		intent.setState(DownloadStates.DOWNLOAD_COMPLETE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 	
 	private void saveSubstitutionsPlan(String plan) throws Exception {

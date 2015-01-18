@@ -20,11 +20,11 @@ public class Plan extends HashMap<Class, List<Substitution>> {
 		this.date = new Date(date);
 	}
 	
-	public String getAsOfTime() {
+	public String getCreationTime() {
 		return asOfTime;
 	}
 
-	public void setAsOfTime(String asOfTime) {
+	public void setCreationTime(String asOfTime) {
 		this.asOfTime = asOfTime;
 	}
 }

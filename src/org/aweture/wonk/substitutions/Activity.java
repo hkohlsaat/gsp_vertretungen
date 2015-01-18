@@ -4,13 +4,18 @@ import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.storage.OnSubstitutesSavedListener;
+import org.aweture.wonk.storage.DownloadInformationIntent;
+import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
 import org.aweture.wonk.storage.SubstitutionsStore;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class Activity extends android.support.v7.app.ActionBarActivity implements OnSubstitutesSavedListener {
+public class Activity extends android.support.v7.app.ActionBarActivity {
+	
+	private BroadcastReceiver dataInfoBroadcastReceiver;
 	
 	private ViewPager viewPager;
 	private TabStrip tabStrip;
@@ -53,15 +60,17 @@ public class Activity extends android.support.v7.app.ActionBarActivity implement
 	@Override
 	protected void onStart() {
 		super.onStart();
-		SubstitutionsStore dataStore = SubstitutionsStore.getInstance(this);
-		dataStore.registerOnSubstitutesSavedListener(this);
+		dataInfoBroadcastReceiver = new DataInformationBroadcastReceiver();
+		IntentFilter filter = new DownloadInformationIntent.DownloadInformationIntentFilter();
+		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+		manager.registerReceiver(dataInfoBroadcastReceiver, filter);
 	}
 	
 	@Override
 	protected void onStop() {
 		super.onStop();
-		SubstitutionsStore dataStore = SubstitutionsStore.getInstance(this);
-		dataStore.removeOnSubstitutesSavedListener(this);
+		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+		manager.unregisterReceiver(dataInfoBroadcastReceiver);
 	}
 	
 	private class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
@@ -118,11 +127,32 @@ public class Activity extends android.support.v7.app.ActionBarActivity implement
 			container.removeView(loadingPlaceholder);
 		}
 	}
+	
+	private class DataInformationBroadcastReceiver extends BroadcastReceiver {
 
-	@Override
-	public void onNewSubstitutesSaved(int planCount) {
-		FragmentPagerAdapter adapter = (FragmentPagerAdapter) viewPager.getAdapter();
-		adapter.planCount = planCount;
-		adapter.notifyDataSetChanged();
+		@Override
+		public void onReceive(Context context, Intent i) {
+			DownloadInformationIntent intent = (DownloadInformationIntent) i;
+			DownloadStates state = intent.getState();
+			
+			switch (state) {
+			case DOWNLOAD_STARTING:
+				// TODO: Start a progress bar.
+				break;
+			case DOWNLOAD_ABORTED:
+				// TODO: Stop things from DOWLOAD_STARTING case.
+				break;
+			case DOWNLOAD_COMPLETE:
+				// TODO: Stop things from DOWLOAD_STARTING case.
+				break;
+			case NEW_DATA_SAVED:
+				SubstitutionsStore dataStore = SubstitutionsStore.getInstance(Activity.this);
+				int planCount = dataStore.getCurrentPlans().length;
+				FragmentPagerAdapter adapter = (FragmentPagerAdapter) viewPager.getAdapter();
+				adapter.planCount = planCount;
+				adapter.notifyDataSetChanged();
+				break;
+			}
+		}
 	}
 }

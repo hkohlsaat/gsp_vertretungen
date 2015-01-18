@@ -7,40 +7,36 @@ import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.Teachers;
 import org.aweture.wonk.models.Teachers.Teacher;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class SubstitutionView extends FrameLayout implements Expandable, OnClickListener, OnPreDrawListener{
+public class SubstitutionView extends FrameLayout implements Expandable, OnClickListener{
 	
-	private static final String LOG_TAG = SubstitutionView.class.getSimpleName();
-	private static final int XML_RESOURCE = R.layout.view_substitution;
-	private static final int COLLAPSED_BACKGROUND = 0x00dddddd;
-	private static final int EXPANDED_BACKGROUND = 0xffdddddd;
+	private static final int BACKGROUND_COLOR_RGB = 0xdddddd;
 	private static final int ANIMATION_DURATION = 150;
+	/** Width of the gap in {@link TypedValue#COMPLEX_UNIT_DIP}. */
+	private static final int GAP_WIDTH = 8;
 	
-	/** Default width of the gap in dp */
-	private static final int STD_GAP_WIDTH = 8;
-	
-	private Rect screenSize = new Rect();
-	
+	// Measurement data
+	private int screenWidth;
 	private int gapWidth;
 	private int marginLeft;
 	
+	// Child views
 	private TextView periodTextView;
 	private TextView subjectTextView;
 	private TextView instdOfTextView;
@@ -50,26 +46,61 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 	private TextView infoTextView;
 	private TextView textTextView;
 	
+	// Models and helper classes
 	private Teachers teachers;
 	private Subjects subjects;
 	private Substitution substitution;
 	
 	private ExpansionCoordinator expansionCoordinator;
 	
-	private BackgroundColorUpdater backgroundColorUpdater;
-	private ValueAnimator expandingBackgroundColorAnimation;
-	private ValueAnimator collapsingBackgroundColorAnimation;
 	private ExpansionAnimation expansionAnimation;
+	
+	private OnPreDrawListener onPickOffNewHeightPreDrawListener;
+	private OnPreDrawListener onStartAnimationsPreDrawListener;
 
-	public SubstitutionView(Context context) {
+	public SubstitutionView(Context context, ExpansionCoordinator expansionCoordinator) {
 		super(context);
 		
 		teachers = new Teachers(context);
 		subjects = new Subjects(context);
 		
-		LayoutInflater.from(context).inflate(XML_RESOURCE, this, true);
+		setUpMeasurementData();
 		
+		inflateViewContents();
+		findChildViews();
+		integrateAnimationsIntoChildViews();
 		
+		setOnClickListener(this);
+		
+		this.expansionCoordinator = expansionCoordinator;
+		
+		expansionAnimation = new ExpansionAnimation();
+		
+		onPickOffNewHeightPreDrawListener = new OnPickOffNewHeightPreDrawListener();
+		onStartAnimationsPreDrawListener = new OnStartAnimationsPreDrawListener();
+	}
+	
+	private void inflateViewContents() {
+		int xmlResource = R.layout.view_substitution;
+		Context context = getContext();
+		LayoutInflater.from(context).inflate(xmlResource, this, true);
+	}
+	
+	private void setUpMeasurementData() {
+		Resources resources = getContext().getResources();
+		
+		DisplayMetrics dm = resources.getDisplayMetrics();
+		gapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, GAP_WIDTH, dm);
+		
+		int marginId = R.dimen.class_substitution_item_margin;
+		marginLeft = resources.getDimensionPixelSize(marginId);
+		
+		Rect rect = new Rect();
+		getWindowVisibleDisplayFrame(rect);
+		screenWidth = rect.width();
+	}
+	
+	private void findChildViews() {
 		periodTextView = (TextView) findViewById(R.id.periodTextView);
 		subjectTextView = (TextView) findViewById(R.id.subjectTextView);
 		instdOfTextView = (TextView) findViewById(R.id.instdOfTextView);
@@ -78,7 +109,9 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 		substTeacherTextView = (TextView) findViewById(R.id.substTeacherTextView);
 		textTextView = (TextView) findViewById(R.id.textTextView);
 		infoTextView = (TextView) findViewById(R.id.infoTextView);
-		
+	}
+	
+	private void integrateAnimationsIntoChildViews() {
 		// Set an Animation object each to be associated with one TextView only.
 		periodTextView.setTag(new RightTimeRightPlaceAnimation(periodTextView));
 		subjectTextView.setTag(new RightTimeRightPlaceAnimation(subjectTextView));
@@ -88,29 +121,11 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 		substTeacherTextView.setTag(new RightTimeRightPlaceAnimation(substTeacherTextView));
 		textTextView.setTag(new RightTimeRightPlaceAnimation(textTextView));
 		infoTextView.setTag(new RightTimeRightPlaceAnimation(infoTextView));
-		
-		DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
-		gapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, STD_GAP_WIDTH, dm);
-		marginLeft = context.getResources().getDimensionPixelSize(R.dimen.class_substitution_item_margin);
-		
-		setOnClickListener(this);
-		
-		backgroundColorUpdater = new BackgroundColorUpdater();
-		
-		expandingBackgroundColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), COLLAPSED_BACKGROUND, EXPANDED_BACKGROUND);
-		expandingBackgroundColorAnimation.addUpdateListener(backgroundColorUpdater);
-		expandingBackgroundColorAnimation.setDuration(ANIMATION_DURATION);
-		
-		collapsingBackgroundColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), EXPANDED_BACKGROUND, COLLAPSED_BACKGROUND);
-		collapsingBackgroundColorAnimation.addUpdateListener(backgroundColorUpdater);
-		collapsingBackgroundColorAnimation.setDuration(ANIMATION_DURATION);
-		expansionAnimation = new ExpansionAnimation();
 	}
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		getWindowVisibleDisplayFrame(screenSize);
-		int width = screenSize.width();
+		int width = screenWidth;
 		int height = 0;
 		int mode = 0;
 		
@@ -208,13 +223,19 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 		return bottom;
 	}
 	
-
-	public void setExpansionCoordinator(ExpansionCoordinator expansionCoordinator) {
-		this.expansionCoordinator = expansionCoordinator;
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
+		if (expansionCoordinator.isExpanded(this)) {
+			expansionCoordinator.removeAsExpanded(this);
+			
+			setBackgroundColor(BACKGROUND_COLOR_RGB);
+		}
 	}
 	
 	public void setSubstitution(Substitution substitution) {
 		this.substitution = substitution;
+		
 		applySubstitutionData();
 		applyVisibilityProperties();
 	}
@@ -269,27 +290,12 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 
 	@Override
 	public void onClick(View v) {
-		if (expansionCoordinator != null) {
-			expansionCoordinator.clicked(this);
-		} else {
-			String className = ExpansionCoordinator.class.getSimpleName();
-			Log.w(LOG_TAG, "Click happened but no "
-					+ className + "set! Ignoring click!");
-		}
+		expansionCoordinator.clicked(this);
 	}
 
 	@Override
-	public void expand() {
-		setupExpansionChange();
-	}
-
-	@Override
-	public void collapse() {
-		setupExpansionChange();
-	}
-	
-	private void setupExpansionChange() {
-		expansionAnimation.setOldHeight(getHeight());
+	public void changeExpansionState() {
+		expansionAnimation.oldHeight = getHeight();
 		
 		getAnimation(periodTextView).queryOldPosition();
 		getAnimation(subjectTextView).queryOldPosition();
@@ -299,45 +305,56 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 		getAnimation(substTeacherTextView).queryOldPosition();
 		getAnimation(textTextView).queryOldPosition();
 		getAnimation(infoTextView).queryOldPosition();
-		
-		applyVisibilityProperties();
-		if (isAttachedToWindow()) {
-			getViewTreeObserver().addOnPreDrawListener(this);
-		}
-	}
 
-	@Override
-	public boolean onPreDraw() {
-		getViewTreeObserver().removeOnPreDrawListener(this);
+		applyVisibilityProperties();
 		
-		if (expansionCoordinator.isExpanded(this)) {
-			expandingBackgroundColorAnimation.start();
-		} else {
-			collapsingBackgroundColorAnimation.start();
+		if (isAttachedToWindow()) {
+			getViewTreeObserver().addOnPreDrawListener(onPickOffNewHeightPreDrawListener);
 		}
-		
-		startAnimation(expansionAnimation);
-		
-		periodTextView.startAnimation(getAnimation(periodTextView));
-		subjectTextView.startAnimation(getAnimation(subjectTextView));
-		instdOfTextView.startAnimation(getAnimation(instdOfTextView));
-		instdTeacherTextView.startAnimation(getAnimation(instdTeacherTextView));
-		kindTextView.startAnimation(getAnimation(kindTextView));
-		substTeacherTextView.startAnimation(getAnimation(substTeacherTextView));
-		textTextView.startAnimation(getAnimation(textTextView));
-		infoTextView.startAnimation(getAnimation(infoTextView));
-		return false;
 	}
 	
 	private RightTimeRightPlaceAnimation getAnimation(View view) {
 		return (RightTimeRightPlaceAnimation) view.getTag();
 	}
 	
-	private class BackgroundColorUpdater implements AnimatorUpdateListener {
-	    @Override
-	    public void onAnimationUpdate(ValueAnimator animator) {
-	        setBackgroundColor((Integer) animator.getAnimatedValue());
-	    }
+	private class OnPickOffNewHeightPreDrawListener implements OnPreDrawListener {
+
+		@Override
+		public boolean onPreDraw() {
+			ViewTreeObserver viewTreeObserver = getViewTreeObserver();
+			viewTreeObserver.removeOnPreDrawListener(this);
+			viewTreeObserver.addOnPreDrawListener(onStartAnimationsPreDrawListener);
+			
+			expansionAnimation.newHeight = getHeight();
+			
+			ViewGroup.LayoutParams layoutParams = getLayoutParams();
+			layoutParams.height = expansionAnimation.oldHeight;
+			
+			requestLayout();
+			
+			return false;
+		}
+	}
+	
+	private class OnStartAnimationsPreDrawListener implements OnPreDrawListener {
+		
+		@Override
+		public boolean onPreDraw() {
+			getViewTreeObserver().removeOnPreDrawListener(this);
+			
+			startAnimation(expansionAnimation);
+			
+			periodTextView.startAnimation(getAnimation(periodTextView));
+			subjectTextView.startAnimation(getAnimation(subjectTextView));
+			instdOfTextView.startAnimation(getAnimation(instdOfTextView));
+			instdTeacherTextView.startAnimation(getAnimation(instdTeacherTextView));
+			kindTextView.startAnimation(getAnimation(kindTextView));
+			substTeacherTextView.startAnimation(getAnimation(substTeacherTextView));
+			textTextView.startAnimation(getAnimation(textTextView));
+			infoTextView.startAnimation(getAnimation(infoTextView));
+			
+			return true;
+		}
 	}
 	
 	private class ExpansionAnimation extends Animation {
@@ -348,14 +365,16 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 			setDuration(ANIMATION_DURATION);
 		}
 
-		public void setOldHeight(int oldHeight) {
-			this.oldHeight = oldHeight;
-		}
-
 		@Override
 		protected void applyTransformation(float interpolatedTime, Transformation t) {
-			getLayoutParams().height = computeHeight(interpolatedTime);
+			applyNewHeight(interpolatedTime);
+			setNewBackgroundColor(interpolatedTime);
 			requestLayout();
+		}
+		
+		private void applyNewHeight(float interpolatedTime) {
+			ViewGroup.LayoutParams layoutParams = getLayoutParams();
+			layoutParams.height = computeHeight(interpolatedTime);
 		}
 		
 		private int computeHeight(float interpolatedTime) {
@@ -366,16 +385,23 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 			}
 		}
 		
-		@Override
-		public void initialize(int width, int height, int parentWidth, int parentHeight) {
-			super.initialize(width, height, parentWidth, parentHeight);
-			newHeight = height;
+		private void setNewBackgroundColor(float interpolatedTime) {
+			if (oldHeight > newHeight) {
+				interpolatedTime = 1 - interpolatedTime;
+			}
+			int backgroundAlpha = (int) (0xff * interpolatedTime) << 24;
+			int backgroundColor = backgroundAlpha ^ BACKGROUND_COLOR_RGB;
+			SubstitutionView.this.setBackgroundColor(backgroundColor);
 		}
 	}
 	
 	/**
-	 * This animation cares for {@link View}s <ul><li>coming to the screen</li>
-	 * <li>leaving the screen</li><li>staying on screen and changing position.</li></ul>
+	 * This animation cares for {@link View}s
+	 * <ul>
+	 * 		<li>coming to the screen</li>
+	 * 		<li>leaving the screen</li>
+	 * 		<li>staying on screen and changing position.</li>
+	 * </ul>
 	 * 
 	 * <p>"Coming" means View.GONE before and View.VISIBLE after layout. The view
 	 * will get faded in.
@@ -417,7 +443,7 @@ public class SubstitutionView extends FrameLayout implements Expandable, OnClick
 		
 		/**
 		 * Constructor
-		 * @param view (of type {@link View} should get supplied to get the current state at animation begin.
+		 * @param view (of type {@link View}) should get supplied to get the current state at animation begin.
 		 */
 		public RightTimeRightPlaceAnimation(View view) {
 			this.view = view;

@@ -9,13 +9,20 @@ public class ExpansionCoordinator {
 		expanded = expandable;
 		
 		if (formerExpanded == null) {
-			expanded.expand();
+			expanded.changeExpansionState();
 		} else if (formerExpanded == expanded) {
 			expanded = null;
-			formerExpanded.collapse();
+			formerExpanded.changeExpansionState();
 		} else {
-			formerExpanded.collapse();
-			expanded.expand();
+			formerExpanded.changeExpansionState();
+			expanded.changeExpansionState();
+		}
+	}
+	
+	public void removeAsExpanded(Expandable expandable) {
+		if (expanded == expandable) {
+			expanded.changeExpansionState();
+			expanded = null;
 		}
 	}
 	

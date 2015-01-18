@@ -89,7 +89,7 @@ public class IServHtmlUtil {
 			
 			// Create Plan and set data.
 			Plan plan = new Plan();
-			plan.setAsOfTime(asOfTime);
+			plan.setCreationTime(asOfTime);
 			plan.setDate(date);
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;

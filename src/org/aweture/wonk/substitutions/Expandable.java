@@ -14,16 +14,5 @@ public interface Expandable {
 	 * The {@link View} should expand. This method is the right place
 	 * to animate a transition.
 	 */
-	public void expand();
-	
-	/**
-	 * The {@link View} should collapse. This method is the right place
-	 * to animate a transition.
-	 */
-	public void collapse();
-	
-	/**
-	 * The {@link View} should set itself to collapse without animating.
-	 */
-	//public void collapseSilently();
+	public void changeExpansionState();
 }
