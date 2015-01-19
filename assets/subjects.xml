@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <subjects>
-<subject short="Bi" name="Biologie" />
-<subject short="Ch" name="Chemie" />
-<subject short="D" name="Deutsch" />
-<subject short="E" name="Englisch" />
-<subject short="Ek" name="Erdkunde" />
-<subject short="F2/3" name="Französisch" />
-<subject short="F2" name="Französisch" />
-<subject short="F3" name="Französisch" />
-<subject short="G" name="Geschichte" />
-<subject short="KfD" name="Deutsch" />
-<subject short="KfE" name="Englisch" />
-<subject short="KfM" name="Mathe" />
-<subject short="kRel" name="kath. Religion" />
-<subject short="Ku" name="Kunst" />
-<subject short="L2/3" name="Latein" />
-<subject short="L2" name="Latein" />
-<subject short="L3" name="Latein" />
-<subject short="LQ" name="LionsQuest" />
-<subject short="M" name="Mathe" />
-<subject short="MFö" name="Mathe (Förder.)" />
-<subject short="Mu" name="Musik" />
-<subject short="MZ" name="Musik" />
-<subject short="Ph" name="Physik" />
-<subject short="Phil" name="Philosophie" />
-<subject short="Rel" name="Religion" />
-<subject short="Spo" name="Sport" />
-<subject short="WP" name="Wirtschaft/Politik" />
+<subject short="Bi" name="Biologie" concurrentlyTaught="false" />
+<subject short="Ch" name="Chemie" concurrentlyTaught="false" />
+<subject short="D" name="Deutsch" concurrentlyTaught="false" />
+<subject short="E" name="Englisch" concurrentlyTaught="false" />
+<subject short="Ek" name="Erdkunde" concurrentlyTaught="false" />
+<subject short="F2/3" name="Französisch" concurrentlyTaught="true" />
+<subject short="F2" name="Französisch" concurrentlyTaught="true" />
+<subject short="F3" name="Französisch" concurrentlyTaught="true" />
+<subject short="G" name="Geschichte" concurrentlyTaught="false" />
+<subject short="KfD" name="Deutsch" concurrentlyTaught="true" />
+<subject short="KfE" name="Englisch" concurrentlyTaught="true" />
+<subject short="KfM" name="Mathe" concurrentlyTaught="true" />
+<subject short="kRel" name="kath. Religion" concurrentlyTaught="false" />
+<subject short="Ku" name="Kunst" cconcurrentlyTaught="true" />
+<subject short="L2/3" name="Latein" concurrentlyTaught="true" />
+<subject short="L2" name="Latein" concurrentlyTaught="true" />
+<subject short="L3" name="Latein" concurrentlyTaught="true" />
+<subject short="LQ" name="LionsQuest" concurrentlyTaught="false" />
+<subject short="M" name="Mathe" concurrentlyTaught="false" />
+<subject short="MFö" name="Mathe (Förder.)" concurrentlyTaught="false" />
+<subject short="Mu" name="Musik" concurrentlyTaught="true" />
+<subject short="MZ" name="Musik" concurrentlyTaught="false" />
+<subject short="Ph" name="Physik" concurrentlyTaught="false" />
+<subject short="Phil" name="Philosophie" concurrentlyTaught="true" />
+<subject short="Rel" name="Religion" concurrentlyTaught="true" />
+<subject short="Spo" name="Sport" concurrentlyTaught="false" />
+<subject short="WP" name="Wirtschaft/Politik" concurrentlyTaught="false" />
 </subjects>

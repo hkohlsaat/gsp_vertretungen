@@ -29,12 +29,9 @@ public class SubstitutionsFragment extends Fragment {
 	private RecyclerView recyclerView;
 	private RecyclerView.Adapter<Adapter.ViewHolder> adapter;
 	
-	private ExpansionCoordinator expansionCoordinator;
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		expansionCoordinator = new ExpansionCoordinator();
 		adapter = new Adapter();
 		plan = new Plan();
 		sortedClasses = new ArrayList<Class>();
@@ -91,7 +88,6 @@ public class SubstitutionsFragment extends Fragment {
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 	        ClassView view = new ClassView(getActivity());
-	        view.setExpansionCoordinatior(expansionCoordinator);
 	        ViewHolder vh = new ViewHolder(view);
 	        return vh;
 

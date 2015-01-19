@@ -81,7 +81,7 @@ public class IServHtmlUtil {
 		for (int i = 1; i < planCount * 2; i += 2) {
 			// Get as of time.
 			Node asOfTimeNode = nodeList.item(i - 1);
-			String asOfTime = getAsOfTime(asOfTimeNode);
+			String creationTime = getCreationTime(asOfTimeNode);
 			
 			// Get regarding date.
 			Element currentElement = (Element) nodeList.item(i);
@@ -89,16 +89,16 @@ public class IServHtmlUtil {
 			
 			// Create Plan and set data.
 			Plan plan = new Plan();
-			plan.setCreationTime(asOfTime);
+			plan.setCreationTime(creationTime);
 			plan.setDate(date);
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;
 		}
 	}
 	
-	private String getAsOfTime(Node node) {
-		String rawAsOfTime = node.getTextContent();
-		return rawAsOfTime.substring(7);
+	private String getCreationTime(Node node) {
+		String rawCreationTime = node.getTextContent();
+		return rawCreationTime.substring(7);
 	}
 	
 	private String getDate(Node currentPlan) {

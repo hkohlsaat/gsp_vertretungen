@@ -18,6 +18,14 @@
 		android:textSize="@dimen/text_size" />
 	
 	<TextView
+	    android:id="@+id/courseSpecificationTextView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="@dimen/row_height"
+		
+		android:gravity="center_vertical"
+	    android:textSize="@dimen/text_size" />
+	
+	<TextView
 	    android:id="@+id/instdOfTextView"
 		android:layout_width="wrap_content"
 		android:layout_height="@dimen/row_height"
