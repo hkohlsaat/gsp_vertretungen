@@ -47,8 +47,10 @@ public class SubstitutionsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.layout_recycler_view, container, false);
 		
+		// Get the RecyclerView
 		recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 		
+		// Set up the RecyclerView
 		Context context = inflater.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);

@@ -195,6 +195,8 @@ public class IServHtmlUtil {
 				int end = matcher.end();
 				String sufixQueue = compactClassName.substring(start, end);
 				for (String sufix : sufixes.split("\\?")) {
+					
+					sufix = sufix.replaceAll("\\(|\\)", "");
 					if (sufixQueue.contains(sufix)) {
 						classNames.add(prefix + sufix);
 					}

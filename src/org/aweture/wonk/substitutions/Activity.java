@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,7 +54,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		startService(new Intent(this, UpdateService.class));
+		UpdateService.startToUpdate(this);
 		return true;
 	}
 	
@@ -84,9 +85,16 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		public Fragment getItem(int index) {
+			Log.d(Activity.class.getSimpleName(), "new SubstitutionFragment at index " + index);
 			SubstitutionsFragment fragment = new SubstitutionsFragment();
 			fragment.setPlanIndex(index);
 			return fragment;
+		}
+		
+		@Override
+		public int getItemPosition(Object object) {
+			// TODO Auto-generated method stub
+			return super.getItemPosition(object);
 		}
 
 		@Override
@@ -134,7 +142,6 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		public void onReceive(Context context, Intent i) {
 			DownloadInformationIntent intent = (DownloadInformationIntent) i;
 			DownloadStates state = intent.getState();
-			
 			switch (state) {
 			case DOWNLOAD_STARTING:
 				// TODO: Start a progress bar.

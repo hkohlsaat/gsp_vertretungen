@@ -105,7 +105,7 @@ public class SubstitutionsStore {
 			// Compare the creation times.
 			String creationTime1 = plans1[0].getCreationTime();
 			String creationTime2 = plans2[0].getCreationTime();
-			return creationTime1.equals(creationTime2);
+			//return creationTime1.equals(creationTime2);
 		}
 		return false;
 	}
