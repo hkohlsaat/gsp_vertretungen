@@ -22,26 +22,30 @@ public class DataContract {
 	private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
 	
 	public static String dateToString(Calendar calendar) {
-		Date date = calendar.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		String string = sdf.format(date);
+		String string = formatToString(calendar, DATE_FORMAT);
 		return string;
 	}
 	public static String datetimeToString(Calendar calendar) {
+		String string = formatToString(calendar, DATETIME_FORMAT);
+		return string;
+	}
+	private static String formatToString(Calendar calendar, String format) {
 		Date date = calendar.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat(DATETIME_FORMAT);
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		String string = sdf.format(date);
 		return string;
 	}
+	
 	public static Calendar dateToCalendar(String dateString) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		Date date = sdf.parse(dateString);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
+		Calendar calendar = parseToCalendar(dateString, DATE_FORMAT);
 		return calendar;
 	}
 	public static Calendar datetimeToCalendar(String dateString) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat(DATETIME_FORMAT);
+		Calendar calendar = parseToCalendar(dateString, DATETIME_FORMAT);
+		return calendar;
+	}
+	private static Calendar parseToCalendar(String dateString, String format) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		Date date = sdf.parse(dateString);
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(date);
@@ -84,7 +88,7 @@ public class DataContract {
 		public static final String CONTENT_ITEM_TYPE =
 				"vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_SUBSTITUTION;
 		
-		// The table name is set dynamically. See tables_dir table for runtime name(s).
+		// The table name is set dynamically. They are stored in tables_dir table.
 		
 		public static final String COLUMN_PERIOD_NAME = "period";
 		public static final String COLUMN_PERIOD_TYPE = "INTEGER";
