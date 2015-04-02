@@ -2,6 +2,7 @@ package org.aweture.wonk.landing;
 
 import org.aweture.wonk.Application;
 import org.aweture.wonk.R;
+import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
@@ -58,7 +59,9 @@ public class Activity extends android.app.Activity {
 	private void loginSuccess() {
 		SimpleData data = SimpleData.getInstance(this);
 		data.setUserdataInserted();
-		UpdateService.startToUpdate(this);
+		startService(new Intent(this, UpdateService.class));
+		UpdateScheduler updateScheduler = new UpdateScheduler(this);
+		updateScheduler.schedule();
 		Intent intent = new Intent(this, org.aweture.wonk.overview.Activity.class);
 		startActivity(intent);
 	}

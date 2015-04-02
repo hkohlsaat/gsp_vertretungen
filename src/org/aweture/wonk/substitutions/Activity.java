@@ -54,7 +54,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		UpdateService.startToUpdate(this);
+		startService(new Intent(this, UpdateService.class));
 		return true;
 	}
 	

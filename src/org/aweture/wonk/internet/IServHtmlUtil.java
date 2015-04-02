@@ -1,4 +1,4 @@
-package org.aweture.wonk.background;
+package org.aweture.wonk.internet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

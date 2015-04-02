@@ -14,7 +14,8 @@ public class OnBootBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		UpdateService.startToUpdate(context);
+		UpdateScheduler updateScheduler = new UpdateScheduler(context);
+		updateScheduler.schedule();
 	}
 
 }
