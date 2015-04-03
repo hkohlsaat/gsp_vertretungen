@@ -5,10 +5,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.aweture.wonk.models.Class;
+import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
@@ -20,8 +22,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Xml;
 
-public class SubstitutionsStore {
-	public static final String LOG_TAG = SubstitutionsStore.class.getSimpleName();
+public class XmlSubstitutionsStore implements DataStore {
+	public static final String LOG_TAG = XmlSubstitutionsStore.class.getSimpleName();
 	
 	private static final String FILE_NAME = "substitutions.xml";
 	private static final int FILE_MODE = Context.MODE_PRIVATE;
@@ -40,27 +42,18 @@ public class SubstitutionsStore {
 	private static final String ATTRIBUTE_SUBST_TEACHER = "substTeacher";
 	private static final String ATTRIBUTE_KIND = "kind";
 	
-	private static SubstitutionsStore instance;
-	
 	private Context context;
 	private Plan[] plans;
 	
-	public static SubstitutionsStore getInstance(Context context) {
-		if (instance == null) {
-			instance = new SubstitutionsStore(context);
-		}
-		return instance;
-	}
-	
-	private SubstitutionsStore(Context context) {
+	XmlSubstitutionsStore(Context context) {
 		this.context = context;
 	}
 	
-	public synchronized Plan[] getCurrentPlans() {
+	public synchronized List<Plan> getCurrentPlans() {
 		if (plans == null) {
 			plans = readPlans();
 		}
-		return plans;
+		return Arrays.asList(plans);
 	}
 	
 	public synchronized Plan getPlanByDate(String date) {
@@ -103,8 +96,8 @@ public class SubstitutionsStore {
 				plans1.length > 0 && plans2.length > 0) {
 			
 			// Compare the creation times.
-			String creationTime1 = plans1[0].getCreationTime();
-			String creationTime2 = plans2[0].getCreationTime();
+			//String creationTime1 = plans1[0].getCreation();
+			//String creationTime2 = plans2[0].getCreation();
 			//return creationTime1.equals(creationTime2);
 		}
 		return false;
@@ -140,11 +133,13 @@ public class SubstitutionsStore {
 
 	private Plan readPlan(XmlPullParser parser) throws XmlPullParserException, IOException {
 		parser.require(XmlPullParser.START_TAG, null, TAG_PLAN);
-		String date = parser.getAttributeValue(null, ATTRIBUTE_DATE);
-		String creationTime = parser.getAttributeValue(null, ATTRIBUTE_PLAN_CREATION);
+		String dateString = parser.getAttributeValue(null, ATTRIBUTE_DATE);
+		String creationTimeString = parser.getAttributeValue(null, ATTRIBUTE_PLAN_CREATION);
 		Plan plan = new Plan();
+		Date date = Date.fromStringDate(dateString);
 		plan.setDate(date);
-		plan.setCreationTime(creationTime);
+		Date creationTime = Date.fromStringDateTime(creationTimeString);
+		plan.setCreated(creationTime);
 		
 		while (parser.nextTag() == XmlPullParser.START_TAG) {
 			// Read for each class.
@@ -206,8 +201,8 @@ public class SubstitutionsStore {
 
 	private String planToXml(Plan plan) {
 		StringBuilder builder = new StringBuilder();
-		String date = plan.getDate().toString();
-		String creationTime = plan.getCreationTime();
+		String date = plan.getDate().toDateString();
+		String creationTime = plan.getCreation().toDateTimeString();
 		builder.append("<" + TAG_PLAN);
 		builder.append(attr(ATTRIBUTE_DATE, date));
 		builder.append(attr(ATTRIBUTE_PLAN_CREATION, creationTime));

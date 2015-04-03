@@ -1,11 +1,5 @@
 package org.aweture.wonk.storage;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -17,40 +11,6 @@ public class DataContract {
 	
 	private static final String PATH_TABLE = "tables";
 	private static final String PATH_SUBSTITUTION = "substitutions";
-	
-	private static final String DATE_FORMAT = "yyyy-MM-dd";
-	private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
-	
-	public static String dateToString(Calendar calendar) {
-		String string = formatToString(calendar, DATE_FORMAT);
-		return string;
-	}
-	public static String datetimeToString(Calendar calendar) {
-		String string = formatToString(calendar, DATETIME_FORMAT);
-		return string;
-	}
-	private static String formatToString(Calendar calendar, String format) {
-		Date date = calendar.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		String string = sdf.format(date);
-		return string;
-	}
-	
-	public static Calendar dateToCalendar(String dateString) throws ParseException {
-		Calendar calendar = parseToCalendar(dateString, DATE_FORMAT);
-		return calendar;
-	}
-	public static Calendar datetimeToCalendar(String dateString) throws ParseException {
-		Calendar calendar = parseToCalendar(dateString, DATETIME_FORMAT);
-		return calendar;
-	}
-	private static Calendar parseToCalendar(String dateString, String format) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		Date date = sdf.parse(dateString);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		return calendar;
-	}
 	
 	public static final class TableEntry implements BaseColumns {
 		
@@ -70,8 +30,6 @@ public class DataContract {
 		public static final String COLUMN_CREATED_TYPE = "TEXT";
 		public static final String COLUMN_QUERIED_NAME = "queried";
 		public static final String COLUMN_QUERIED_TYPE = "TEXT";
-		public static final String COLUMN_NAME_NAME = "name";
-		public static final String COLUMN_NAME_TYPE = "TEXT";
 		
 		public static Uri appendId(long id) {
 			return ContentUris.withAppendedId(CONTENT_URI, id);

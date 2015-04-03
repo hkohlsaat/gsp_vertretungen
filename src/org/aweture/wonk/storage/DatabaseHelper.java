@@ -4,7 +4,6 @@ import org.aweture.wonk.storage.DataContract.TableEntry;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
@@ -13,8 +12,8 @@ class DatabaseHelper extends SQLiteOpenHelper{
 	private static final String DATABASE_NAME = "wonk.db";
 	private static final int DATABASE_VERSION = 3;
 
-	public DatabaseHelper(Context context, CursorFactory factory) {
-		super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+	public DatabaseHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
 	@Override
@@ -23,8 +22,7 @@ class DatabaseHelper extends SQLiteOpenHelper{
 				TableEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				TableEntry.COLUMN_DATE_NAME + " " + TableEntry.COLUMN_DATE_TYPE + ", " +
 				TableEntry.COLUMN_CREATED_NAME + " " + TableEntry.COLUMN_CREATED_TYPE + ", " +
-				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ", " +
-				TableEntry.COLUMN_NAME_NAME + " " + TableEntry.COLUMN_NAME_TYPE + ")";
+				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ")";
 		db.execSQL(creationSQL);
 	}
 

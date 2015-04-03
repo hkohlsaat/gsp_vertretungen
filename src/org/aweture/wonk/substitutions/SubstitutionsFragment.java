@@ -8,7 +8,8 @@ import java.util.List;
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.storage.SubstitutionsStore;
+import org.aweture.wonk.storage.DataStore;
+import org.aweture.wonk.storage.DataStoreFactory;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -70,9 +71,9 @@ public class SubstitutionsFragment extends Fragment {
 		Bundle argumentBundle = getArguments();
 		int planIndex = argumentBundle.getInt(PLAN_INDEX_ARGUMENT);
 		
-		// Access the SubstitutionsStore and store the plan.
-		SubstitutionsStore dataStore = SubstitutionsStore.getInstance(context);
-		plan = dataStore.getCurrentPlans()[planIndex];
+		// Access the XmlSubstitutionsStore and store the plan.
+		DataStore dataStore = DataStoreFactory.getDataStore(context);
+		plan = dataStore.getCurrentPlans().get(planIndex);
 		
 		// Obtain a list with all classes sorted.
 		sortedClasses.clear();

@@ -1,4 +1,4 @@
-package org.aweture.wonk.internet;
+package org.aweture.wonk.background;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.aweture.wonk.models.Class;
+import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
 import org.w3c.dom.Document;
@@ -85,11 +86,13 @@ public class IServHtmlUtil {
 			
 			// Get regarding date.
 			Element currentElement = (Element) nodeList.item(i);
-			String date = getDate(currentElement.getElementsByTagName("div").item(0));
+			String dateString = getDate(currentElement.getElementsByTagName("div").item(0));
 			
 			// Create Plan and set data.
 			Plan plan = new Plan();
-			plan.setCreationTime(creationTime);
+			Date creation = Date.fromStringDateTime(creationTime);
+			plan.setCreated(creation);
+			Date date = Date.fromStringDate(dateString);
 			plan.setDate(date);
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;

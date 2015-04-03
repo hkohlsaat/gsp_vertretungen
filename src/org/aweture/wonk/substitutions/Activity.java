@@ -1,12 +1,15 @@
 package org.aweture.wonk.substitutions;
 
+import java.util.List;
+
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.DataStore;
+import org.aweture.wonk.storage.DataStoreFactory;
 import org.aweture.wonk.storage.DownloadInformationIntent;
 import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
-import org.aweture.wonk.storage.SubstitutionsStore;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -104,8 +107,8 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		@Override
 		public CharSequence getPageTitle(int position) {
-			SubstitutionsStore dataStore = SubstitutionsStore.getInstance(Activity.this);
-			Plan plan = dataStore.getCurrentPlans()[position];
+			DataStore dataStore = DataStoreFactory.getDataStore(Activity.this);
+			Plan plan = dataStore.getCurrentPlans().get(position);
 			Date date = plan.getDate();
 			String relativeWord = date.resolveToRelativeWord();
 			if (relativeWord != null) {
@@ -119,9 +122,9 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		protected Integer doInBackground(Void... params) {
-			SubstitutionsStore dataStore = SubstitutionsStore.getInstance(Activity.this);
-			Plan[] plans = dataStore.getCurrentPlans();
-			return plans.length;
+			DataStore dataStore = DataStoreFactory.getDataStore(Activity.this);
+			List<Plan> plans = dataStore.getCurrentPlans();
+			return plans.size();
 		}
 		
 		@Override
@@ -153,8 +156,8 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 				// TODO: Stop things from DOWLOAD_STARTING case.
 				break;
 			case NEW_DATA_SAVED:
-				SubstitutionsStore dataStore = SubstitutionsStore.getInstance(Activity.this);
-				int planCount = dataStore.getCurrentPlans().length;
+				DataStore dataStore = DataStoreFactory.getDataStore(Activity.this);
+				int planCount = dataStore.getCurrentPlans().size();
 				FragmentPagerAdapter adapter = (FragmentPagerAdapter) viewPager.getAdapter();
 				adapter.planCount = planCount;
 				adapter.notifyDataSetChanged();

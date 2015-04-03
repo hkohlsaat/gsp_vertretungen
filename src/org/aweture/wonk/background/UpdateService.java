@@ -3,19 +3,18 @@ package org.aweture.wonk.background;
 import java.io.IOException;
 
 import org.aweture.wonk.Application;
-import org.aweture.wonk.internet.IServHtmlUtil;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.DataStoreFactory;
 import org.aweture.wonk.storage.DownloadInformationIntent;
 import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
+import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.SimpleData;
-import org.aweture.wonk.storage.SubstitutionsStore;
+import org.aweture.wonk.storage.XmlSubstitutionsStore;
 
-import android.app.AlarmManager;
 import android.app.IntentService;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
@@ -110,7 +109,7 @@ public class UpdateService extends IntentService {
 		IServHtmlUtil iServHtmlTable = new IServHtmlUtil(plan);
 		Plan[] plans = iServHtmlTable.toPlans();
 		Context context = getApplicationContext();
-		SubstitutionsStore substitutionsStore = SubstitutionsStore.getInstance(context);
-		substitutionsStore.savePlans(plans);
+		DataStore dataStore = DataStoreFactory.getDataStore(context);
+		dataStore.savePlans(plans);
 	}
 }

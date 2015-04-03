@@ -5,49 +5,70 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
-public class Date {
+public class Date extends GregorianCalendar {
 	private static final String LOG_TAG = Date.class.getSimpleName();
+	
 	private static final String DATE_FORMAT = "dd.MM.yyyy";
+	private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm";
 	
-	private SimpleDateFormat sdf;
-	private String date;
+	public static Date fromStringDate(String date) {
+		return toDate(date, DATE_FORMAT);
+	}
 	
-	@SuppressLint("SimpleDateFormat")
-	public Date(String date) {
-		this.date = date;
-		sdf = new SimpleDateFormat(DATE_FORMAT);
+	public static Date fromStringDateTime(String dateTime) {
+		return toDate(dateTime, DATETIME_FORMAT);
+	}
+	
+	private static Date toDate(String stamp, String pattern) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			Date instance = new Date();
+			instance.setTime(sdf.parse(stamp));
+			return instance;
+		} catch (ParseException e) {
+			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+	
+	public String toDateString() {
+		return toString(DATE_FORMAT);
+	}
+	
+	public String toDateTimeString() {
+		return toString(DATETIME_FORMAT);
+	}
+	
+	private String toString(String pattern) {
+		java.util.Date date = getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		String dateString = sdf.format(date);
+		return dateString;
 	}
 	
 	@Override
 	public String toString() {
-		return date;
+		java.util.Date date = getTime();
+		return date.toString();
 	}
 	
 	public String resolveToRelativeWord() {
-		try {
-			Calendar givenDate = GregorianCalendar.getInstance();
-			givenDate.setTime(sdf.parse(date));
-			
-			Calendar yesterday = GregorianCalendar.getInstance();
-			yesterday.add(Calendar.DAY_OF_YEAR, -1);
-			
-			Calendar today = GregorianCalendar.getInstance();
+		Calendar yesterday = GregorianCalendar.getInstance();
+		yesterday.add(Calendar.DAY_OF_YEAR, -1);
+		
+		Calendar today = GregorianCalendar.getInstance();
 
-			Calendar tomorrow = GregorianCalendar.getInstance();
-			tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+		Calendar tomorrow = GregorianCalendar.getInstance();
+		tomorrow.add(Calendar.DAY_OF_YEAR, 1);
 
-			if (isSameDay(today, givenDate)) {
-				return "heute";
-			} else if (isSameDay(yesterday, givenDate)) {
-				return "gestern";
-			} else if (isSameDay(tomorrow, givenDate)) {
-				return "morgen";
-			}
-		} catch (ParseException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+		if (isSameDay(today, this)) {
+			return "heute";
+		} else if (isSameDay(yesterday, this)) {
+			return "gestern";
+		} else if (isSameDay(tomorrow, this)) {
+			return "morgen";
 		}
 		return null;
 	}

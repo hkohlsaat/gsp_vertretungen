@@ -7,7 +7,8 @@ import java.util.List;
 public class Plan extends HashMap<Class, List<Substitution>> {
 	
 	private Date date;
-	private String creationTime;
+	private Date created;
+	private Date queried; 
 
 	public Date getDate() {
 		return date;
@@ -16,15 +17,20 @@ public class Plan extends HashMap<Class, List<Substitution>> {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-	public void setDate(String date) {
-		this.date = new Date(date);
-	}
 	
-	public String getCreationTime() {
-		return creationTime;
+	public Date getCreation() {
+		return created;
 	}
 
-	public void setCreationTime(String creationTime) {
-		this.creationTime = creationTime;
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getQueried() {
+		return queried;
+	}
+
+	public void setQueried(Date queried) {
+		this.queried = queried;
 	}
 }
