@@ -5,16 +5,15 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.aweture.wonk.LogUtil;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Xml;
 
 
 public class Subjects {
-	private final String LOG_TAG = this.getClass().getSimpleName();
 	
 	private final String ATTRIBUTE_SHORT= "short";
 	private final String ATTRIBUTE_NAME = "name";
@@ -62,7 +61,7 @@ public class Subjects {
 	        	parser.nextText();
 	        }
 		} catch (IOException | XmlPullParserException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 		}
 	}
 	

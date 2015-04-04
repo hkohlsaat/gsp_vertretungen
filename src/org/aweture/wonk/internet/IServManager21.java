@@ -12,9 +12,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
+
 import javax.net.ssl.HttpsURLConnection;
+
+import org.aweture.wonk.LogUtil;
+
 import android.annotation.TargetApi;
-import android.util.Log;
 
 /**
  * {@link IServManager} implementation for API 21 and above.
@@ -24,7 +27,6 @@ import android.util.Log;
  */
 @TargetApi(21)
 public class IServManager21 implements IServManager {
-	private static final String TAG = IServManager.class.getSimpleName();
 
 	private URL iServRoot;
 	private URL iServSubstitutes;
@@ -43,9 +45,9 @@ public class IServManager21 implements IServManager {
 			iServSubstitutes = new URL("https://gsp-ploen.de/idesk/infodisplay/mods/link.local.php/panelId=50/run/Schueler_Online/subst_001.htm");
 			iServURI = new URI("https://gsp-ploen.de/");
 		} catch (MalformedURLException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 		} catch (URISyntaxException e) {
-			Log.e(TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 		}
 	}
 	
@@ -82,7 +84,7 @@ public class IServManager21 implements IServManager {
 			conn.disconnect();
 		} catch (IOException e) {
 			closeResources(conn, out);
-			Log.e(TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 			return LoginResult.NetworkFail;
 		}
 		

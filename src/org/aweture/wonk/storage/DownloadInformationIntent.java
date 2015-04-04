@@ -1,11 +1,11 @@
 package org.aweture.wonk.storage;
 
+import org.aweture.wonk.LogUtil;
+
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
 
 public class DownloadInformationIntent extends Intent {
-	private static final String LOG_TAG = DownloadInformationIntent.class.getSimpleName();
 	
 	public enum DownloadStates {
 		/** The download is about to start after informing about it. */
@@ -27,7 +27,7 @@ public class DownloadInformationIntent extends Intent {
 	
 	public void setState(DownloadStates state) {
 		putExtra(STATE_EXTRA, state);
-		Log.i(LOG_TAG, "Creating Intent with state " + state);
+		LogUtil.d("Creating Intent with state " + state);
 	}
 	
 	public DownloadStates getState() {

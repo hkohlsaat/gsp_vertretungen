@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.aweture.wonk"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -22,15 +22,13 @@
         android:supportsRtl="false" >
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
-        <activity android:name="org.aweture.wonk.overview.Activity">
+        <activity android:name="org.aweture.wonk.substitutions.Activity"
+            android:theme="@style/AppBaseCompatTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="org.aweture.wonk.substitutions.Activity"
-            android:theme="@style/AppBaseCompatTheme"
-            android:label="@string/substitutions_plan" />
         
         <service android:name="org.aweture.wonk.background.UpdateService" />
 		<receiver android:name="org.aweture.wonk.background.OnBootBroadcastReceiver">

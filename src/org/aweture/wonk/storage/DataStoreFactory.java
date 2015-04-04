@@ -14,7 +14,7 @@ public class DataStoreFactory {
 	}
 	
 	private static DataStore createStore(Context context) {
-		return new XmlSubstitutionsStore(context);
+		return new DatabaseDataStore(context);
 	}
 
 }

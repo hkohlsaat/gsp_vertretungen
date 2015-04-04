@@ -117,7 +117,12 @@ public class SubstitutionsFragment extends Fragment {
 
 		@Override
 		public int compare(Class lhs, Class rhs) {
-			int difference = lhs.getGrade() - rhs.getGrade();
+			int difference;
+			if (areBothOberstufe(lhs, rhs) && isOnlyOneALetterGrader(lhs, rhs)) {
+				difference = lhs.isLetterGrader() ? -1 : 1;
+			} else {
+				difference = lhs.getGrade() - rhs.getGrade();
+			}
 			if (difference > 0) {
 				return 1;
 			} else if (difference < 0) {
@@ -125,6 +130,14 @@ public class SubstitutionsFragment extends Fragment {
 			} else {
 				return lhs.getName().compareTo(rhs.getName());
 			}
+		}
+		
+		private boolean areBothOberstufe(Class x, Class y) {
+			return x.isOberstufe() && y.isOberstufe();
+		}
+		
+		private boolean isOnlyOneALetterGrader(Class x, Class y) {
+			return x.isLetterGrader() ^ y.isLetterGrader();
 		}
 	}
 }

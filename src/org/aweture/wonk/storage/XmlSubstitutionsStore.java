@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
@@ -19,11 +20,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.util.Xml;
 
 public class XmlSubstitutionsStore implements DataStore {
-	public static final String LOG_TAG = XmlSubstitutionsStore.class.getSimpleName();
 	
 	private static final String FILE_NAME = "substitutions.xml";
 	private static final int FILE_MODE = Context.MODE_PRIVATE;
@@ -85,7 +84,7 @@ public class XmlSubstitutionsStore implements DataStore {
 			outputStreamWriter.close();
 			
 		} catch (IOException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 		}
 	}
 	
@@ -126,7 +125,7 @@ public class XmlSubstitutionsStore implements DataStore {
 	        }
 	        plans = planList.toArray(new Plan[planList.size()]);
 		} catch (IOException | XmlPullParserException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 		}
 		return plans;
 	}

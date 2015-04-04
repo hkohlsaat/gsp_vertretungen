@@ -47,7 +47,7 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 		a.recycle();
 		setBackgroundColor(backgroundColor);
 		
-		int indicatorHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+		int indicatorHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
 		indicator = new Rect(0, 0, 0, indicatorHeight);
 		
 		indicatorPaint = new Paint();
@@ -128,15 +128,15 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 			indicator.left = leftTextView.getLeft();
 			indicator.right = leftTextView.getRight();
 			int heigt = indicator.height();
-			indicator.bottom = getHeight() - 1;
+			indicator.bottom = getHeight();
 			indicator.top = indicator.bottom - heigt;
 			
 			if (positionOffset != 0) {
-				float partOfRight = (float) Math.pow(positionOffset, 2);
+				float partOfRight = (float) positionOffset;
 				int rightLength = (int) (getChildAt(position + 1).getWidth() * partOfRight);
 				indicator.right += rightLength;
 				
-				float partOfLeft = (float) Math.pow(1 - positionOffset, 2);
+				float partOfLeft = (float) 1 - positionOffset;
 				int leftLenght = (int) (leftTextView.getWidth() * partOfLeft);
 				indicator.left += leftTextView.getWidth() - leftLenght;
 			}

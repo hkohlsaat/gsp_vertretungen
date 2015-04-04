@@ -62,8 +62,9 @@ public class Activity extends android.app.Activity {
 		startService(new Intent(this, UpdateService.class));
 		UpdateScheduler updateScheduler = new UpdateScheduler(this);
 		updateScheduler.schedule();
-		Intent intent = new Intent(this, org.aweture.wonk.overview.Activity.class);
+		Intent intent = new Intent(this, org.aweture.wonk.substitutions.Activity.class);
 		startActivity(intent);
+		finish();
 	}
 
 	private void loginNetworkFail() {

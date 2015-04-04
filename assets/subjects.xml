@@ -22,6 +22,8 @@
 <subject short="MFö" name="Mathe (Förder.)" concurrentlyTaught="false" />
 <subject short="Mu" name="Musik" concurrentlyTaught="true" />
 <subject short="MZ" name="Musik" concurrentlyTaught="false" />
+<subject short="O-Ch" name="Oberstufenchor" concurrentlyTaught="true" />
+<subject short="OrCh" name="Orchester" concurrentlyTaught="true" />
 <subject short="Ph" name="Physik" concurrentlyTaught="false" />
 <subject short="Phil" name="Philosophie" concurrentlyTaught="true" />
 <subject short="Rel" name="Religion" concurrentlyTaught="true" />

@@ -2,7 +2,7 @@
 <resources>
 	
     <!-- Strings regarding the app in general -->
-    <string name="app_name">Streber</string>
+    <string name="app_name">Vertretungen</string>
     <string name="substitutions_plan">Vertretungsplan</string>
     <string name="timetable">Stundenplan</string>
     
@@ -11,8 +11,8 @@
     
     <!-- Strings regarding landing section -->
     <string name="welcome">Willkommen</string>
-    <string name="intro">Diese freshe App zeigt Euch den brandaktuellen Vertretungsplan und Euren echtzeit Stundenplan.</string>
-    <string name="data_insert">Der Vertretungsplan wird von der Webseite heruntergeladen. Dafür müsst Ihr zunächst Eure Zugangsdaten angeben. Sie werden nur auf diesem Gerät gespeichert und lediglich für die Anmeldung bei gsp-ploen.de/iserv verwendet.</string>
+    <string name="intro">Diese App zeigt Dir den aktuellen Vertretungsplan des Gymnasiums Schloss Plön.</string>
+    <string name="data_insert">Der Vertretungsplan wird von der Webseite heruntergeladen. Dafür musst Du zunächst Deine Zugangsdaten angeben. Sie werden nur auf diesem Gerät gespeichert und lediglich für die Anmeldung bei gsp-ploen.de/iserv verwendet.</string>
     <string name="username">Dein Nutzername</string>
     <string name="password">Dein Passwort</string>
     <string name="login">Login</string>

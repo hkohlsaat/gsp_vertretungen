@@ -5,10 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.util.Log;
+import org.aweture.wonk.LogUtil;
 
 public class Date extends GregorianCalendar {
-	private static final String LOG_TAG = Date.class.getSimpleName();
 	
 	private static final String DATE_FORMAT = "dd.MM.yyyy";
 	private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm";
@@ -28,7 +27,7 @@ public class Date extends GregorianCalendar {
 			instance.setTime(sdf.parse(stamp));
 			return instance;
 		} catch (ParseException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 			throw new RuntimeException(e.getMessage());
 		}
 	}

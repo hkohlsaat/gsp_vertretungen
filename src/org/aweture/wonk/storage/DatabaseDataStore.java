@@ -78,7 +78,8 @@ public class DatabaseDataStore implements DataStore {
 			
 			plans.add(plan);
 			
-			Cursor substitutionsCursor = database.query(dateString, null, null, null, null, null, null);
+			final String substitutionsTableName = "\"" + dateString + "\"";
+			Cursor substitutionsCursor = database.query(substitutionsTableName, null, null, null, null, null, null);
 
 			final int periodIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_PERIOD_NAME);
 			final int substTeacherIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_NAME);
@@ -121,6 +122,7 @@ public class DatabaseDataStore implements DataStore {
 		}
 		
 		plansCursor.close();
+		database.close();
 		return plans;
 	}
 	
@@ -141,7 +143,8 @@ public class DatabaseDataStore implements DataStore {
 			planValues.put(DataContract.TableEntry.COLUMN_QUERIED_NAME, queriedString);
 			database.insert(tableName, null, planValues);
 			
-			database.execSQL("CREATE TABLE IF NOT EXISTS " + dateString + " ("
+			final String substitutionsTableName = "\"" + dateString + "\"";
+			database.execSQL("CREATE TABLE IF NOT EXISTS " + substitutionsTableName + " ("
 					+ DataContract.SubstitutionEntry.COLUMN_PERIOD_NAME + " " + DataContract.SubstitutionEntry.COLUMN_PERIOD_TYPE + ", "
 					+ DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_NAME + " " + DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_TYPE + ", "
 					+ DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_NAME + " " + DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_TYPE + ", "
@@ -172,10 +175,11 @@ public class DatabaseDataStore implements DataStore {
 					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_KIND_NAME, kind);
 					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_TEXT_NAME, text);
 					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_CLASS_NAME, className);
-					database.insert(dateString, null, substitutionValues);
+					database.insert(substitutionsTableName, null, substitutionValues);
 				}
 			}
 		}
+		database.close();
 	}
 	
 	private void resetDatabase(SQLiteDatabase database) {
@@ -185,8 +189,8 @@ public class DatabaseDataStore implements DataStore {
 		final int dateIndex = plansCursor.getColumnIndexOrThrow(DataContract.TableEntry.COLUMN_DATE_NAME);
 		
 		while (plansCursor.moveToNext()) {
-			final String dateString = plansCursor.getString(dateIndex);
-			database.execSQL("DROP TABLE IF EXISTS " + dateString);
+			final String substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + "\"";
+			database.execSQL("DROP TABLE IF EXISTS " + substitutionsTableName);
 		}
 		
 		plansCursor.close();

@@ -2,6 +2,7 @@ package org.aweture.wonk.substitutions;
 
 import java.util.List;
 
+import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
@@ -9,6 +10,7 @@ import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.DataStoreFactory;
 import org.aweture.wonk.storage.DownloadInformationIntent;
+import org.aweture.wonk.storage.SimpleData;
 import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
 
 import android.content.BroadcastReceiver;
@@ -20,7 +22,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,14 +39,21 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.activity_substitutions);
-		
-		viewPager = (ViewPager) findViewById(R.id.pager);
-		tabStrip = (TabStrip) findViewById(R.id.tabStrip);
-		tabStrip.setViewPager(viewPager);
-		
-    	PlanLoader loader = new PlanLoader();
-    	loader.execute();
+		SimpleData data = SimpleData.getInstance(this);
+		if (!data.isUserdataInserted(false)) {
+			Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
+			startActivity(intent);
+			finish();
+		} else {
+			setContentView(R.layout.activity_substitutions);
+			
+			viewPager = (ViewPager) findViewById(R.id.pager);
+			tabStrip = (TabStrip) findViewById(R.id.tabStrip);
+			tabStrip.setViewPager(viewPager);
+			
+	    	PlanLoader loader = new PlanLoader();
+	    	loader.execute();
+		}
 	}
 	
 	@Override
@@ -88,7 +96,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		public Fragment getItem(int index) {
-			Log.d(Activity.class.getSimpleName(), "new SubstitutionFragment at index " + index);
+			LogUtil.d("new SubstitutionFragment at index " + index);
 			SubstitutionsFragment fragment = new SubstitutionsFragment();
 			fragment.setPlanIndex(index);
 			return fragment;
@@ -114,7 +122,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			if (relativeWord != null) {
 				return relativeWord;
 			}
-			return date.toString();
+			return date.toDateString();
 		}
 	}
 	

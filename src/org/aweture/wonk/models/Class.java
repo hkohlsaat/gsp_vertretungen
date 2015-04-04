@@ -11,6 +11,15 @@ public class Class {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public boolean isLetterGrader() {
+		char firstChar = name.charAt(0);
+		return Character.isLetter(firstChar);
+	}
+	
+	public boolean isOberstufe() {
+		return getGrade() > 10;
+	}
 
 	public int getGrade() {
 		char firstChar = name.charAt(0);

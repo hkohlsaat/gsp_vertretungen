@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
@@ -22,8 +23,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import android.util.Log;
 
 /**
  * Utility class to transform the at times messy html returned
@@ -94,6 +93,7 @@ public class IServHtmlUtil {
 			plan.setCreated(creation);
 			Date date = Date.fromStringDate(dateString);
 			plan.setDate(date);
+			plan.setQueried(new Date());
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;
 		}
@@ -183,7 +183,7 @@ public class IServHtmlUtil {
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"11", "12", "13"}, "g?n?s?");
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?N?S?L?W?");
 		if (!compactClassName.isEmpty()) {
-			Log.w(IServHtmlUtil.class.getSimpleName(), "Class names not fully solved: " + compactClassName);
+			LogUtil.w("Class names not fully solved: " + compactClassName);
 		}
 		return classNames.toArray(new String[classNames.size()]);
 	}
@@ -191,7 +191,7 @@ public class IServHtmlUtil {
 	private String filterClassNames(List<String> classNames, String compactClassName, String[] prefixes, String sufixes) {
 		for (String prefix : prefixes) {
 
-			Pattern pattern = Pattern.compile("^" + prefix + sufixes);
+			Pattern pattern = Pattern.compile(prefix + sufixes);
 			Matcher matcher = pattern.matcher(compactClassName);
 			if (matcher.find()) {
 				int start = matcher.start() + prefix.length();

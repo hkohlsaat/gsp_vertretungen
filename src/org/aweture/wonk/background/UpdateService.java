@@ -3,28 +3,26 @@ package org.aweture.wonk.background;
 import java.io.IOException;
 
 import org.aweture.wonk.Application;
+import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.DataStoreFactory;
 import org.aweture.wonk.storage.DownloadInformationIntent;
 import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
-import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.SimpleData;
-import org.aweture.wonk.storage.XmlSubstitutionsStore;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 public class UpdateService extends IntentService {
-	private static final String LOG_TAG = UpdateService.class.getSimpleName();
 
 	public UpdateService() {
-		super(LOG_TAG);
+		super(UpdateService.class.getSimpleName());
 	}
 
 	@Override
@@ -75,13 +73,13 @@ public class UpdateService extends IntentService {
 			
 			saveSubstitutionsPlan(plan);
 		} catch (IOException e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 			// This catch-clause will only get executed when the download procedure
 			// failed. Inform about update abortion.
 			reportUpdateAborted();
 			return false;
 		} catch (Exception e) {
-			Log.e(LOG_TAG, Log.getStackTraceString(e));
+			LogUtil.e(e);
 			return false;
 		}
 		return true;
