@@ -22,6 +22,7 @@
         android:supportsRtl="false" >
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
+        <activity android:name="org.aweture.wonk.tmp.Activity" />
         <activity android:name="org.aweture.wonk.substitutions.Activity"
             android:theme="@style/AppBaseCompatTheme" >
             <intent-filter>

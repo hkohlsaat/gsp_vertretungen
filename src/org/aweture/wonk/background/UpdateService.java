@@ -1,23 +1,24 @@
 package org.aweture.wonk.background;
 
-import java.io.IOException;
+import java.util.List;
 
 import org.aweture.wonk.Application;
 import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManager21;
+import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.storage.DataContract;
 import org.aweture.wonk.storage.DataStore;
-import org.aweture.wonk.storage.DataStoreFactory;
-import org.aweture.wonk.storage.DownloadInformationIntent;
-import org.aweture.wonk.storage.DownloadInformationIntent.DownloadStates;
+import org.aweture.wonk.storage.DatabaseHelper;
 import org.aweture.wonk.storage.SimpleData;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import android.database.sqlite.SQLiteDatabase;
 
 public class UpdateService extends IntentService {
 
@@ -64,50 +65,30 @@ public class UpdateService extends IntentService {
 	}
 	
 	private boolean update(IServManager iServManager) {
-		// Inform about update start.
-		reportUpdateStart();
 		try {
 			String plan = iServManager.downloadSubstitutionPlan();
-			// Inform about update completeness.
-			reportUpdateComplete();
-			
 			saveSubstitutionsPlan(plan);
-		} catch (IOException e) {
-			LogUtil.e(e);
-			// This catch-clause will only get executed when the download procedure
-			// failed. Inform about update abortion.
-			reportUpdateAborted();
-			return false;
+			return true;
 		} catch (Exception e) {
 			LogUtil.e(e);
 			return false;
 		}
-		return true;
-	}
-	
-	private void reportUpdateStart() {
-		DownloadInformationIntent intent = new DownloadInformationIntent();
-		intent.setState(DownloadStates.DOWNLOAD_STARTING);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-	}
-	
-	private void reportUpdateAborted() {
-		DownloadInformationIntent intent = new DownloadInformationIntent();
-		intent.setState(DownloadStates.DOWNLOAD_ABORTED);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-	}
-	
-	private void reportUpdateComplete() {
-		DownloadInformationIntent intent = new DownloadInformationIntent();
-		intent.setState(DownloadStates.DOWNLOAD_COMPLETE);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 	
 	private void saveSubstitutionsPlan(String plan) throws Exception {
 		IServHtmlUtil iServHtmlTable = new IServHtmlUtil(plan);
-		Plan[] plans = iServHtmlTable.toPlans();
+		List<Plan> plans = iServHtmlTable.toPlans();
 		Context context = getApplicationContext();
-		DataStore dataStore = DataStoreFactory.getDataStore(context);
+		DataStore dataStore = DataStore.getInstance(context);
 		dataStore.savePlans(plans);
+		
+		// WHEN DELETING THE TEST CODE HEREAFTER:
+		// MAKE DATABASEHELPER CLASS DEFAULT AGAIN !!!!!!
+		DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
+		SQLiteDatabase database = helper.getWritableDatabase();
+		ContentValues v = new ContentValues();
+		v.put(DataContract.TableEntry.COLUMN_QUERIED_NAME, new Date().toDateTimeString());
+		database.insert("queries", null, v);
+		database.close();
 	}
 }

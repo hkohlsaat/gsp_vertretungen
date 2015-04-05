@@ -8,6 +8,7 @@
     
     <!-- Strings regarding actions -->
     <string name="action_update">Aktualisieren</string>
+    <string name="action_see_queries">See queries</string>
     
     <!-- Strings regarding landing section -->
     <string name="welcome">Willkommen</string>

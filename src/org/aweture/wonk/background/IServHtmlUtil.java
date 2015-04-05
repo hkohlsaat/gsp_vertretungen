@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,13 +35,13 @@ import org.xml.sax.SAXException;
 public class IServHtmlUtil {
 	
 	private String plan;
-	private Plan[] plans;
+	private List<Plan> plans;
 	
 	public IServHtmlUtil(String plan) {
 		this.plan = plan;
 	}
 	
-	public Plan[] toPlans() throws UnsupportedEncodingException, SAXException, IOException, ParserConfigurationException {
+	public List<Plan> toPlans() throws UnsupportedEncodingException, SAXException, IOException, ParserConfigurationException {
 		prepareForParsing();
 		Document document = parseToDocument();
 		Element rootElement = (Element) document.getFirstChild();
@@ -76,7 +77,7 @@ public class IServHtmlUtil {
 	private void readPlans(NodeList nodeList) {
 		// Initialize a Plan[].
 		int planCount = nodeList.getLength() / 2;
-		plans = new Plan[planCount];
+		Plan[] plans = new Plan[planCount];
 		// Fill the Plan[].
 		for (int i = 1; i < planCount * 2; i += 2) {
 			// Get as of time.
@@ -97,6 +98,7 @@ public class IServHtmlUtil {
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
 			plans[(i - 1) / 2] = plan;
 		}
+		this.plans = Arrays.asList(plans);
 	}
 	
 	private String getCreationTime(Node node) {

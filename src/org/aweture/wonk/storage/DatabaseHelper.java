@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-class DatabaseHelper extends SQLiteOpenHelper{
+public class DatabaseHelper extends SQLiteOpenHelper{
 	
 	private static final String DATABASE_NAME = "wonk.db";
 	private static final int DATABASE_VERSION = 3;
@@ -22,6 +22,10 @@ class DatabaseHelper extends SQLiteOpenHelper{
 				TableEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				TableEntry.COLUMN_DATE_NAME + " " + TableEntry.COLUMN_DATE_TYPE + ", " +
 				TableEntry.COLUMN_CREATED_NAME + " " + TableEntry.COLUMN_CREATED_TYPE + ", " +
+				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ")";
+		db.execSQL(creationSQL);
+		creationSQL = "CREATE TABLE queries (" +
+				TableEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ")";
 		db.execSQL(creationSQL);
 	}

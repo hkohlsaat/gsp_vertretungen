@@ -17,10 +17,21 @@ public class LogUtil {
 		Log.e(getTag(), stackTraceString);
 	}
 	
+	public static void currentMethod() {
+		String tag = getTag();
+		String message = "in " + tag + "#" + getMethodName();
+		Log.d(tag, message);
+	}
+	
 	private static String getTag() {
-		String fileName = Thread.currentThread().getStackTrace()[4].getFileName();
-		String tag = fileName.replace(".java", "");
+		String fullClassName = Thread.currentThread().getStackTrace()[4].getClassName();
+		int simpleNameStart = fullClassName.lastIndexOf(".") + 1;
+		String tag = fullClassName.substring(simpleNameStart);
 		return tag;
+	}
+	
+	private static String getMethodName() {
+		return Thread.currentThread().getStackTrace()[4].getMethodName();
 	}
 
 }

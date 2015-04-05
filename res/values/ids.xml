@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="substitutions_Activty_PlansLoader" type="id" ></item>
+    <item name="substitutions_Fragement_PlansLoader" type="id" ></item>
+</resources>

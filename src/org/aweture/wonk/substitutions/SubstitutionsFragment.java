@@ -8,12 +8,14 @@ import java.util.List;
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.storage.DataStore;
-import org.aweture.wonk.storage.DataStoreFactory;
+import org.aweture.wonk.storage.PlansLoader;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,24 +26,26 @@ public class SubstitutionsFragment extends Fragment {
 	
 	private static final String PLAN_INDEX_ARGUMENT = "plan_index";
 	
-	private Plan plan;
-	private List<Class> sortedClasses;
-	
 	private RecyclerView recyclerView;
-	private RecyclerView.Adapter<Adapter.ViewHolder> adapter;
+	private Adapter adapter;
+	
+	private int planIndex;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		adapter = new Adapter();
-		plan = new Plan();
-		sortedClasses = new ArrayList<Class>();
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setupData(getActivity());
+		LoaderManager manager = getLoaderManager();
+		manager.initLoader(R.id.substitutions_Fragement_PlansLoader, null, adapter);
+
+		// Get the arguments and obtain the planIndex.
+		Bundle argumentBundle = getArguments();
+		planIndex = argumentBundle.getInt(PLAN_INDEX_ARGUMENT);
 	}
 	
 	@Override
@@ -66,22 +70,15 @@ public class SubstitutionsFragment extends Fragment {
 		setArguments(argumentBundle);
 	}
 	
-	public void setupData(Context context) {
-		// Get the arguments and obtain the planIndex.
-		Bundle argumentBundle = getArguments();
-		int planIndex = argumentBundle.getInt(PLAN_INDEX_ARGUMENT);
+	private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements LoaderCallbacks<List<Plan>> {
 		
-		// Access the XmlSubstitutionsStore and store the plan.
-		DataStore dataStore = DataStoreFactory.getDataStore(context);
-		plan = dataStore.getCurrentPlans().get(planIndex);
+		private List<Class> sortedClasses;
+		private Plan plan;
 		
-		// Obtain a list with all classes sorted.
-		sortedClasses.clear();
-		sortedClasses.addAll(plan.keySet());
-		Collections.sort(sortedClasses, new ClassComparator());
-	}
-	
-	private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+		public Adapter() {
+			sortedClasses = new ArrayList<Class>();
+			plan = new Plan();
+		}
 		
 		@Override
 		public int getItemCount() {
@@ -110,6 +107,30 @@ public class SubstitutionsFragment extends Fragment {
 				super(itemView);
 				classView = itemView;
 			}
+		}
+
+		@Override
+		public Loader<List<Plan>> onCreateLoader(int id, Bundle args) {
+			return new PlansLoader(getActivity());
+		}
+
+		@Override
+		public void onLoadFinished(Loader<List<Plan>> loader, List<Plan> planList) {
+			plan = planList.get(planIndex);
+			
+			// Obtain a list with all classes sorted.
+			sortedClasses.clear();
+			sortedClasses.addAll(plan.keySet());
+			Collections.sort(sortedClasses, new ClassComparator());
+			
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public void onLoaderReset(Loader<List<Plan>> arg0) {
+			plan = new Plan();
+			sortedClasses.clear();
+			notifyDataSetChanged();
 		}
 	}
 	

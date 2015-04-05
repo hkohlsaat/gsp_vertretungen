@@ -1,7 +1,5 @@
 package org.aweture.wonk.storage;
 
-import org.aweture.wonk.LogUtil;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -38,7 +36,6 @@ public class SimpleData {
 		setUserdataInserted(true);
 	}
 	public void setUserdataInserted(boolean isInserted) {
-		LogUtil.d(Boolean.toString(isInserted));
 		Editor editor = sharedPreferences.edit();
 		editor.putBoolean(KEY_USERDATA_INSERTED, isInserted);
 		editor.apply();
