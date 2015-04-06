@@ -1,14 +1,19 @@
 package org.aweture.wonk.substitutions;
 
+import org.aweture.wonk.LogUtil;
+
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.appcompat.R;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -29,19 +34,27 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 	private ViewPager viewPager;
 
 	public TabStrip(Context context) {
-		this(context, null, 0, 0);
+		super(context);
+		init(context, null);
 	}
 	public TabStrip(Context context, AttributeSet attrs) {
-		this(context, attrs, 0, 0);
+		super(context, attrs);
+		init(context, attrs);
 	}
 	public TabStrip(Context context, AttributeSet attrs, int defStyleAttr) {
-		this(context, attrs, defStyleAttr, 0);
+		super(context, attrs, defStyleAttr);
+		init(context, attrs);
 	}
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public TabStrip(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
+		init(context, attrs);
+	}
+	
+	private void init(Context context, AttributeSet attrs) {
 		setOrientation(HORIZONTAL);
 		
-		int[] textSizeAttr = new int[]{android.R.attr.colorPrimary};
+		int[] textSizeAttr = new int[]{R.attr.colorPrimary};
 		TypedArray a = context.obtainStyledAttributes(attrs, textSizeAttr);
 		int backgroundColor = a.getColor(0, 0xffffffff);
 		a.recycle();
@@ -54,11 +67,12 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 		indicatorPaint.setColor(0xfFffffff);
 	}
 	
+	
 	public void setViewPager(ViewPager viewPager) {
 		this.viewPager = viewPager;
 		viewPager.setOnPageChangeListener(this);
 	}
-	
+
 	public void setTabsFromPagerAdapter(PagerAdapter pagerAdapter) {
 		removeAllViews();
 		
@@ -66,6 +80,8 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 		for (int i = 0; i < pages; i++) {
 			addTab(pagerAdapter.getPageTitle(i), i);
 		}
+		TextView tv = (TextView) getChildAt(0);
+		tv.setTextColor(0xffffffff);
 	}
 	
 	public int addTab(CharSequence tabText, int tabNr) {

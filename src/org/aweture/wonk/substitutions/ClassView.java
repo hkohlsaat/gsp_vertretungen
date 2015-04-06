@@ -5,12 +5,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Substitution;
-
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -29,16 +29,24 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	private Queue<SubstitutionView> itemOverflow;
 
 	public ClassView(Context context) {
-		this(context, null);
+		super(context);
+		init(context);
 	}
 	public ClassView(Context context, AttributeSet attrs) {
-		this(context, attrs, 0);
+		super(context, attrs);
+		init(context);
 	}
 	public ClassView(Context context, AttributeSet attrs, int defStyleAttr) {
-		this(context, attrs, defStyleAttr, 0);
+		super(context, attrs, defStyleAttr);
+		init(context);
 	}
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public ClassView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
+		init(context);
+	}
+	
+	private void init(Context context) {
 		setOrientation(VERTICAL);
 		LayoutInflater.from(context).inflate(R.layout.view_class, this, true);
 

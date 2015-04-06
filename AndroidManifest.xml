@@ -5,8 +5,8 @@
     android:versionName="1.1" >
 
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="21" />
+        android:minSdkVersion="15"
+        android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,13 +18,11 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="org.aweture.wonk.Application"
-        android:supportsRtl="false" >
+        android:name="org.aweture.wonk.Application" >
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
         <activity android:name="org.aweture.wonk.tmp.Activity" />
-        <activity android:name="org.aweture.wonk.substitutions.Activity"
-            android:theme="@style/AppBaseCompatTheme" >
+        <activity android:name="org.aweture.wonk.substitutions.Activity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
