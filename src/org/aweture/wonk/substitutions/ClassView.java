@@ -108,13 +108,6 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	
 	@Override
 	public int compare(Substitution lhs, Substitution rhs) {
-		int difference = lhs.getPeriodNumber() - rhs.getPeriodNumber();
-		if (difference > 0) {
-			return 1;
-		} else if (difference < 0) {
-			return -1;
-		} else {
-			return 0;
-		}
+		return lhs.getPeriodNumber() - rhs.getPeriodNumber();
 	}
 }

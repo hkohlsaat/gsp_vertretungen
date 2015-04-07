@@ -44,9 +44,8 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			
 			viewPager = (ViewPager) findViewById(R.id.pager);
 			tabStrip = (TabStrip) findViewById(R.id.tabStrip);
-			tabStrip.setViewPager(viewPager);
-
 			adapter = new SubstitutionsFragmentAdapter();
+			
 			viewPager.setAdapter(adapter);
 
 			LoaderManager manager = getSupportLoaderManager();
@@ -137,7 +136,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 				loadingPlaceholder.setVisibility(View.GONE);
 			}
 			
-			tabStrip.setTabsFromPagerAdapter(this);
+			tabStrip.setViewPager(viewPager);
 		}
 
 		@Override

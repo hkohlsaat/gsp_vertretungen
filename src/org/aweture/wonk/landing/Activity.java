@@ -1,7 +1,6 @@
 package org.aweture.wonk.landing;
 
 import org.aweture.wonk.Application;
-import org.aweture.wonk.LogUtil;
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.background.UpdateService;
@@ -28,11 +27,8 @@ public class Activity extends android.app.Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		LogUtil.d("1");
-	    //getActionBar().hide();
-		LogUtil.d("2");
+	    getActionBar().hide();
 		setContentView(R.layout.activity_landing);
-		LogUtil.d("3");
 		usernameInput = (EditText) findViewById(R.id.login_username);
 		passwordInput = (EditText) findViewById(R.id.login_password);
 	}

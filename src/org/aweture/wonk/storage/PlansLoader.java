@@ -22,6 +22,7 @@ public class PlansLoader extends AsyncTaskLoader<List<Plan>> {
 	@Override
 	protected void onStartLoading() {
 		forceLoad();
+		
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
 		IntentFilter filter = new IntentFilter(DataStore.NEW_PLANS_ACTION);
 		manager.registerReceiver(receiver, filter);

@@ -1,6 +1,7 @@
 package org.aweture.wonk.substitutions;
 
-import org.aweture.wonk.LogUtil;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,22 +9,18 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.appcompat.R;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-public class TabStrip extends LinearLayout implements OnPageChangeListener {
-	
-	private static final short MIN_ALPHA = 0x99;
+public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.OnTabClickListener {
 	
 	private int position;
 	private float positionOffset;
@@ -32,6 +29,7 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 	private Paint indicatorPaint;
 	
 	private ViewPager viewPager;
+	private List<Tab> tabs;
 
 	public TabStrip(Context context) {
 		super(context);
@@ -52,15 +50,18 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 	}
 	
 	private void init(Context context, AttributeSet attrs) {
+		tabs = new ArrayList<Tab>();
 		setOrientation(HORIZONTAL);
 		
-		int[] textSizeAttr = new int[]{R.attr.colorPrimary};
-		TypedArray a = context.obtainStyledAttributes(attrs, textSizeAttr);
-		int backgroundColor = a.getColor(0, 0xffffffff);
-		a.recycle();
+		TypedArray a = context.obtainStyledAttributes(attrs, new int[]{R.attr.colorPrimary});
+		final int backgroundColor = a.getColor(0, 0xffffffff);
 		setBackgroundColor(backgroundColor);
+		a.recycle();
 		
-		int indicatorHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+		final int unit = TypedValue.COMPLEX_UNIT_DIP;
+		final int value = 4;
+		final DisplayMetrics metrics = getResources().getDisplayMetrics();
+		final int indicatorHeight = (int) TypedValue.applyDimension(unit, value, metrics);
 		indicator = new Rect(0, 0, 0, indicatorHeight);
 		
 		indicatorPaint = new Paint();
@@ -68,36 +69,37 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 	}
 	
 	
-	public void setViewPager(ViewPager viewPager) {
-		this.viewPager = viewPager;
+	public void setViewPager(ViewPager pager) {
+		viewPager = pager;
 		viewPager.setOnPageChangeListener(this);
+		PagerAdapter adapter = viewPager.getAdapter();
+		setupFromAdapterInformation(adapter);
 	}
 
-	public void setTabsFromPagerAdapter(PagerAdapter pagerAdapter) {
+	private void setupFromAdapterInformation(PagerAdapter pagerAdapter) {
 		removeAllViews();
+		tabs.clear();
 		
-		int pages = pagerAdapter.getCount();
+		final int pages = pagerAdapter.getCount();
 		for (int i = 0; i < pages; i++) {
-			addTab(pagerAdapter.getPageTitle(i), i);
+			Tab tab = addTab(pagerAdapter.getPageTitle(i));
+			tabs.add(tab);
 		}
-		TextView tv = (TextView) getChildAt(0);
-		tv.setTextColor(0xffffffff);
+		
+		if (tabs.size() > 0) {
+			Tab tab = tabs.get(0);
+			tab.setVolume(1);
+		}
 	}
 	
-	public int addTab(CharSequence tabText, int tabNr) {
-		TextView textView = new TextView(getContext());
-		textView.setText(tabText);
-		textView.setGravity(Gravity.CENTER);
-		textView.setTypeface(null, Typeface.BOLD);
-		textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-		textView.setAllCaps(true);
-		textView.setTextColor((MIN_ALPHA << 24) + 0xffffff);
-		textView.setOnClickListener(new OnTabClickListener(tabNr));
+	private Tab addTab(CharSequence tabText) {
+		Tab tab = new Tab(getContext(), tabText);
+		tab.setOnTabClickListener(this);
 		
 		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT, 1);
-		addView(textView, params);
+		addView(tab.getView(), params);
 		
-		return tabNr;
+		return tab;
 	}
 	
 	@Override
@@ -109,7 +111,7 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 		this.position = position;
 		this.positionOffset = positionOffset;
 		if (getChildCount() > 0) {
-			updateTabTexts();
+			updateTabs();
 			invalidate();
 		}
 	}
@@ -118,60 +120,51 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener {
 	public void onPageSelected(int arg0) {
 	}
 	
-	private void updateTabTexts() {
-		TextView leftText = (TextView) getChildAt(position);
-		int argb = leftText.getTextColors().getDefaultColor();
-		int rgb = argb & 0xffffff;
-		int alpha = (int) (MIN_ALPHA + ((0xff - MIN_ALPHA) * (1 - positionOffset)));
-		leftText.setTextColor((alpha << 24) + rgb);
+	private void updateTabs() {
+		// update left tab
+		Tab tab = tabs.get(position);
+		tab.setVolume(1 - positionOffset);
 		
+		// update right tab
 		int rightPosition = position + 1;
-		if (rightPosition < getChildCount()) {
-			TextView rightText = (TextView) getChildAt(rightPosition);
-			argb = rightText.getTextColors().getDefaultColor();
-			rgb = argb & 0xffffff;
-			alpha = (int) (MIN_ALPHA + ((0xff - MIN_ALPHA) * positionOffset));
-			rightText.setTextColor((alpha << 24) + rgb);
+		if (tabs.size() > rightPosition) {
+			tab = tabs.get(rightPosition);
+			tab.setVolume(positionOffset);
 		}
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (getChildCount() > 0) {
+		if (getChildCount() > position) {
 			
-			TextView leftTextView = (TextView) getChildAt(position);
-			
-			indicator.left = leftTextView.getLeft();
-			indicator.right = leftTextView.getRight();
-			int heigt = indicator.height();
-			indicator.bottom = getHeight();
-			indicator.top = indicator.bottom - heigt;
-			
+			setupInticator();
 			if (positionOffset != 0) {
-				float partOfRight = (float) positionOffset;
-				int rightLength = (int) (getChildAt(position + 1).getWidth() * partOfRight);
-				indicator.right += rightLength;
-				
-				float partOfLeft = (float) 1 - positionOffset;
-				int leftLenght = (int) (leftTextView.getWidth() * partOfLeft);
-				indicator.left += leftTextView.getWidth() - leftLenght;
+				shiftIndicator();
 			}
+			
 			canvas.drawRect(indicator, indicatorPaint);
 		}
 	}
 	
-	private class OnTabClickListener implements OnClickListener {
-		private final int tabNr;
+	private void setupInticator() {
+		View view = tabs.get(position).getView();
+		indicator.top = getHeight() - indicator.height();
+		indicator.right = view.getRight();
+		indicator.bottom = getHeight();
+		indicator.left = view.getLeft();
+	}
+	
+	private void shiftIndicator() {
+		indicator.left += indicator.width() * positionOffset;
 		
-		public OnTabClickListener(int tabNr) {
-			this.tabNr = tabNr;
-		}
+		View view = tabs.get(position + 1).getView();
+		indicator.right += view.getWidth() * positionOffset;
+	}
+	
 
-		@Override
-		public void onClick(View v) {
-			if (viewPager != null) {
-				viewPager.setCurrentItem(tabNr);
-			}
-		}
+	@Override
+	public void onTabClicked(Tab tab) {
+		int index = tabs.indexOf(tab);
+		viewPager.setCurrentItem(index);
 	}
 }

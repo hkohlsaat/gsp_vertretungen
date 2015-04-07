@@ -144,10 +144,8 @@ public class SubstitutionsFragment extends Fragment {
 			} else {
 				difference = lhs.getGrade() - rhs.getGrade();
 			}
-			if (difference > 0) {
-				return 1;
-			} else if (difference < 0) {
-				return -1;
+			if (difference != 0) {
+				return difference;
 			} else {
 				return lhs.getName().compareTo(rhs.getName());
 			}
