@@ -2,16 +2,9 @@ package org.aweture.wonk.substitutions;
 
 public class ExpansionCoordinator {
 	
-	private static ExpansionCoordinator instance = new ExpansionCoordinator();
-	
 	private Expandable expanded;
 	
-	private ExpansionCoordinator(){
-		// Singleton
-	}
-	
-	public static ExpansionCoordinator getInstance() {
-		return instance;
+	ExpansionCoordinator(){
 	}
 	
 	

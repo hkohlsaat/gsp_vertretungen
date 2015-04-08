@@ -15,7 +15,6 @@
     <!-- Dimens regarding substitution section -->
     <dimen name="class_headline_margin">8dp</dimen>
     <dimen name="class_headline_margin_left">16dp</dimen>
-    <dimen name="class_substitution_item_margin">16dp</dimen>
     
     <dimen name="row_height">48dp</dimen>
     <dimen name="colum_gab">12dp</dimen>

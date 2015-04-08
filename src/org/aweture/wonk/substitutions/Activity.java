@@ -34,8 +34,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		SimpleData data = SimpleData.getInstance(this);
-		if (!data.isUserdataInserted(false)) {
+		if (shouldDisplayLanding()) {
 			Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
 			startActivity(intent);
 			finish();
@@ -51,6 +50,11 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			LoaderManager manager = getSupportLoaderManager();
 			manager.initLoader(R.id.substitutions_Activty_PlansLoader, null, adapter);
 		}
+	}
+	
+	private boolean shouldDisplayLanding() {
+		SimpleData data = SimpleData.getInstance(this);
+		return !data.isUserdataInserted(false);
 	}
 	
 	@Override

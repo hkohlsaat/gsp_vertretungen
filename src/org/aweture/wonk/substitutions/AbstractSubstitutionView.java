@@ -2,9 +2,9 @@ package org.aweture.wonk.substitutions;
 
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Subjects;
+import org.aweture.wonk.models.Subjects.Subject;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.Teachers;
-import org.aweture.wonk.models.Subjects.Subject;
 import org.aweture.wonk.models.Teachers.Teacher;
 
 import android.content.Context;
@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * {@link View} representing {@link Substitution}s by expanding
+ * {@link View} presenting {@link Substitution}s by expanding
  * when clicked but not animated.
  * 
  * @author Hannes Kohlsaat
@@ -27,36 +27,35 @@ import android.widget.TextView;
  */
 public class AbstractSubstitutionView extends ViewGroup implements Expandable, OnClickListener {
 	
-	private static final int BLANK_WIDTH_DIP = 8;
+	private static final int MIDDLE_GAP_WIDTH_DIP = 8;
+	private static final int PADDING_LEFT_DIP = 16;
+	
+	private static final ExpansionCoordinator expansionCoordinator = new ExpansionCoordinator();
 	
 	private final ViewHolder viewHolder;
-	private final ExpansionCoordinator expansionCoordinator;
 	
-	private final int margin;
-	private final int blankWidth;
+	private final int paddingLeft;
+	private final int middleGapWidth;
 	private final int screenWidth;
 	
 	private final Teachers teachers;
 	private final Subjects subjects;
 	
 	private Substitution substitution;
-
+	
+	
 	public AbstractSubstitutionView(Context context) {
 		super(context);
-
+		
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 		layoutInflater.inflate(R.layout.view_substitution, this, true);
 		
 		viewHolder = new ViewHolder();
-		expansionCoordinator = ExpansionCoordinator.getInstance();
 		
-		int marginLeftResourceId = R.dimen.class_substitution_item_margin;
 		Resources resources = getResources();
-		margin = resources.getDimensionPixelSize(marginLeftResourceId);
-		
-
 		DisplayMetrics dm = resources.getDisplayMetrics();
-		blankWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, BLANK_WIDTH_DIP, dm);
+		paddingLeft = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_LEFT_DIP, dm);
+		middleGapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MIDDLE_GAP_WIDTH_DIP, dm);
 		
 		Rect rect = new Rect();
 		getWindowVisibleDisplayFrame(rect);
@@ -68,12 +67,8 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		setOnClickListener(this);
 	}
 	
-	public ViewHolder getViewHolder() {
+	ViewHolder getViewHolder() {
 		return viewHolder;
-	}
-	
-	public boolean isExpanded() {
-		return expansionCoordinator.isExpanded(this);
 	}
 	
 	@Override
@@ -133,18 +128,22 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		}
 	}
 	
+	private boolean isExpanded() {
+		return expansionCoordinator.isExpanded(this);
+	}
+	
 	private void setExpandedVisibilities() {
 		viewHolder.subject.setVisibility(VISIBLE);
 		viewHolder.course.setVisibility(GONE);
 		viewHolder.instdOf.setVisibility(VISIBLE);
 		viewHolder.instdTeacher.setVisibility(VISIBLE);
 		viewHolder.substTeacher.setVisibility(VISIBLE);
-		if (viewHolder.text.getText().toString().isEmpty()) {
-			viewHolder.info.setVisibility(GONE);
-			viewHolder.text.setVisibility(GONE);
-		} else {
+		if (substitution.hasText()) {
 			viewHolder.info.setVisibility(VISIBLE);
 			viewHolder.text.setVisibility(VISIBLE);
+		} else {
+			viewHolder.info.setVisibility(GONE);
+			viewHolder.text.setVisibility(GONE);
 		}
 	}
 	
@@ -200,31 +199,31 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		measureChild(viewHolder.instdOf, widthMeasureSpec, heightMeasureSpec);
 		measureChild(viewHolder.instdTeacher, widthMeasureSpec, heightMeasureSpec);
 		measureChild(viewHolder.substTeacher, widthMeasureSpec, heightMeasureSpec);
-		if (isVisible(viewHolder.info)) {
+		if (substitution.hasText()) {
 			measureChild(viewHolder.info, widthMeasureSpec, heightMeasureSpec);
 			measureChild(viewHolder.text, widthMeasureSpec, heightMeasureSpec);
 		}
 	}
 	
 	private int computeOwnHeightExpanded() {
-		int bottom1 = viewHolder.period.getMeasuredHeight();
-		int bottom2 = viewHolder.subject.getMeasuredHeight();
-		int height = Math.max(bottom1, bottom2);
+		int leftHeight = viewHolder.period.getMeasuredHeight();
+		int rightHeight = viewHolder.subject.getMeasuredHeight();
+		int ownHeight = Math.max(leftHeight, rightHeight);
 		
-		bottom1 = viewHolder.instdOf.getMeasuredHeight();
-		bottom2 = viewHolder.instdTeacher.getMeasuredHeight();
-		height += Math.max(bottom1, bottom2);
+		leftHeight = viewHolder.instdOf.getMeasuredHeight();
+		rightHeight = viewHolder.instdTeacher.getMeasuredHeight();
+		ownHeight += Math.max(leftHeight, rightHeight);
 		
-		bottom1 = viewHolder.kind.getMeasuredHeight();
-		bottom2 = viewHolder.substTeacher.getMeasuredHeight();
-		height += Math.max(bottom1, bottom2);
+		leftHeight = viewHolder.kind.getMeasuredHeight();
+		rightHeight = viewHolder.substTeacher.getMeasuredHeight();
+		ownHeight += Math.max(leftHeight, rightHeight);
 		
-		if (isVisible(viewHolder.info)) {
-			bottom1 = viewHolder.info.getMeasuredHeight();
-			bottom2 = viewHolder.text.getMeasuredHeight();
-			height += Math.max(bottom1, bottom2);
+		if (substitution.hasText()) {
+			leftHeight = viewHolder.info.getMeasuredHeight();
+			rightHeight = viewHolder.text.getMeasuredHeight();
+			ownHeight += Math.max(leftHeight, rightHeight);
 		}
-		return height;
+		return ownHeight;
 	}
 	
 	private int computeChildrenMeasuredStateExpanded() {
@@ -246,10 +245,10 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 	}
 	
 	private int computeOwnHeightCollapsed() {
-		int bottom1 = viewHolder.period.getMeasuredHeight();
-		int bottom2 = viewHolder.kind.getMeasuredHeight();
-		int height = Math.max(bottom1, bottom2);
-		return height;
+		int leftHeight = viewHolder.period.getMeasuredHeight();
+		int rightHeight = viewHolder.kind.getMeasuredHeight();
+		int ownHeight = Math.max(leftHeight, rightHeight);
+		return ownHeight;
 	}
 	
 	private int computeChildrenMeasuredStateCollapsed() {
@@ -268,64 +267,60 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 	}
 	
 	private void onLayoutExpanded() {
-		int leftWidth = viewHolder.period.getMeasuredWidth();
-		leftWidth = Math.max(leftWidth, viewHolder.instdOf.getMeasuredWidth());
-		leftWidth = Math.max(leftWidth, viewHolder.kind.getMeasuredWidth());
-		if (isVisible(viewHolder.info)) {
-			leftWidth = Math.max(leftWidth, viewHolder.info.getMeasuredWidth());
+		int leftColumnWidth = viewHolder.period.getMeasuredWidth();
+		leftColumnWidth = Math.max(leftColumnWidth, viewHolder.instdOf.getMeasuredWidth());
+		leftColumnWidth = Math.max(leftColumnWidth, viewHolder.kind.getMeasuredWidth());
+		if (substitution.hasText()) {
+			leftColumnWidth = Math.max(leftColumnWidth, viewHolder.info.getMeasuredWidth());
 		}
-		leftWidth += margin;
+		leftColumnWidth += paddingLeft;
 		
-		int bottom1 = layoutLeftTextView(viewHolder.period, leftWidth, 0);
-		int bottom2 = layoutRightTextView(viewHolder.subject, leftWidth, 0);
-		int nextTop = Math.max(bottom1, bottom2);
+		int top = 0;
+		int leftBottom = layoutLeftTextView(viewHolder.period, leftColumnWidth, top);
+		int rightBottom = layoutRightTextView(viewHolder.subject, leftColumnWidth, top);
 		
-		bottom1 = layoutLeftTextView(viewHolder.instdOf, leftWidth, nextTop);
-		bottom2 = layoutRightTextView(viewHolder.instdTeacher, leftWidth, nextTop);
-		nextTop = Math.max(bottom1, bottom2);
+		top = Math.max(leftBottom, rightBottom);
+		leftBottom = layoutLeftTextView(viewHolder.instdOf, leftColumnWidth, top);
+		rightBottom = layoutRightTextView(viewHolder.instdTeacher, leftColumnWidth, top);
 		
-		bottom1 = layoutLeftTextView(viewHolder.kind, leftWidth, nextTop);
-		bottom2 = layoutRightTextView(viewHolder.substTeacher, leftWidth, nextTop);
-		nextTop = Math.max(bottom1, bottom2);
+		top = Math.max(leftBottom, rightBottom);
+		leftBottom = layoutLeftTextView(viewHolder.kind, leftColumnWidth, top);
+		rightBottom = layoutRightTextView(viewHolder.substTeacher, leftColumnWidth, top);
 		
-		if (isVisible(viewHolder.info)) {
-			layoutLeftTextView(viewHolder.info, leftWidth, nextTop);
-			layoutRightTextView(viewHolder.text, leftWidth, nextTop);
+		if (substitution.hasText()) {
+			top = Math.max(leftBottom, rightBottom);
+			layoutLeftTextView(viewHolder.info, leftColumnWidth, top);
+			layoutRightTextView(viewHolder.text, leftColumnWidth, top);
 		}
 	}
 	
 	private void onLayoutCollapsed() {
-		int leftWidth = viewHolder.period.getMeasuredWidth();
-		leftWidth += margin;
-		layoutLeftTextView(viewHolder.period, leftWidth, 0);
-		layoutRightTextView(viewHolder.kind, leftWidth, 0);
+		int leftWidth = viewHolder.period.getMeasuredWidth() + paddingLeft;
+		int top = 0;
+		layoutLeftTextView(viewHolder.period, leftWidth, top);
+		layoutRightTextView(viewHolder.kind, leftWidth, top);
 		
 		// layout course info
-		int left = getMeasuredWidth() - viewHolder.course.getMeasuredWidth() - margin;
-		int top = 0;
-		int right = getMeasuredWidth() - margin;
+		int left = getMeasuredWidth() - viewHolder.course.getMeasuredWidth() - paddingLeft;
+		int right = getMeasuredWidth() - paddingLeft;
 		int bottom = viewHolder.course.getMeasuredHeight();
 		viewHolder.course.layout(left, top, right, bottom);
 	}
 	
-	private int layoutLeftTextView(TextView view, int leftWidth, int top) {
-		int left = leftWidth - view.getMeasuredWidth();
-		int right = leftWidth;
+	private int layoutLeftTextView(TextView view, int leftColumnWidth, int top) {
+		int left = leftColumnWidth - view.getMeasuredWidth();
+		int right = leftColumnWidth;
 		int bottom = top + view.getMeasuredHeight();
 		view.layout(left, top, right, bottom);
 		return bottom;
 	}
 	
 	private int layoutRightTextView(TextView view, int leftWidth, int top) {
-		int left = leftWidth + blankWidth;
+		int left = leftWidth + middleGapWidth;
 		int right = left + view.getMeasuredWidth();
 		int bottom = top + view.getMeasuredHeight();
 		view.layout(left, top, right, bottom);
 		return bottom;
-	}
-	
-	boolean isVisible(View view) {
-		return view.getVisibility() != GONE;
 	}
 	
 	class ViewHolder {
@@ -339,6 +334,17 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		public final TextView info;
 		public final TextView text;
 		
+		public AppearanceAnimation periodAnimation;
+		public AppearanceAnimation subjectAnimation;
+		public AppearanceAnimation courseAnimation;
+		public AppearanceAnimation instdOfAnimation;
+		public AppearanceAnimation instdTeacherAnimation;
+		public AppearanceAnimation kindAnimation;
+		public AppearanceAnimation substTeacherAnimation;
+		public AppearanceAnimation infoAnimation;
+		public AppearanceAnimation textAnimation;
+		
+		
 		private ViewHolder() {
 			period = (TextView) findViewById(R.id.periodTextView);
 			subject = (TextView) findViewById(R.id.subjectTextView);
@@ -349,6 +355,52 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 			substTeacher = (TextView) findViewById(R.id.substTeacherTextView);
 			text = (TextView) findViewById(R.id.textTextView);
 			info = (TextView) findViewById(R.id.infoTextView);
+
+			periodAnimation = new AppearanceAnimation(period);
+			subjectAnimation = new AppearanceAnimation(subject);
+			courseAnimation = new AppearanceAnimation(course);
+			instdOfAnimation = new AppearanceAnimation(instdOf);
+			instdTeacherAnimation = new AppearanceAnimation(instdTeacher);
+			kindAnimation = new AppearanceAnimation(kind);
+			substTeacherAnimation = new AppearanceAnimation(substTeacher);
+			textAnimation = new AppearanceAnimation(text);
+			infoAnimation = new AppearanceAnimation(info);
+		}
+		
+		public void setAnimationDuration(long durationMillis) {
+			periodAnimation.setDuration(durationMillis);
+			subjectAnimation.setDuration(durationMillis);
+			courseAnimation.setDuration(durationMillis);
+			instdOfAnimation.setDuration(durationMillis);
+			instdTeacherAnimation.setDuration(durationMillis);
+			kindAnimation.setDuration(durationMillis);
+			substTeacherAnimation.setDuration(durationMillis);
+			textAnimation.setDuration(durationMillis);
+			infoAnimation.setDuration(durationMillis);
+		}
+		
+		public void queryOldPositions() {
+			periodAnimation.queryOldPosition();
+			subjectAnimation.queryOldPosition();
+			courseAnimation.queryOldPosition();
+			instdOfAnimation.queryOldPosition();
+			instdTeacherAnimation.queryOldPosition();
+			kindAnimation.queryOldPosition();
+			substTeacherAnimation.queryOldPosition();
+			textAnimation.queryOldPosition();
+			infoAnimation.queryOldPosition();
+		}
+		
+		public void startAnimations() {
+			period.startAnimation(periodAnimation);
+			subject.startAnimation(subjectAnimation);
+			course.startAnimation(courseAnimation);
+			instdOf.startAnimation(instdOfAnimation);
+			instdTeacher.startAnimation(instdTeacherAnimation);
+			kind.startAnimation(kindAnimation);
+			substTeacher.startAnimation(substTeacherAnimation);
+			text.startAnimation(textAnimation);
+			info.startAnimation(infoAnimation);
 		}
 	}
 }

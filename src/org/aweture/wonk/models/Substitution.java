@@ -45,4 +45,8 @@ public class Substitution {
 	public void setText(String text) {
 		this.text = text;
 	}
+	
+	public boolean hasText() {
+		return !text.isEmpty();
+	}
 }

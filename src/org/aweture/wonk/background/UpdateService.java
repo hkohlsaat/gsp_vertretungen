@@ -29,6 +29,7 @@ public class UpdateService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Application application = (Application) getApplication();
+		String message = "no connectivity";
 		
 		if (application.hasConnectivity()) {
 			
@@ -38,15 +39,28 @@ public class UpdateService extends IntentService {
 			switch (result) {
 			case Success:
 				update(iServManager);
+				message = "success";	
 				break;
 			case WrongData:
 				SimpleData data = SimpleData.getInstance(getApplicationContext());
 				data.setUserdataInserted(false);
 				UpdateScheduler updateScheduler = new UpdateScheduler(getApplicationContext());
 				updateScheduler.unschedule();
+				message = "wrong data";	
 				break;
+			default:
+				message = "fail";	
 			}
 		}
+
+		// WHEN DELETING THE TEST CODE HEREAFTER:
+		// MAKE DATABASEHELPER CLASS DEFAULT AGAIN !!!!!!
+		DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
+		SQLiteDatabase database = helper.getWritableDatabase();
+		ContentValues v = new ContentValues();
+		v.put(DataContract.TableEntry.COLUMN_QUERIED_NAME, new Date().toDateTimeString() + "\t" + message);
+		database.insert("queries", null, v);
+		database.close();
 	}
 	
 	private LoginResult login(IServManager iServManager) {
@@ -81,14 +95,5 @@ public class UpdateService extends IntentService {
 		Context context = getApplicationContext();
 		DataStore dataStore = DataStore.getInstance(context);
 		dataStore.savePlans(plans);
-		
-		// WHEN DELETING THE TEST CODE HEREAFTER:
-		// MAKE DATABASEHELPER CLASS DEFAULT AGAIN !!!!!!
-		DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
-		SQLiteDatabase database = helper.getWritableDatabase();
-		ContentValues v = new ContentValues();
-		v.put(DataContract.TableEntry.COLUMN_QUERIED_NAME, new Date().toDateTimeString());
-		database.insert("queries", null, v);
-		database.close();
 	}
 }

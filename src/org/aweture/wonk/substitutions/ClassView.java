@@ -21,8 +21,6 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	private Class currentClass;
 	private List<Substitution> substitutions;
 	
-	private ExpansionCoordinator expansionCoordinator;
-	
 	private TextView classNameTextView;
 	
 	private Queue<SubstitutionView> items;
@@ -54,10 +52,6 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 		itemOverflow = new LinkedList<SubstitutionView>();
 		
 		classNameTextView = (TextView) findViewById(R.id.className);
-	}
-	
-	public void setExpansionCoordinatior(ExpansionCoordinator expansionCoordinator) {
-		this.expansionCoordinator = expansionCoordinator;
 	}
 	
 	public void setSubstitutions(Class currentClass, List<Substitution> substitutions) {
@@ -95,7 +89,7 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	private SubstitutionView getUndisplayedSubstitutionView() {
 		SubstitutionView view = itemOverflow.poll();
 		if (view == null) {
-			view = new SubstitutionView(getContext(), expansionCoordinator);
+			view = new SubstitutionView(getContext());
 		}
 		return view;
 	}
