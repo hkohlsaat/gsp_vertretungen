@@ -1,56 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <teachers>
-<teacher short="Ak" name="Aulke" accusative="Aulke" />
-<teacher short="An" name="Andresen" accusative="Andresen" />
-<teacher short="Be" name="Beinert" accusative="Beinert" />
-<teacher short="Bu" name="Buchholz" accusative="Buchholz" />
-<teacher short="Chn" name="Christiansen" accusative="Christiansen" />
-<teacher short="Chr" name="Christensen" accusative="Christensen" />
-<teacher short="Co" name="Cordsen" accusative="Cordsen" />
-<teacher short="Dg" name="Dölger" accusative="Dölger" />
-<teacher short="Ds" name="Dose" accusative="Dose" />
-<teacher short="Eh" name="Ehlert" accusative="Ehlert" />
-<teacher short="Fe" name="Fritzsche" accusative="Fritzsche" />
-<teacher short="Fo" name="Fortmann" accusative="Fortmann" />
-<teacher short="Fr" name="Fritze" accusative="Fritze" />
-<teacher short="Fz" name="Fritz" accusative="Fritz" />
-<teacher short="Go" name="Gongoll" accusative="Gongoll" />
-<teacher short="Gr" name="Griebel" accusative="Griebel" />
-<teacher short="Ha" name="Hamann" accusative="Hamann" />
-<teacher short="Hd" name="Herden" accusative="Herden" />
-<teacher short="Hf" name="Haltenhof" accusative="Haltenhof" />
-<teacher short="Hg" name="Hartwig" accusative="Hartwig" />
-<teacher short="Ja" name="Jarzembowski" accusative="Jarzembowski" />
-<teacher short="Ke" name="Klee" accusative="Klee" />
-<teacher short="Kg" name="Kroglowski" accusative="Kroglowski" />
-<teacher short="Kh" name="Kahnt" accusative="Kahnt" />
-<teacher short="Kl" name="Klein" accusative="Klein" />
-<teacher short="Kn" name="Knuth" accusative="Knuth" />
-<teacher short="Kr" name="Kraack" accusative="Kraack" />
-<teacher short="Ks" name="Kasselmann" accusative="Kasselmann" />
-<teacher short="Lj" name="Lütjohann" accusative="Lütjohann" />
-<teacher short="MB" name="Mushold-Burg" accusative="Mushold-Burg" />
-<teacher short="Mk" name="Merklinger" accusative="Merklinger" />
-<teacher short="Ne" name="Nentwig" accusative="Nentwig" />
-<teacher short="Ng" name="Nieschlag" accusative="Nieschlag" />
-<teacher short="Or" name="Ortuño" accusative="Ortuño" />
-<teacher short="Pa" name="Paasch-Beeck" accusative="Paasch-Beeck" />
-<teacher short="Pi" name="Piecyk" accusative="Piecyk" />
-<teacher short="Pl" name="Paulsen" accusative="Paulsen" />
-<teacher short="Pm" name="Palm" accusative="Palm" />
-<teacher short="RP" name="Rogg-Pietz" accusative="Rogg-Pietz" />
-<teacher short="Rg" name="Romming" accusative="Romming" />
-<teacher short="Ro" name="Roloff" accusative="Roloff" />
-<teacher short="Sa" name="Sauer" accusative="Sauer" />
+<teacher short="Ak" name="Herr Aulke" accusative="Herrn Aulke" />
+<teacher short="Be" name="Frau Beinert" accusative="Frau Beinert" />
+<teacher short="Bu" name="Herr Buchholz" accusative="Herrn Buchholz" />
+<teacher short="Chn" name="Frau Christiansen" accusative="Frau Christiansen" />
+<teacher short="Chr" name="Herr Christensen" accusative="Herrn Christensen" />
+<teacher short="Co" name="Frau Cordsen" accusative="Frau Cordsen" />
+<teacher short="Dg" name="Herr Dölger" accusative="Herrn Dölger" />
+<teacher short="Ds" name="Frau Dose" accusative="Frau Dose" />
+<teacher short="Eh" name="Frau Ehlert" accusative="Frau Ehlert" />
+<teacher short="Fe" name="Frau Fritzsche" accusative="Frau Fritzsche" />
+<teacher short="Fo" name="Herr Fortmann" accusative="Herrn Fortmann" />
+<teacher short="Fr" name="Frau Fritze" accusative="Frau Fritze" />
+<teacher short="Fz" name="Frau Fritz" accusative="Frau Fritz" />
+<teacher short="Go" name="Frau Gongoll" accusative="Frau Gongoll" />
+<teacher short="Gr" name="Frau Griebel" accusative="Frau Griebel" />
+<teacher short="Ha" name="Herr Hamann" accusative="Herrn Hamann" />
+<teacher short="Hd" name="Frau Herden" accusative="Frau Herden" />
+<teacher short="Hf" name="Frau Haltenhof" accusative="Frau Haltenhof" />
+<teacher short="Hg" name="Herr Hartwig" accusative="Herrn Hartwig" />
+<teacher short="In" name="Frau Ingwersen" accusative="Frau Ingwersen" />
+<teacher short="Kb" name="Herr Kubitza" accusative="Herrn Kubitza" />
+<teacher short="Ke" name="Frau Klee" accusative="Frau Klee" />
+<teacher short="Kg" name="Frau Kroglowski" accusative="Frau Kroglowski" />
+<teacher short="Kh" name="Herr Kahnt" accusative="Herrn Kahnt" />
+<teacher short="Kl" name="Herr Klein" accusative="Herrn Klein" />
+<teacher short="Kn" name="Frau Knuth" accusative="Frau Knuth" />
+<teacher short="Kr" name="Herr Kraack" accusative="Herrn Kraack" />
+<teacher short="Ks" name="Frau Kasselmann" accusative="Frau Kasselmann" />
+<teacher short="Lj" name="Herr Lütjohann" accusative="Herrn Lütjohann" />
+<teacher short="MB" name="Herr Mushold-Burg" accusative="Herrn Mushold-Burg" />
+<teacher short="Ne" name="Herr Nentwig" accusative="Herrn Nentwig" />
+<teacher short="Ng" name="Frau Nieschlag" accusative="Frau Nieschlag" />
+<teacher short="Or" name="Herr Ortuño" accusative="Herrn Ortuño" />
+<teacher short="Pa" name="Herr Paasch-Beeck" accusative="Herrn Paasch-Beeck" />
+<teacher short="Pi" name="Herr Piecyk" accusative="Herrn Piecyk" />
+<teacher short="Pl" name="Frau Paulsen" accusative="Frau Paulsen" />
+<teacher short="Pm" name="Frau Palm" accusative="Frau Palm" />
+<teacher short="RP" name="Herr Rogg-Pietz" accusative="Herrn Rogg-Pietz" />
+<teacher short="Rg" name="Frau Romming" accusative="Frau Romming" />
 <teacher short="Sk" name="Frau Surkau" accusative="Frau Surkau" />
-<teacher short="Skw" name="Skwirblies" accusative="Skwirblies" />
-<teacher short="Sp" name="Spinneker" accusative="Spinneker" />
-<teacher short="Sr" name="Sauder" accusative="Sauder" />
-<teacher short="St" name="Sturde" accusative="Sturde" />
+<teacher short="Skw" name="Herr Skwirblies" accusative="Herrn Skwirblies" />
+<teacher short="Sp" name="Herr Spinneker" accusative="Herrn Spinneker" />
+<teacher short="Sr" name="Frau Sauder" accusative="Frau Sauder" />
+<teacher short="St" name="Herr Sturde" accusative="Herrn Sturde" />
 <teacher short="Su" name="Herr Surkau" accusative="Herrn Surkau" />
 <teacher short="Te" name="Herr Tensing" accusative="Herrn Tensing" />
 <teacher short="Ts" name="Frau Tensing" accusative="Frau Tensing" />
-<teacher short="Tz" name="Tietz" accusative="Tietz" />
-<teacher short="Wi" name="Wilker" accusative="Wilker" />
-<teacher short="ZS" name="Zick-Stojan" accusative="Zick-Stojan" />
+<teacher short="Wi" name="Frau Wilker" accusative="Frau Wilker" />
+<teacher short="ZS" name="Frau Zick-Stojan" accusative="Frau Zick-Stojan" />
 </teachers>
