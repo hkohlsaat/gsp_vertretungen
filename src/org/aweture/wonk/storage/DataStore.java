@@ -8,6 +8,8 @@ import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
+import org.aweture.wonk.storage.DataContract.SubstitutionColumns;
+import org.aweture.wonk.storage.DataContract.TableColumns;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -66,12 +68,12 @@ public class DataStore {
 	private List<Plan> queryPlans() {
 		DatabaseHelper dbHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = dbHelper.getReadableDatabase();
-		String tableName = DataContract.TableEntry.TABLE_NAME;
+		String tableName = TableColumns.TABLE_NAME;
 		Cursor plansCursor = database.query(tableName, null, null, null, null, null, null);
 		
-		final int dateIndex = plansCursor.getColumnIndexOrThrow(DataContract.TableEntry.COLUMN_DATE_NAME);
-		final int createdIndex = plansCursor.getColumnIndexOrThrow(DataContract.TableEntry.COLUMN_CREATED_NAME);
-		final int queriedIndex = plansCursor.getColumnIndexOrThrow(DataContract.TableEntry.COLUMN_QUERIED_NAME);
+		final int dateIndex = plansCursor.getColumnIndexOrThrow(TableColumns.DATE.name());
+		final int createdIndex = plansCursor.getColumnIndexOrThrow(TableColumns.CREATED.name());
+		final int queriedIndex = plansCursor.getColumnIndexOrThrow(TableColumns.QUERIED.name());
 		
 		List<Plan> plans = new ArrayList<Plan>();
 		
@@ -94,13 +96,13 @@ public class DataStore {
 			final String substitutionsTableName = "\"" + dateString + "\"";
 			Cursor substitutionsCursor = database.query(substitutionsTableName, null, null, null, null, null, null);
 
-			final int periodIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_PERIOD_NAME);
-			final int substTeacherIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_NAME);
-			final int instdTeacherIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_NAME);
-			final int instdSubjectIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_INSTD_SUBJECT_NAME);
-			final int kindIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_KIND_NAME);
-			final int textIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_TEXT_NAME);
-			final int classIndex = substitutionsCursor.getColumnIndexOrThrow(DataContract.SubstitutionEntry.COLUMN_CLASS_NAME);
+			final int periodIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.PERIOD.name());
+			final int substTeacherIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.SUBST_TEACHER.name());
+			final int instdTeacherIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.INSTD_TEACHER.name());
+			final int instdSubjectIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.INSTD_SUBJECT.name());
+			final int kindIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.KIND.name());
+			final int textIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.TEXT.name());
+			final int classIndex = substitutionsCursor.getColumnIndexOrThrow(SubstitutionColumns.CLASS.name());
 			
 			while (substitutionsCursor.moveToNext()) {
 				final int period = substitutionsCursor.getInt(periodIndex);
@@ -149,22 +151,19 @@ public class DataStore {
 			final String createdString = plan.getCreation().toDateTimeString();
 			final String queriedString = plan.getQueried().toDateTimeString();
 
-			String tableName = DataContract.TableEntry.TABLE_NAME;
+			String tableName = TableColumns.TABLE_NAME;
 			ContentValues planValues = new ContentValues();
-			planValues.put(DataContract.TableEntry.COLUMN_DATE_NAME, dateString);
-			planValues.put(DataContract.TableEntry.COLUMN_CREATED_NAME, createdString);
-			planValues.put(DataContract.TableEntry.COLUMN_QUERIED_NAME, queriedString);
+			planValues.put(TableColumns.DATE.name(), dateString);
+			planValues.put(TableColumns.CREATED.name(), createdString);
+			planValues.put(TableColumns.QUERIED.name(), queriedString);
 			database.insert(tableName, null, planValues);
 			
 			final String substitutionsTableName = "\"" + dateString + "\"";
-			database.execSQL("CREATE TABLE IF NOT EXISTS " + substitutionsTableName + " ("
-					+ DataContract.SubstitutionEntry.COLUMN_PERIOD_NAME + " " + DataContract.SubstitutionEntry.COLUMN_PERIOD_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_NAME + " " + DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_NAME + " " + DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_INSTD_SUBJECT_NAME + " " + DataContract.SubstitutionEntry.COLUMN_INSTD_SUBJECT_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_KIND_NAME + " " + DataContract.SubstitutionEntry.COLUMN_KIND_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_TEXT_NAME + " " + DataContract.SubstitutionEntry.COLUMN_TEXT_TYPE + ", "
-					+ DataContract.SubstitutionEntry.COLUMN_CLASS_NAME + " " + DataContract.SubstitutionEntry.COLUMN_CLASS_TYPE + ")");
+			CreateQuery createQuery = new CreateQuery(substitutionsTableName);
+			for (SubstitutionColumns column : SubstitutionColumns.values()) {
+				createQuery.addColumn(column.name(), column.type());
+			}
+			database.execSQL(createQuery.toString());
 			
 			Set<Class> classes = plan.keySet();
 			
@@ -181,13 +180,13 @@ public class DataStore {
 					final String text = substitution.getText();
 					
 					ContentValues substitutionValues = new ContentValues();
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_PERIOD_NAME, Integer.valueOf(period));
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_SUBST_TEACHER_NAME, substTeacher);
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_INSTD_TEACHER_NAME, instdTeacher);
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_INSTD_SUBJECT_NAME, instdSubject);
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_KIND_NAME, kind);
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_TEXT_NAME, text);
-					substitutionValues.put(DataContract.SubstitutionEntry.COLUMN_CLASS_NAME, className);
+					substitutionValues.put(SubstitutionColumns.PERIOD.name(), Integer.valueOf(period));
+					substitutionValues.put(SubstitutionColumns.SUBST_TEACHER.name(), substTeacher);
+					substitutionValues.put(SubstitutionColumns.INSTD_TEACHER.name(), instdTeacher);
+					substitutionValues.put(SubstitutionColumns.INSTD_SUBJECT.name(), instdSubject);
+					substitutionValues.put(SubstitutionColumns.KIND.name(), kind);
+					substitutionValues.put(SubstitutionColumns.TEXT.name(), text);
+					substitutionValues.put(SubstitutionColumns.CLASS.name(), className);
 					database.insert(substitutionsTableName, null, substitutionValues);
 				}
 			}
@@ -196,10 +195,10 @@ public class DataStore {
 	}
 	
 	private void resetDatabase(SQLiteDatabase database) {
-		String tableName = DataContract.TableEntry.TABLE_NAME;
+		String tableName = TableColumns.TABLE_NAME;
 		Cursor plansCursor = database.query(tableName, null, null, null, null, null, null);
 		
-		final int dateIndex = plansCursor.getColumnIndexOrThrow(DataContract.TableEntry.COLUMN_DATE_NAME);
+		final int dateIndex = plansCursor.getColumnIndexOrThrow(TableColumns.DATE.name());
 		
 		while (plansCursor.moveToNext()) {
 			final String substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + "\"";

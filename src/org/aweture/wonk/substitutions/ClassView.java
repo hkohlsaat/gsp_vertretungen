@@ -17,14 +17,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class ClassView extends LinearLayout implements Comparator<Substitution> {
+
+	private static final Queue<SubstitutionView> itemOverflow = new LinkedList<SubstitutionView>();
+	
+	private Queue<SubstitutionView> items;
+	private TextView classNameTextView;
 	
 	private Class currentClass;
 	private List<Substitution> substitutions;
 	
-	private TextView classNameTextView;
-	
-	private Queue<SubstitutionView> items;
-	private Queue<SubstitutionView> itemOverflow;
 
 	public ClassView(Context context) {
 		super(context);
@@ -49,7 +50,6 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 		LayoutInflater.from(context).inflate(R.layout.view_class, this, true);
 
 		items = new LinkedList<SubstitutionView>();
-		itemOverflow = new LinkedList<SubstitutionView>();
 		
 		classNameTextView = (TextView) findViewById(R.id.className);
 	}

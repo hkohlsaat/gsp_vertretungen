@@ -1,5 +1,11 @@
-package org.aweture.wonk;
+package org.aweture.wonk.log;
 
+import org.aweture.wonk.storage.DataContract.LogColumns;
+import org.aweture.wonk.storage.DatabaseHelper;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class LogUtil {
@@ -21,6 +27,16 @@ public class LogUtil {
 		String tag = getTag();
 		String message = "in " + tag + "#" + getMethodName();
 		Log.d(tag, message);
+	}
+	
+	public static void logToDB(Context context, String message) {
+		DatabaseHelper helper = new DatabaseHelper(context);
+		SQLiteDatabase database = helper.getWritableDatabase();
+		ContentValues v = new ContentValues();
+		String tag = getTag();
+		v.put(LogColumns.MESSAGE.name(), tag + " |\t" + message);
+		database.insert(LogColumns.TABLE_NAME, null, v);
+		database.close();
 	}
 	
 	private static String getTag() {

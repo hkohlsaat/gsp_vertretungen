@@ -21,7 +21,7 @@
         android:name="org.aweture.wonk.Application" >
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
-        <activity android:name="org.aweture.wonk.tmp.Activity" />
+        <activity android:name="org.aweture.wonk.log.Activity" />
         <activity android:name="org.aweture.wonk.substitutions.Activity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

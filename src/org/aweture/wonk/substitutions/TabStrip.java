@@ -54,8 +54,8 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 		setOrientation(HORIZONTAL);
 		
 		TypedArray a = context.obtainStyledAttributes(attrs, new int[]{R.attr.colorPrimaryDark, R.attr.colorPrimary});
-		final int darkEdgeColor = a.getColor(0, 0x88303030);
-		final int backgroundColor = a.getColor(1, 0xffffffff);
+		final int indicatorColor = a.getColor(0, 0x88303030);
+		final int backgroundColor = a.getColor(1, 0xff0000ff);
 		setBackgroundColor(backgroundColor);
 		a.recycle();
 		
@@ -66,7 +66,7 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 		indicator = new Rect(0, 0, 0, indicatorHeight);
 		
 		indicatorPaint = new Paint();
-		indicatorPaint.setColor(0xffffffff);
+		indicatorPaint.setColor(indicatorColor);
 	}
 	
 	

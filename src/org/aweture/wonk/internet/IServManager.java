@@ -22,14 +22,6 @@ public interface IServManager {
 	}
 	
 	/**
-	 * Encapsulates the user data needed to perform the login.
-	 */
-	class LoginData {
-		String name;
-		String password;
-	}
-	
-	/**
 	 * Perform the login to the IServ web front end.
 	 * @return login result as the {@link LoginResult} enum
 	 */

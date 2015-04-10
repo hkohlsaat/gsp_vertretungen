@@ -1,8 +1,8 @@
-package org.aweture.wonk.tmp;
+package org.aweture.wonk.log;
 
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateScheduler;
-import org.aweture.wonk.storage.DataContract;
+import org.aweture.wonk.storage.DataContract.LogColumns;
 import org.aweture.wonk.storage.DatabaseHelper;
 
 import android.database.Cursor;
@@ -27,11 +27,9 @@ public class Activity extends android.app.Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// WHEN DELETING THE TEST CODE HEREAFTER:
-		// MAKE DATABASEHELPER CLASS DEFAULT AGAIN !!!!!!
-		DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
-		SQLiteDatabase database = helper.getWritableDatabase();
-		Cursor c = database.query("queries", null, null, null, null, null, null);
+		DatabaseHelper helper = new DatabaseHelper(this);
+		SQLiteDatabase database = helper.getReadableDatabase();
+		Cursor c = database.query(LogColumns.TABLE_NAME, null, null, null, null, null, null);
 		writeCursor(c);
 		c.close();
 		database.close();
@@ -42,7 +40,7 @@ public class Activity extends android.app.Activity {
 	}
 	
 	private void writeCursor(Cursor c) {
-		final int columnIndex = c.getColumnIndex(DataContract.TableEntry.COLUMN_QUERIED_NAME);
+		final int columnIndex = c.getColumnIndex(LogColumns.MESSAGE.name());
 		
 		while (c.moveToNext()) {
 			String info = c.getString(columnIndex);

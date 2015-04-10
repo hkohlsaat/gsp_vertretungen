@@ -15,30 +15,27 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.aweture.wonk.LogUtil;
-
-import android.annotation.TargetApi;
+import org.aweture.wonk.log.LogUtil;
 
 /**
- * {@link IServManager} implementation for API 21 and above.
+ * {@link IServManager} implementation.
  * 
  * @author Hannes Kohlsaat
  *
  */
-@TargetApi(21)
-public class IServManager21 implements IServManager {
+public class IServManagerImpl implements IServManager {
 
 	private URL iServRoot;
 	private URL iServSubstitutes;
 	private URI iServURI;
 	
-	private LoginData loginData;
+	private final String username;
+	private final String password;
 	
 	
-	public IServManager21(String username, String password) {
-		loginData = new LoginData();
-		loginData.name = username;
-		loginData.password = password;
+	public IServManagerImpl(String username, String password) {
+		this.username = username;
+		this.password = password;
 
 		try {
 			iServRoot = new URL("https://gsp-ploen.de/idesk/");
@@ -60,7 +57,7 @@ public class IServManager21 implements IServManager {
 		BufferedOutputStream out = null;
 		
 		try {
-			String loginString =  "login_act=" + loginData.name + "&login_pwd=" + loginData.password;
+			String loginString =  "login_act=" + username + "&login_pwd=" + password;
 			byte[] loginBytes = loginString.getBytes("utf-8");
 			
 			// Open a connection to the IDesk and set it up.

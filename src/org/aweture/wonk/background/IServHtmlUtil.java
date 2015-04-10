@@ -13,7 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.aweture.wonk.LogUtil;
+import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;

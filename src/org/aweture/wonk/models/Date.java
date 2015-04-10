@@ -4,10 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
-import org.aweture.wonk.LogUtil;
+import org.aweture.wonk.log.LogUtil;
 
 public class Date extends GregorianCalendar {
+	
+	private static final long serialVersionUID = -5305330648477860288L;
 	
 	private static final String DATE_FORMAT = "dd.MM.yyyy";
 	private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm";
@@ -22,7 +25,7 @@ public class Date extends GregorianCalendar {
 	
 	private static Date toDate(String stamp, String pattern) {
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.GERMANY);
 			Date instance = new Date();
 			instance.setTime(sdf.parse(stamp));
 			return instance;
@@ -42,7 +45,7 @@ public class Date extends GregorianCalendar {
 	
 	private String toString(String pattern) {
 		java.util.Date date = getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.GERMANY);
 		String dateString = sdf.format(date);
 		return dateString;
 	}

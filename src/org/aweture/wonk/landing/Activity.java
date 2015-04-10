@@ -6,7 +6,7 @@ import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
-import org.aweture.wonk.internet.IServManager21;
+import org.aweture.wonk.internet.IServManagerImpl;
 import org.aweture.wonk.storage.SimpleData;
 
 import android.app.AlertDialog;
@@ -22,12 +22,13 @@ import android.widget.EditText;
 
 public class Activity extends android.app.Activity {
 	
-	private EditText usernameInput, passwordInput;
+	private EditText usernameInput;
+	private EditText passwordInput;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    getActionBar().hide();
+	    //getActionBar().hide();
 		setContentView(R.layout.activity_landing);
 		usernameInput = (EditText) findViewById(R.id.login_username);
 		passwordInput = (EditText) findViewById(R.id.login_password);
@@ -82,7 +83,7 @@ public class Activity extends android.app.Activity {
 		protected LoginResult doInBackground(String... params) {
 			String username = params[0];
 			String password = params[1];
-			IServManager im = new IServManager21(username, password);
+			IServManager im = new IServManagerImpl(username, password);
 			return im.logIn();
 		}
 		

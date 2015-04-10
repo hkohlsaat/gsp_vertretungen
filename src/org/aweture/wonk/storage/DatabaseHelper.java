@@ -1,6 +1,6 @@
 package org.aweture.wonk.storage;
 
-import org.aweture.wonk.storage.DataContract.TableEntry;
+import org.aweture.wonk.storage.DataContract.*;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,16 +18,17 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String creationSQL = "CREATE TABLE " + TableEntry.TABLE_NAME + " (" +
-				TableEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-				TableEntry.COLUMN_DATE_NAME + " " + TableEntry.COLUMN_DATE_TYPE + ", " +
-				TableEntry.COLUMN_CREATED_NAME + " " + TableEntry.COLUMN_CREATED_TYPE + ", " +
-				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ")";
-		db.execSQL(creationSQL);
-		creationSQL = "CREATE TABLE queries (" +
-				TableEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-				TableEntry.COLUMN_QUERIED_NAME + " " + TableEntry.COLUMN_QUERIED_TYPE + ")";
-		db.execSQL(creationSQL);
+		CreateQuery createTables = new CreateQuery(TableColumns.TABLE_NAME);
+		for (TableColumns column : TableColumns.values()) {
+			createTables.addColumn(column.name(), column.type());
+		}
+		db.execSQL(createTables.toString());
+		
+		CreateQuery createLog = new CreateQuery(LogColumns.TABLE_NAME);
+		for (LogColumns column : LogColumns.values()) {
+			createLog.addColumn(column.name(), column.type());
+		}
+		db.execSQL(createLog.toString());
 	}
 
 	@Override

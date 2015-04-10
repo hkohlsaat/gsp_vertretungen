@@ -73,7 +73,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			scheduler.schedule();
 			return true;
 		case R.id.action_see_queries:
-			startActivity(new Intent(this, org.aweture.wonk.tmp.Activity.class));
+			startActivity(new Intent(this, org.aweture.wonk.log.Activity.class));
 			return true;
 
 		default:
