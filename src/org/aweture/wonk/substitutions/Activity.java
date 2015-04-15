@@ -11,7 +11,9 @@ import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.PlansLoader;
 import org.aweture.wonk.storage.SimpleData;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -30,6 +32,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	private ViewPager viewPager;
 	private TabStrip tabStrip;
 	
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,6 +49,9 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			adapter = new SubstitutionsFragmentAdapter();
 			
 			viewPager.setAdapter(adapter);
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+				tabStrip.setElevation(5);
 
 			LoaderManager manager = getSupportLoaderManager();
 			manager.initLoader(R.id.substitutions_Activty_PlansLoader, null, adapter);

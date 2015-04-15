@@ -57,10 +57,17 @@ public class SubstitutionsFragment extends Fragment {
 		
 		// Set up the RecyclerView
 		Context context = inflater.getContext();
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(adapter);
+		recyclerView.setLayoutManager(new LinearLayoutManager(context));
+		recyclerView.setAdapter(adapter);
 
 		return view;
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LoaderManager manager = getLoaderManager();
+		manager.destroyLoader(R.id.substitutions_Fragement_PlansLoader);
 	}
 	
 	public void setPlanIndex(int planIndex) {
@@ -87,10 +94,9 @@ public class SubstitutionsFragment extends Fragment {
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-	        ClassView view = new ClassView(getActivity());
-	        ViewHolder vh = new ViewHolder(view);
-	        return vh;
-
+			ClassView view = new ClassView(getActivity());
+			ViewHolder vh = new ViewHolder(view);
+			return vh;
 		}
 
 		@Override

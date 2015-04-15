@@ -24,6 +24,9 @@ public class Activity extends android.app.Activity {
 	
 	private EditText usernameInput;
 	private EditText passwordInput;
+
+	private View loginButton;
+	private View progressBar;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,8 @@ public class Activity extends android.app.Activity {
 		setContentView(R.layout.activity_landing);
 		usernameInput = (EditText) findViewById(R.id.login_username);
 		passwordInput = (EditText) findViewById(R.id.login_password);
+		loginButton = findViewById(R.id.button1);
+		progressBar = findViewById(R.id.progressBar);
 	}
 	
 	@Override
@@ -55,6 +60,9 @@ public class Activity extends android.app.Activity {
 		SimpleData data = SimpleData.getInstance(this);
 		data.setUsername(username);
 		data.setPassword(password);
+		
+		loginButton.setVisibility(View.GONE);
+		progressBar.setVisibility(View.VISIBLE);
 	}
 
 	private void loginSuccess() {
@@ -110,7 +118,7 @@ public class Activity extends android.app.Activity {
 		dialog.show(getFragmentManager(), tag + "Dialog");
 	}
 	
-	private static class OKDialog extends DialogFragment {
+	private class OKDialog extends DialogFragment {
 		
 		public static final String KEY_MESSAGE = "message";
 		public static final String KEY_WIPE_PASSWORD = "wipe";
@@ -130,6 +138,9 @@ public class Activity extends android.app.Activity {
 					if (wipeInput) {
 						((Activity) getActivity()).passwordInput.setText("");
 					}
+
+					loginButton.setVisibility(View.VISIBLE);
+					progressBar.setVisibility(View.GONE);
 				}
 			});
 			return builder.create();
