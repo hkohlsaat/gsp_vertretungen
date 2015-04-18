@@ -39,8 +39,10 @@ public class Teachers {
 	
 	
 	private void populateTeachersMap(Context context) {
-		try (InputStream inputStream = context.getAssets().open("teachers.xml")) {
-			
+		InputStream inputStream = null;
+		try {
+			inputStream = context.getAssets().open("teachers.xml");
+					
 	        XmlPullParser parser = Xml.newPullParser();
 	        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 	        parser.setInput(inputStream, null);
@@ -60,6 +62,17 @@ public class Teachers {
 	        	parser.nextText();
 	        }
 		} catch (IOException | XmlPullParserException e) {
+			LogUtil.e(e);
+		} finally {
+			closeInputStream(inputStream);
+		}
+	}
+	
+	private void closeInputStream(InputStream i) {
+		try {
+			if (i != null)
+				i.close();
+		} catch (Exception e) {
 			LogUtil.e(e);
 		}
 	}

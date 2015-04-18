@@ -1,11 +1,10 @@
 package org.aweture.wonk.substitutions;
 
+import static android.view.View.GONE;
 import android.graphics.Point;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-
-import static android.view.View.GONE;
 
 public class AppearanceAnimation extends Animation {
 	

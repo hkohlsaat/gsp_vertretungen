@@ -1,6 +1,7 @@
 package org.aweture.wonk.storage;
 
-import org.aweture.wonk.storage.DataContract.*;
+import org.aweture.wonk.storage.DataContract.LogColumns;
+import org.aweture.wonk.storage.DataContract.TableColumns;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

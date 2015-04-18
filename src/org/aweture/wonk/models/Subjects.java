@@ -39,7 +39,9 @@ public class Subjects {
 	
 	
 	private void populateSubjectsMap(Context context) {
-		try (InputStream inputStream = context.getAssets().open("subjects.xml")) {
+		InputStream inputStream = null;
+		try {
+			inputStream = context.getAssets().open("subjects.xml");
 			
 	        XmlPullParser parser = Xml.newPullParser();
 	        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -61,6 +63,17 @@ public class Subjects {
 	        	parser.nextText();
 	        }
 		} catch (IOException | XmlPullParserException e) {
+			LogUtil.e(e);
+		} finally {
+			closeInputStream(inputStream);
+		}
+	}
+	
+	private void closeInputStream(InputStream i) {
+		try {
+			if (i != null)
+				i.close();
+		} catch (Exception e) {
 			LogUtil.e(e);
 		}
 	}

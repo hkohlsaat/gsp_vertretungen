@@ -2,6 +2,8 @@ package org.aweture.wonk.substitutions;
 
 import java.util.List;
 
+import org.aweture.wonk.Application;
+import org.aweture.wonk.LicensesDialogFragment;
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.background.UpdateService;
@@ -66,7 +68,11 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.substitutes, menu);
+	    if (Application.IN_DEBUG_MODE) {
+	    	inflater.inflate(R.menu.substitutes_debug_mode, menu);
+	    } else {
+	    	inflater.inflate(R.menu.substitutes, menu);
+	    }
 	    return true;
 	}
 	
@@ -77,6 +83,10 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			startService(new Intent(this, UpdateService.class));
 			UpdateScheduler scheduler = new UpdateScheduler(this);
 			scheduler.schedule();
+			return true;
+		case R.id.action_show_licenses:
+			LicensesDialogFragment fragment = new LicensesDialogFragment();
+			fragment.show(getFragmentManager(), "LicensesDialog");
 			return true;
 		case R.id.action_see_queries:
 			startActivity(new Intent(this, org.aweture.wonk.log.Activity.class));
