@@ -5,9 +5,11 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Substitution;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;

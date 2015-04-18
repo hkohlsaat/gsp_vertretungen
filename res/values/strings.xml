@@ -4,7 +4,7 @@
     <!-- Strings regarding the app in general -->
     <string name="app_name">Vertretungen</string>
     <string name="substitutions_plan">Vertretungsplan</string>
-    <string name="timetable">Stundenplan</string>
+    <string name="licenses">Licenses</string>
     
     <!-- Strings regarding actions -->
     <string name="action_update">Aktualisieren</string>
