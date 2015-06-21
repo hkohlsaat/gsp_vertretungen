@@ -4,6 +4,7 @@ package org.aweture.wonk.models;
 public interface SubstitutionsGroup extends Comparable<SubstitutionsGroup> {
 
 	public String getName();
-	public void setName(String name);
+	public void baseUppon(Object base);
+	public boolean isBasedUppon(Object potentialBase);
 	public boolean isStudentMode();
 }

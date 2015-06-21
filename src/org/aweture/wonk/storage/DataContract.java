@@ -33,8 +33,12 @@ public final class DataContract {
 		INSTD_SUBJECT("TEXT"),
 		KIND("TEXT"),
 		TEXT("TEXT"),
-		CLASS("TEXT");
+		CLASS("TEXT"),
+		TASK_PROVIDER("TEXT");
 		
+
+		public static final String STUDENT_SUFIX = "_student";
+		public static final String TEACHER_SUFIX = "_teacher";
 		
 		private final String TYPE;
 		
@@ -46,6 +50,7 @@ public final class DataContract {
 			return TYPE;
 		}
 	}
+	
 	
 	public enum LogColumns {
 		

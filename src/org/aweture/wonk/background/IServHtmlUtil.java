@@ -77,7 +77,7 @@ public class IServHtmlUtil {
 	
 	private void readPlans(NodeList nodeList) {
 		List<Plan> plans = new ArrayList<Plan>();
-		int nodeLength = nodeList.getLength() / 2;
+		int nodeLength = nodeList.getLength();
 		for (int i = 1; i < nodeLength; i += 2) {
 			// Get as of time.
 			Node asOfTimeNode = nodeList.item(i - 1);
@@ -138,6 +138,10 @@ public class IServHtmlUtil {
 		String compactClassName = cells.item(0).getTextContent();
 		if (compactClassName != null && !compactClassName.matches("(SLR)|(Ltg)")) {
 			String[] classNames = filterClassNames(compactClassName);
+			compactClassName = classNames[0];
+			for (int i = 1; i < classNames.length; i++) {
+				compactClassName += "," + classNames[i];
+			}
 			String periodsString = cells.item(1).getTextContent();
 			int[] periods = filterPeriods(periodsString);
 			String substTeacher = cells.item(2).getTextContent();
@@ -154,27 +158,36 @@ public class IServHtmlUtil {
 				kind = "Vertretung";
 			String text = removeNull(cells.item(7).getTextContent());
 			text = text.replaceAll("regul.r", "regulär");
+			Pattern taskPattern = Pattern.compile("Aufg(\\.|(abe)) [A-Za-z]{2,3}");
+			Matcher taskMatcher = taskPattern.matcher(text);
+			String taskProvider = "";
+			while (taskMatcher.find()) {
+				int end = taskMatcher.end();
+				if (end != text.length() && text.charAt(end) != ' ')
+					continue;
+				int start = end - 3;
+				taskProvider += "," + text.substring(start, end).trim();
+			}
 			
-			
-			for (String className : classNames) {
-				Class currentClass = new Class();
-				currentClass.setName(className);
-				List<Substitution> substitutions = plan.get(currentClass);
-				if (substitutions == null) {
-					substitutions = new ArrayList<Substitution>();
-					plan.put(currentClass, substitutions);
-				}
-				for (int period : periods) {
-					Substitution substitution = new Substitution();
-					substitution.setPeriodNumber(period);
-					substitution.setSubstTeacher(new Teacher(substTeacher));
-					substitution.setInstdTeacher(new Teacher(instdTeacher));
-					substitution.setInstdSubject(new Subject(instdSubject));
-					substitution.setKind(kind);
-					substitution.setText(text);
-					substitutions.add(substitution);
-					LogUtil.d(className + "\t| " + period + "\t| " + substTeacher + "\t| " + instdTeacher + "\t| " + instdSubject + "\t| " + kind  + "\t| " + text);
-				}
+			Class currentClass = new Class();
+			currentClass.baseUppon(compactClassName);
+			List<Substitution> substitutions = plan.get(currentClass);
+			if (substitutions == null) {
+				substitutions = new ArrayList<Substitution>();
+				plan.put(currentClass, substitutions);
+			}
+			for (int period : periods) {
+				Substitution substitution = new Substitution();
+				substitution.setPeriodNumber(period);
+				substitution.setSubstTeacher(new Teacher(substTeacher));
+				substitution.setInstdTeacher(new Teacher(instdTeacher));
+				substitution.setInstdSubject(new Subject(instdSubject));
+				substitution.setKind(kind);
+				substitution.setText(text);
+				substitution.setClassName(compactClassName);
+				substitution.setTaskProvider(new Teacher(taskProvider));
+				substitutions.add(substitution);
+				LogUtil.d(compactClassName + "\t| " + period + "\t| " + substTeacher + "\t| " + instdTeacher + "\t| " + instdSubject + "\t| " + kind  + "\t| " + text  + "\t| " + taskProvider);
 			}
 		}
 	}

@@ -12,6 +12,7 @@ public class Substitution {
 	private String kind;
 	private String text;
 	private String className;
+	private Teacher taskProvider;
 	
 	public int getPeriodNumber() {
 		return periodNumber;
@@ -30,6 +31,12 @@ public class Substitution {
 	}
 	public String getText() {
 		return text;
+	}
+	public String getClassName() {
+		return className;
+	}
+	public Teacher getTaskProvider() {
+		return taskProvider;
 	}
 	public void setPeriodNumber(int periodNumber) {
 		this.periodNumber = periodNumber;
@@ -52,10 +59,10 @@ public class Substitution {
 	public boolean hasText() {
 		return !text.isEmpty();
 	}
-	public String getClassName() {
-		return className;
-	}
 	public void setClassName(String className) {
 		this.className = className;
+	}
+	public void setTaskProvider(Teacher taskProvider) {
+		this.taskProvider = taskProvider;
 	}
 }

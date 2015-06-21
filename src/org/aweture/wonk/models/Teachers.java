@@ -180,5 +180,30 @@ public class Teachers {
 		public String getShortName() {
 			return abbreviation;
 		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Teacher other = (Teacher) obj;
+			if (abbreviation == null) {
+				if (other.abbreviation != null)
+					return false;
+			} else if (!abbreviation.equals(other.abbreviation))
+				return false;
+			return true;
+		}
+		
+		public String toString() {
+			if (abbreviation.equals(name)) {
+				return abbreviation;
+			} else {
+				return name + " (" + abbreviation + ")";
+			}
+		}
 	}
 }

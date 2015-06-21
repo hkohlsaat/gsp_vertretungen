@@ -9,7 +9,6 @@ import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.PlansLoader;
 import org.aweture.wonk.storage.SimpleData;
 
@@ -109,7 +108,8 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	
 	private class SubstitutionsFragmentAdapter extends FragmentPagerAdapter implements LoaderCallbacks<List<Plan>> {
 		
-		private int count = 0;
+		private int count = -1;
+		private List<Plan> plans;
 		
 		public SubstitutionsFragmentAdapter() {
 			super(getSupportFragmentManager());
@@ -134,8 +134,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		@Override
 		public CharSequence getPageTitle(int position) {
-			DataStore dataStore = new DataStore(Activity.this);
-			Plan plan = dataStore.getCurrentPlans().get(position);
+			Plan plan = plans.get(position);
 			Date date = plan.getDate();
 			String relativeWord = date.resolveToRelativeWord();
 			if (relativeWord != null) {
@@ -153,10 +152,15 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		public void onLoadFinished(Loader<List<Plan>> loader, List<Plan> data) {
 			if (count != data.size()) {
 				count = data.size();
+				plans = data;
 				notifyDataSetChanged();
-
-				View loadingPlaceholder = findViewById(R.id.progressPlaceholder);
-				loadingPlaceholder.setVisibility(View.GONE);
+			}
+			if (count == 0 && !UpdateService.isUpdating()) {
+				findViewById(R.id.progressBar).setVisibility(View.GONE);
+				findViewById(R.id.progressPlaceholder).setVisibility(View.VISIBLE);
+				findViewById(R.id.noData).setVisibility(View.VISIBLE);
+			} else if (count != 0) {
+				findViewById(R.id.progressPlaceholder).setVisibility(View.GONE);
 			}
 			
 			tabStrip.setViewPager(viewPager);
@@ -164,11 +168,11 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		public void onLoaderReset(Loader<List<Plan>> loader) {
-			count = 0;
+			count = -1;
 			notifyDataSetChanged();
 			
-			View loadingPlaceholder = findViewById(R.id.progressPlaceholder);
-			loadingPlaceholder.setVisibility(View.VISIBLE);
+			findViewById(R.id.progressPlaceholder).setVisibility(View.VISIBLE);
+			findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 		}
 	}
 }

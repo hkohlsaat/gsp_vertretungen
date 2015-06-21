@@ -3,11 +3,18 @@ package org.aweture.wonk.models;
 
 public class Substitute implements SubstitutionsGroup {
 	
+	private Object base;
 	private String name = "";
 
 	@Override
-	public void setName(String name) {
-		this.name = name;
+	public void baseUppon(Object base) {
+		this.base = base;
+		name = base.toString();
+	}
+	
+	@Override
+	public boolean isBasedUppon(Object potentialBase) {
+		return base.equals(potentialBase);
 	}
 
 	@Override

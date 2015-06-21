@@ -17,6 +17,12 @@ import android.content.Context;
 import android.content.Intent;
 
 public class UpdateService extends IntentService {
+	
+	private static boolean isUpdating = false;
+	
+	public static boolean isUpdating() {
+		return isUpdating;
+	}
 
 	public UpdateService() {
 		super(UpdateService.class.getSimpleName());
@@ -24,6 +30,11 @@ public class UpdateService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		if (isUpdating) {
+			return;
+		} else {
+			isUpdating = true;
+		}
 		Application application = (Application) getApplication();
 		String message = "no connectivity";
 		
@@ -48,6 +59,8 @@ public class UpdateService extends IntentService {
 				message = "fail";	
 			}
 		}
+		
+		isUpdating = false;
 		
 		LogUtil.logToDB(getApplicationContext(), new Date().toDateTimeString() + "\t" + message);
 	}

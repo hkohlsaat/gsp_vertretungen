@@ -21,12 +21,8 @@
     <string name="login_fail">Leider sind die eingegebenen Daten falsch. Bitte überprüfe Deinen Nutzernamen und gib Dein Passwort noch einmal ein.</string>
     <string name="no_network">Das Gerät hat momentan keine Netzwerkverbindung. Bitte versuche es bei Netzwerkzugang erneut.</string>
     
-    <!-- Strings regarding substitution details -->
-    <string name="substitution_details">Vertretungsdetails</string>
-    <string name="instead_of">statt</string>
-    <string name="info">Info</string>
-    <string name="in1">in der</string>
-    <string name="in2">in</string>
+    <!-- Strings regarding substitutions section -->
+    <string name="no_data">Keine Daten</string>
     
     <!-- Strings regarding settings -->
     <string name="settings">Einstellungen</string>

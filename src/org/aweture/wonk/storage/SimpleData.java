@@ -76,7 +76,7 @@ public class SimpleData {
 	}
 	public void setTeachersVersion(int versionNumber) {
 		Editor editor = sharedPreferences.edit();
-		editor.putInt(KEY_FILTER, versionNumber).apply();
+		editor.putInt(KEY_TEACHERS_VERSION, versionNumber).apply();
 	}
 	
 	public int getSubjectsVersion(int defaultVersion) {

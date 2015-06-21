@@ -14,9 +14,12 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	
 	private static final String DATABASE_NAME = "wonk.db";
 	private static final int DATABASE_VERSION = 4;
-
+	
+	private Context context;
+	
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this.context = context;
 	}
 
 	@Override
@@ -52,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		}
 		db.execSQL(createSubjects.toString());
 	}
+	
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -61,6 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		} else if (oldVersion == 3) {
 			createTeachersTable(db);
 			createSubjectsTable(db);
+			new DataStore(context).resetDatabase(db);
 		} else {
 			throwBecauseOldVersionNotHandled(oldVersion);
 		}

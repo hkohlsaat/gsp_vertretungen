@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 
 public class Application extends android.app.Application {
 	
-	public static boolean IN_DEBUG_MODE = true;
+	public static boolean IN_DEBUG_MODE = false;
 	
 	public boolean hasConnectivity() {
 		ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);

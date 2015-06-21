@@ -9,8 +9,8 @@ import java.util.Queue;
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.SubstitutionsGroup;
-import org.aweture.wonk.models.Teachers.Teacher;
 import org.aweture.wonk.storage.SimpleData;
+import org.aweture.wonk.substitutions.SubstitutionPresentation.PresentationFor;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -19,8 +19,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import static org.aweture.wonk.substitutions.SubstitutionPresentation.PresentationFor;
 
 public class SubstGroupView extends LinearLayout implements Comparator<Substitution> {
 
@@ -87,17 +85,16 @@ public class SubstGroupView extends LinearLayout implements Comparator<Substitut
 	private void applySubstitutionsToItems() {
 		SimpleData simpleData = new SimpleData(getContext());
 		boolean student = simpleData.isStudent();
+		
 		for (Substitution substitution : substitutions) {
 			SubstitutionView nextItem = getUndisplayedSubstitutionView();
 			if (student) {
 				nextItem.setSubstitution(substitution, PresentationFor.Student);
 			} else {
-				Teacher substTeacher = substitution.getSubstTeacher();
-				String potentTialGroupName = substTeacher.getName() + " (" + substTeacher.getShortName() + ")";
-				if (currentGroup.getName().equals(potentTialGroupName)) {
-					nextItem.setSubstitution(substitution, PresentationFor.Substitute);
-				} else {
+				if (currentGroup.isBasedUppon(substitution.getTaskProvider())) {
 					nextItem.setSubstitution(substitution, PresentationFor.TaskProvider);
+				} else {
+					nextItem.setSubstitution(substitution, PresentationFor.Substitute);
 				}
 			}
 			items.add(nextItem);

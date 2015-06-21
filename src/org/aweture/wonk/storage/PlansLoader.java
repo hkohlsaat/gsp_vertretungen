@@ -22,14 +22,20 @@ public class PlansLoader extends AsyncTaskLoader<List<Plan>> {
 	@Override
 	protected void onStartLoading() {
 		forceLoad();
-		
-		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
-		IntentFilter filter = new IntentFilter(DataStore.NEW_PLANS_ACTION);
-		manager.registerReceiver(receiver, filter);
+		registerReceiver();
 	}
 	
 	@Override
 	protected void onStopLoading() {
+		unregisterReceiver();
+	}
+	
+	private void registerReceiver() {
+		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
+		IntentFilter filter = new IntentFilter(DataStore.NEW_PLANS_ACTION);
+		manager.registerReceiver(receiver, filter);
+	}
+	private void unregisterReceiver() {
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getContext());
 		manager.unregisterReceiver(receiver);
 	}
@@ -37,7 +43,12 @@ public class PlansLoader extends AsyncTaskLoader<List<Plan>> {
 	@Override
 	public List<Plan> loadInBackground() {
 		DataStore dataStore = new DataStore(getContext());
-		return dataStore.getCurrentPlans();
+		SimpleData simpleData = new SimpleData(getContext());
+		if (simpleData.isStudent()) {
+			return dataStore.getStudentPlans();
+		} else {
+			return dataStore.getTeacherPlans();
+		}
 	}
 	
 	private class NewPlansBroadcastReceiver extends BroadcastReceiver {
@@ -46,6 +57,6 @@ public class PlansLoader extends AsyncTaskLoader<List<Plan>> {
 		public void onReceive(Context context, Intent intent) {
 			forceLoad();
 		}
+		
 	}
-
 }
