@@ -24,7 +24,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		setContentView(R.layout.activity_settings);
 
-		SimpleData simpleData = SimpleData.getInstance(this);
+		SimpleData simpleData = new SimpleData(this);
 		isStudent = simpleData.isStudent();
 		filter = simpleData.getFilter("");
 		
@@ -69,14 +69,14 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	
 	public void onRadioButtonClicked(View radioButton) {
 		isStudent = studentButton == radioButton;
-		SimpleData simpleData = SimpleData.getInstance(this);
+		SimpleData simpleData = new SimpleData(this);
 		simpleData.setWhetherStudent(isStudent);
 		hintFilter();
 	}
 	
 	private void saveFilter() {
 		String filter = filterEditText.getText().toString();
-		SimpleData simpleData = SimpleData.getInstance(this);
+		SimpleData simpleData = new SimpleData(this);
 		simpleData.setFilter(filter);
 	}
 

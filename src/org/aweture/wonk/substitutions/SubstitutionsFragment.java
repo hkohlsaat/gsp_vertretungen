@@ -2,11 +2,9 @@ package org.aweture.wonk.substitutions;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.aweture.wonk.R;
-import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.SubstitutionsGroup;
 import org.aweture.wonk.storage.PlansLoader;

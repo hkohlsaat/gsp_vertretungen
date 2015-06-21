@@ -11,24 +11,16 @@ public class SimpleData {
 	private static final String KEY_PASSWORD = "password";
 	private static final String KEY_IS_STUDENT = "is_student";
 	private static final String KEY_FILTER = "filter";
-	
+	private static final String KEY_SUBJECTS_VERSION = "subjects_version";
+	private static final String KEY_TEACHERS_VERSION = "teachers_version";
 	
 	private static final boolean STD_VALUE_IS_STUDENT = true;
 	
-	private static SimpleData singletonInstance;
-	
 	private SharedPreferences sharedPreferences;
 	
-	private SimpleData(Context context) {
+	public SimpleData(Context context) {
 		String name = this.getClass().getName();
 		sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
-	}
-	
-	public static SimpleData getInstance(Context context) {
-		if (singletonInstance == null) {
-			singletonInstance = new SimpleData(context);
-		}
-		return singletonInstance;
 	}
 
 	public boolean isUserdataInserted(boolean defaultBoolean) {
@@ -77,5 +69,21 @@ public class SimpleData {
 	public void setFilter(String filter) {
 		Editor editor = sharedPreferences.edit();
 		editor.putString(KEY_FILTER, filter).apply();
+	}
+
+	public int getTeachersVersion(int defaultVersion) {
+		return sharedPreferences.getInt(KEY_TEACHERS_VERSION, defaultVersion);
+	}
+	public void setTeachersVersion(int versionNumber) {
+		Editor editor = sharedPreferences.edit();
+		editor.putInt(KEY_FILTER, versionNumber).apply();
+	}
+	
+	public int getSubjectsVersion(int defaultVersion) {
+		return sharedPreferences.getInt(KEY_SUBJECTS_VERSION, defaultVersion);
+	}
+	public void setSubjectsVersion(int versionNumber) {
+		Editor editor = sharedPreferences.edit();
+		editor.putInt(KEY_SUBJECTS_VERSION, versionNumber).apply();
 	}
 }

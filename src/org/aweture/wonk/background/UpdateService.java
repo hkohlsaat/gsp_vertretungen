@@ -38,7 +38,7 @@ public class UpdateService extends IntentService {
 				message = "success";	
 				break;
 			case WrongData:
-				SimpleData data = SimpleData.getInstance(getApplicationContext());
+				SimpleData data = new SimpleData(getApplicationContext());
 				data.setUserdataInserted(false);
 				UpdateScheduler updateScheduler = new UpdateScheduler(getApplicationContext());
 				updateScheduler.unschedule();
@@ -61,7 +61,7 @@ public class UpdateService extends IntentService {
 	}
 	
 	private IServManager getIServManager() {
-		SimpleData data = SimpleData.getInstance(getApplicationContext());
+		SimpleData data = new SimpleData(getApplicationContext());
 		String username = data.getUsername("");
 		String password = data.getPassword("");
 		return new IServManagerImpl(username, password);
@@ -82,7 +82,7 @@ public class UpdateService extends IntentService {
 		IServHtmlUtil iServHtmlTable = new IServHtmlUtil(plan);
 		List<Plan> plans = iServHtmlTable.toPlans();
 		Context context = getApplicationContext();
-		DataStore dataStore = DataStore.getInstance(context);
+		DataStore dataStore = new DataStore(context);
 		dataStore.savePlans(plans);
 	}
 }

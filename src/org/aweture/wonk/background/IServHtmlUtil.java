@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,9 +16,9 @@ import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.Subjects.Subject;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.Teachers.Teacher;
-import org.aweture.wonk.models.Subjects.Subject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -77,11 +76,9 @@ public class IServHtmlUtil {
 	}
 	
 	private void readPlans(NodeList nodeList) {
-		// Initialize a Plan[].
-		int planCount = nodeList.getLength() / 2;
-		Plan[] plans = new Plan[planCount];
-		// Fill the Plan[].
-		for (int i = 1; i < planCount * 2; i += 2) {
+		List<Plan> plans = new ArrayList<Plan>();
+		int nodeLength = nodeList.getLength() / 2;
+		for (int i = 1; i < nodeLength; i += 2) {
 			// Get as of time.
 			Node asOfTimeNode = nodeList.item(i - 1);
 			String creationTime = getCreationTime(asOfTimeNode);
@@ -98,9 +95,9 @@ public class IServHtmlUtil {
 			plan.setDate(date);
 			plan.setQueried(new Date());
 			transferSubstitutions(plan, currentElement.getElementsByTagName("table"));
-			plans[(i - 1) / 2] = plan;
+			plans.add(plan);
 		}
-		this.plans = Arrays.asList(plans);
+		this.plans = plans;
 	}
 	
 	private String getCreationTime(Node node) {
@@ -176,6 +173,7 @@ public class IServHtmlUtil {
 					substitution.setKind(kind);
 					substitution.setText(text);
 					substitutions.add(substitution);
+					LogUtil.d(className + "\t| " + period + "\t| " + substTeacher + "\t| " + instdTeacher + "\t| " + instdSubject + "\t| " + kind  + "\t| " + text);
 				}
 			}
 		}
