@@ -57,7 +57,7 @@ public class Activity extends android.app.Activity {
 			showDialog(R.string.no_network, false, "NoNetwork");
 		}
 		
-		SimpleData data = SimpleData.getInstance(this);
+		SimpleData data = new SimpleData(this);
 		data.setUsername(username);
 		data.setPassword(password);
 		
@@ -66,7 +66,7 @@ public class Activity extends android.app.Activity {
 	}
 
 	private void loginSuccess() {
-		SimpleData data = SimpleData.getInstance(this);
+		SimpleData data = new SimpleData(this);
 		data.setUserdataInserted();
 		startService(new Intent(this, UpdateService.class));
 		UpdateScheduler updateScheduler = new UpdateScheduler(this);

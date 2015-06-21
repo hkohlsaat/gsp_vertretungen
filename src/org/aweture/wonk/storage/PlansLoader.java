@@ -36,7 +36,7 @@ public class PlansLoader extends AsyncTaskLoader<List<Plan>> {
 	
 	@Override
 	public List<Plan> loadInBackground() {
-		DataStore dataStore = DataStore.getInstance(getContext());
+		DataStore dataStore = new DataStore(getContext());
 		return dataStore.getCurrentPlans();
 	}
 	

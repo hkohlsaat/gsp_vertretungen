@@ -61,7 +61,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	}
 	
 	private boolean shouldDisplayLanding() {
-		SimpleData data = SimpleData.getInstance(this);
+		SimpleData data = new SimpleData(this);
 		return !data.isUserdataInserted(false);
 	}
 	
@@ -134,7 +134,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		@Override
 		public CharSequence getPageTitle(int position) {
-			DataStore dataStore = DataStore.getInstance(Activity.this);
+			DataStore dataStore = new DataStore(Activity.this);
 			Plan plan = dataStore.getCurrentPlans().get(position);
 			Date date = plan.getDate();
 			String relativeWord = date.resolveToRelativeWord();

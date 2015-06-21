@@ -85,7 +85,7 @@ public class SubstGroupView extends LinearLayout implements Comparator<Substitut
 	}
 	
 	private void applySubstitutionsToItems() {
-		SimpleData simpleData = SimpleData.getInstance(getContext());
+		SimpleData simpleData = new SimpleData(getContext());
 		boolean student = simpleData.isStudent();
 		for (Substitution substitution : substitutions) {
 			SubstitutionView nextItem = getUndisplayedSubstitutionView();

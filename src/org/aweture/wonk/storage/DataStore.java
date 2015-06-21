@@ -29,19 +29,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 public class DataStore {
 	
-	private static DataStore singletonInstance;
-	
-	public static DataStore getInstance(Context context) {
-		if (singletonInstance == null) {
-			singletonInstance = new DataStore(context);
-		} else {
-			synchronized (singletonInstance) {
-				singletonInstance.context = context;
-			}
-		}
-		return singletonInstance;
-	}
-	
 	public static final String NEW_PLANS_ACTION = "org.aweture.wonk.storage.DataStore.NEW_PLANS_ACTION";
 
 	private Context context;
@@ -50,10 +37,12 @@ public class DataStore {
 	private Teachers teachers;
 	private Subjects subjects;
 	
-	DataStore(Context context) {
+	public DataStore(Context context) {
 		this.context = context;
-		this.teachers = new Teachers(context);
-		this.subjects = new Subjects(context);
+		teachers = new Teachers(context);
+		teachers.prefetch();
+		subjects = new Subjects(context);
+		subjects.prefetch();
 	}
 
 	public synchronized List<Plan> getCurrentPlans() {
@@ -91,7 +80,7 @@ public class DataStore {
 		
 		List<Plan> plans = new ArrayList<Plan>();
 		
-		SimpleData simpleData = SimpleData.getInstance(context);
+		SimpleData simpleData = new SimpleData(context);
 		boolean studentRepresentation = simpleData.isStudent();
 		
 		while (plansCursor.moveToNext()) {
@@ -209,17 +198,8 @@ public class DataStore {
 		}
 		
 		plansCursor.close();
-		database.close();
+		dbHelper.close();
 		return plans;
-	}
-	
-	private SubstitutionsGroup newSubstitutionsGroup() {
-		SimpleData simpleData = SimpleData.getInstance(context);
-		if (simpleData.isStudent()) {
-			return new Class();
-		} else {
-			return new Substitute();
-		}
 	}
 	
 	private void insertPlans(List<Plan> plans) {

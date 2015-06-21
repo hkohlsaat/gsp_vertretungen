@@ -2,45 +2,111 @@ package org.aweture.wonk.models;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.aweture.wonk.log.LogUtil;
+import org.aweture.wonk.storage.DataContract;
+import org.aweture.wonk.storage.DataContract.TeachersColumns;
+import org.aweture.wonk.storage.DatabaseHelper;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Xml;
 
 public class Teachers {
-
-	private final String ATTRIBUTE_SHORT= "short";
-	private final String ATTRIBUTE_NAME = "name";
-	private final String ATTRIBUTE_NAME_COMPELLATION = "name_compellation";
-	private final String ATTRIBUTE_ACCUSATIVE = "accusative";
 	
-    private Map<String, Teacher> teachers = new HashMap<String, Teacher>();
+	public static final int VERSION = 0;
+
+	private static final String ATTRIBUTE_SHORT= "short";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_COMPELLATION = "compellation";
+	
+	private Context context;
+	private HashMap<String, Teacher> prefetchTeachers;
 	
 	public Teachers(Context context) {
-		teachers = new HashMap<String, Teacher>();
-        
-		populateTeachersMap(context);
+		this.context = context;
 	}
 	
-	public Teacher getTeacher(String shortName) {
-		Teacher teacher = getTeacherOrNull(shortName);
+	public void rewriteTable() {
+		DatabaseHelper dbHelper = new DatabaseHelper(context);
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		db.execSQL("DELETE FROM " + TeachersColumns.TABLE_NAME);
+		List<String> insertStatements = getInsetStatements();
+		for (String statement : insertStatements) {
+			db.execSQL(statement);
+		}
+		db.close();
+	}
+	
+	public void prefetch() {
+		prefetchTeachers = new HashMap<String, Teacher>();
+		DatabaseHelper dbHelper = new DatabaseHelper(context);
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(TeachersColumns.TABLE_NAME, null, null, null, null, null, null);
+		
+		while(cursor.moveToNext()) {
+			String name = cursor.getString(cursor.getColumnIndex(TeachersColumns.NAME.name()));
+			String abbreviation = cursor.getString(cursor.getColumnIndex(TeachersColumns.ABBREVIATION.name()));
+			String compellation = cursor.getString(cursor.getColumnIndex(TeachersColumns.COMPELLATION.name()));
+			
+			Teacher teacher = new Teacher();
+			teacher.setAbbreviation(abbreviation);
+			teacher.setName(name);
+			teacher.setCompellation(compellation);
+			prefetchTeachers.put(abbreviation, teacher);
+		}
+		
+		cursor.close();
+		db.close();
+	}
+	
+	public Teacher getTeacher(String abbreviation) {
+		Teacher teacher = getTeacherOrNull(abbreviation);
 		if (teacher == null) {
-			teacher = new Teacher(shortName);
+			teacher = new Teacher(abbreviation);
 		}
 		return teacher;
 	}
 	
-	public Teacher getTeacherOrNull(String shortName) {
-		return teachers.get(shortName);
+	public Teacher getTeacherOrNull(String abbreviation) {
+		if (prefetchTeachers != null) {
+			return prefetchTeachers.get(abbreviation);
+		} else {
+			return querySingleTeacher(abbreviation);
+		}
+	}
+	
+	private Teacher querySingleTeacher(String abbreviation) {
+		DatabaseHelper dbHelper = new DatabaseHelper(context);
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(TeachersColumns.TABLE_NAME, null, TeachersColumns.ABBREVIATION
+				+ " = \"" + abbreviation + "\"", null, null, null, null);
+		
+		Teacher teacher = null;
+		if (cursor.moveToNext()) {
+			String name = cursor.getString(cursor.getColumnIndex(TeachersColumns.NAME.name()));
+			String compellation = cursor.getString(cursor.getColumnIndex(TeachersColumns.COMPELLATION.name()));
+			
+			teacher = new Teacher();
+			teacher.setAbbreviation(abbreviation);
+			teacher.setName(name);
+			teacher.setCompellation(compellation);
+		}
+		
+		cursor.close();
+		db.close();
+		return teacher;
 	}
 	
 	
-	private void populateTeachersMap(Context context) {
+	private List<String> getInsetStatements() {
+		List<String> sqlStatements = new ArrayList<String>();
 		InputStream inputStream = null;
 		try {
 			inputStream = context.getAssets().open("teachers.xml");
@@ -51,18 +117,15 @@ public class Teachers {
 	        parser.nextTag();
 	        
 	        while (parser.nextTag() == XmlPullParser.START_TAG){
-	        	String shortName = parser.getAttributeValue(null, ATTRIBUTE_SHORT);
-	    		String accusative = parser.getAttributeValue(null, ATTRIBUTE_ACCUSATIVE);
+	        	String abbreviation = parser.getAttributeValue(null, ATTRIBUTE_SHORT);
 	    		String name = parser.getAttributeValue(null, ATTRIBUTE_NAME);
-	    		String nameWithCompellation = parser.getAttributeValue(null, ATTRIBUTE_NAME_COMPELLATION);
+	    		String compellation = parser.getAttributeValue(null, ATTRIBUTE_COMPELLATION);
 	    		
-	    		Teacher teacher = new Teacher();
-	    		teacher.setShortName(shortName);
-	    		teacher.setName(name);
-	    		teacher.setAccusative(accusative);
-	    		teacher.setNameWithCompellation(nameWithCompellation);
+	    		sqlStatements.add("INSERT INTO " + DataContract.TeachersColumns.TABLE_NAME + " ("
+	    				+ TeachersColumns.ABBREVIATION + ", " + TeachersColumns.NAME + ", "
+	    				+ TeachersColumns.COMPELLATION + ") VALUES (\"" + abbreviation + "\", \""
+	    				+ name + "\", \"" + compellation + "\")");
 	    		
-	    		teachers.put(shortName, teacher);
 	        	parser.nextText();
 	        }
 		} catch (IOException | XmlPullParserException e) {
@@ -70,6 +133,7 @@ public class Teachers {
 		} finally {
 			closeInputStream(inputStream);
 		}
+		return sqlStatements;
 	}
 	
 	private void closeInputStream(InputStream i) {
@@ -85,41 +149,36 @@ public class Teachers {
 
 	public static class Teacher {
 		private String name = "";
-		private String nameWithCompellation = "";
-		private String accusative = "";
-		private String shortName = "";
+		private String compellation = "";
+		private String abbreviation = "";
 		
 		public Teacher() {}
-		public Teacher(String shortName) {
-			name = shortName;
-			nameWithCompellation = shortName;
-			accusative = shortName;
-			this.shortName = shortName;
+		public Teacher(String abbreviation) {
+			name = abbreviation;
+			this.abbreviation = abbreviation;
+		}
+		
+		private void setAbbreviation(String abbreviation) {
+			this.abbreviation = abbreviation;
+		}
+		private void setName(String name) {
+			this.name = name;
+		}
+		private void setCompellation(String compellation) {
+			this.compellation = compellation;
 		}
 
 		public String getName() {
 			return name;
 		}
 		public String getNameWithCompellation() {
-			return nameWithCompellation;
+			return compellation + " " + name;
 		}
 		public String getAccusative() {
-			return accusative;
+			return getNameWithCompellation().replace("Herr", "Herrn");
 		}
 		public String getShortName() {
-			return shortName;
-		}
-		private void setNameWithCompellation(String name) {
-			this.nameWithCompellation = name;
-		}
-		private void setAccusative(String accusative) {
-			this.accusative = accusative;
-		}
-		private void setShortName(String shortName) {
-			this.shortName = shortName;
-		}
-		private void setName(String name) {
-			this.name = name;
+			return abbreviation;
 		}
 	}
 }
