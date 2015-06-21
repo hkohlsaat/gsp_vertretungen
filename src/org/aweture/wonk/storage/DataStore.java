@@ -1,13 +1,22 @@
 package org.aweture.wonk.storage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.Subjects;
+import org.aweture.wonk.models.Subjects.Subject;
+import org.aweture.wonk.models.Substitute;
 import org.aweture.wonk.models.Substitution;
+import org.aweture.wonk.models.SubstitutionsGroup;
+import org.aweture.wonk.models.Teachers;
+import org.aweture.wonk.models.Teachers.Teacher;
 import org.aweture.wonk.storage.DataContract.SubstitutionColumns;
 import org.aweture.wonk.storage.DataContract.TableColumns;
 
@@ -38,8 +47,13 @@ public class DataStore {
 	private Context context;
 	private List<Plan> plans;
 	
+	private Teachers teachers;
+	private Subjects subjects;
+	
 	DataStore(Context context) {
 		this.context = context;
+		this.teachers = new Teachers(context);
+		this.subjects = new Subjects(context);
 	}
 
 	public synchronized List<Plan> getCurrentPlans() {
@@ -77,6 +91,9 @@ public class DataStore {
 		
 		List<Plan> plans = new ArrayList<Plan>();
 		
+		SimpleData simpleData = SimpleData.getInstance(context);
+		boolean studentRepresentation = simpleData.isStudent();
+		
 		while (plansCursor.moveToNext()) {
 			final String dateString = plansCursor.getString(dateIndex);
 			final String createdString = plansCursor.getString(createdIndex);
@@ -106,20 +123,32 @@ public class DataStore {
 			
 			while (substitutionsCursor.moveToNext()) {
 				final int period = substitutionsCursor.getInt(periodIndex);
-				final String substTeacher = substitutionsCursor.getString(substTeacherIndex);
-				final String instdTeacher = substitutionsCursor.getString(instdTeacherIndex);
-				final String instdSubject = substitutionsCursor.getString(instdSubjectIndex);
+				final String substTeacherShort = substitutionsCursor.getString(substTeacherIndex);
+				final String instdTeacherShort = substitutionsCursor.getString(instdTeacherIndex);
+				final String instdSubjectShort = substitutionsCursor.getString(instdSubjectIndex);
 				final String kind = substitutionsCursor.getString(kindIndex);
 				final String text = substitutionsCursor.getString(textIndex);
 				final String className = substitutionsCursor.getString(classIndex);
 				
-				Class currentClass = new Class();
-				currentClass.setName(className);
+				Teacher instdTeacher = teachers.getTeacher(instdTeacherShort);
+				Teacher substTeacher = teachers.getTeacher(substTeacherShort);
+				Subject instdSubject = subjects.getSubject(instdSubjectShort);
 				
-				List<Substitution> substitutions = plan.get(currentClass);
+				SubstitutionsGroup currentGroup = null;
+				if (studentRepresentation) {
+					currentGroup = new Class();
+					currentGroup.setName(className);
+				} else if (!substTeacherShort.isEmpty()){
+					currentGroup = new Substitute();
+					currentGroup.setName(substTeacher.getName() + " (" + substTeacherShort + ")");
+				} else {
+					continue;
+				}
+				
+				List<Substitution> substitutions = plan.get(currentGroup);
 				if(substitutions == null) {
 					substitutions = new ArrayList<Substitution>();
-					plan.put(currentClass, substitutions);
+					plan.put(currentGroup, substitutions);
 				}
 				
 				Substitution substitution = new Substitution();
@@ -129,8 +158,51 @@ public class DataStore {
 				substitution.setInstdSubject(instdSubject);
 				substitution.setKind(kind);
 				substitution.setText(text);
+				substitution.setClassName(className);
 				
+				if (!studentRepresentation) {
+					boolean foundSame = false;
+					Substitution same = null;
+					for (Substitution s : substitutions) {
+						if (foundSame = s.getPeriodNumber() == period) {
+							same = s;
+							break;
+						}
+					}
+					if (foundSame) {
+						same.setClassName(same.getClassName() + ", " + className);
+						continue;
+					}
+				}
 				substitutions.add(substitution);
+			}
+			
+			HashMap<SubstitutionsGroup, List<Substitution>> planCopy = new HashMap<SubstitutionsGroup, List<Substitution>>(plan);
+			if (!studentRepresentation) {
+				Pattern pattern = Pattern.compile("Aufg(\\.|abe) [A-Z][a-z]{1,2}");
+				Set<SubstitutionsGroup> groups = planCopy.keySet();
+				for (SubstitutionsGroup group : groups) {
+					List<Substitution> substitutions = planCopy.get(group);
+					for (Substitution substitution : substitutions) {
+						Matcher matcher = pattern.matcher(substitution.getText());
+						while (matcher.find()) {
+							int end = matcher.end();
+							int start = end - 3;
+							String shortName = substitution.getText().substring(start, end).trim();
+							Teacher taskProvider = teachers.getTeacherOrNull(shortName);
+							if (taskProvider != null) {
+								Substitute substitute = new Substitute();
+								substitute.setName(taskProvider.getName() + " (" + taskProvider.getShortName() + ")");
+								List<Substitution> _substitutions = plan.get(substitute);
+								if (_substitutions == null) {
+									_substitutions = new ArrayList<Substitution>();
+									plan.put(substitute, _substitutions);
+								}
+								_substitutions.add(substitution);
+							}
+						}
+					}
+				}
 			}
 			
 			substitutionsCursor.close();
@@ -139,6 +211,15 @@ public class DataStore {
 		plansCursor.close();
 		database.close();
 		return plans;
+	}
+	
+	private SubstitutionsGroup newSubstitutionsGroup() {
+		SimpleData simpleData = SimpleData.getInstance(context);
+		if (simpleData.isStudent()) {
+			return new Class();
+		} else {
+			return new Substitute();
+		}
 	}
 	
 	private void insertPlans(List<Plan> plans) {
@@ -165,17 +246,17 @@ public class DataStore {
 			}
 			database.execSQL(createQuery.toString());
 			
-			Set<Class> classes = plan.keySet();
+			Set<SubstitutionsGroup> substitutionsGroups = plan.keySet();
 			
-			for (Class currentClass : classes) {
-				final String className = currentClass.getName();
-				List<Substitution> substitutions = plan.get(currentClass);
+			for (SubstitutionsGroup substitutionsGroup : substitutionsGroups) {
+				final String className = substitutionsGroup.getName();
+				List<Substitution> substitutions = plan.get(substitutionsGroup);
 				
 				for (Substitution substitution : substitutions) {
 					final int period = substitution.getPeriodNumber();
-					final String substTeacher = substitution.getSubstTeacher();
-					final String instdTeacher = substitution.getInstdTeacher();
-					final String instdSubject = substitution.getInstdSubject();
+					final String substTeacher = substitution.getSubstTeacher().getShortName();
+					final String instdTeacher = substitution.getInstdTeacher().getShortName();
+					final String instdSubject = substitution.getInstdSubject().getAbbreviation();
 					final String kind = substitution.getKind();
 					final String text = substitution.getText();
 					

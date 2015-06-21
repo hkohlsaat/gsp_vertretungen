@@ -80,10 +80,17 @@ public class Subjects {
 	
 	
 
-	public class Subject {
+	public static class Subject {
 		private String name = "";
 		private String abbreviation = "";
 		private boolean concurrentlyTaught = false;
+		
+		public Subject() {}
+		public Subject(String abbreviation) {
+			name = abbreviation;
+			this.abbreviation = abbreviation;
+		}
+		
 		
 		public String getName() {
 			return name;

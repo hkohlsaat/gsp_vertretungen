@@ -88,6 +88,9 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			LicensesDialogFragment fragment = new LicensesDialogFragment();
 			fragment.show(getFragmentManager(), "LicensesDialog");
 			return true;
+		case R.id.action_settings:
+			startActivity(new Intent(this, org.aweture.wonk.settings.Activity.class));
+			return true;
 		case R.id.action_see_queries:
 			startActivity(new Intent(this, org.aweture.wonk.log.Activity.class));
 			return true;

@@ -8,6 +8,7 @@ import java.util.List;
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.SubstitutionsGroup;
 import org.aweture.wonk.storage.PlansLoader;
 
 import android.content.Context;
@@ -79,11 +80,11 @@ public class SubstitutionsFragment extends Fragment {
 	
 	private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements LoaderCallbacks<List<Plan>> {
 		
-		private List<Class> sortedClasses;
+		private List<SubstitutionsGroup> sortedSubstitutionGroups;
 		private Plan plan;
 		
 		public Adapter() {
-			sortedClasses = new ArrayList<Class>();
+			sortedSubstitutionGroups = new ArrayList<SubstitutionsGroup>();
 			plan = new Plan();
 		}
 		
@@ -94,22 +95,22 @@ public class SubstitutionsFragment extends Fragment {
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			ClassView view = new ClassView(getActivity());
+			SubstGroupView view = new SubstGroupView(getActivity());
 			ViewHolder vh = new ViewHolder(view);
 			return vh;
 		}
 
 		@Override
 		public void onBindViewHolder(ViewHolder vh, int position) {
-			Class currentClass = sortedClasses.get(position);
-			vh.classView.setSubstitutions(currentClass, plan.get(currentClass));
+			SubstitutionsGroup currentGroup = sortedSubstitutionGroups.get(position);
+			vh.classView.setSubstitutions(currentGroup, plan.get(currentGroup));
 		}
 		
 		public class ViewHolder extends RecyclerView.ViewHolder{
 			
-			public ClassView classView;
+			public SubstGroupView classView;
 
-			public ViewHolder(ClassView itemView) {
+			public ViewHolder(SubstGroupView itemView) {
 				super(itemView);
 				classView = itemView;
 			}
@@ -125,9 +126,9 @@ public class SubstitutionsFragment extends Fragment {
 			plan = planList.get(planIndex);
 			
 			// Obtain a list with all classes sorted.
-			sortedClasses.clear();
-			sortedClasses.addAll(plan.keySet());
-			Collections.sort(sortedClasses, new ClassComparator());
+			sortedSubstitutionGroups.clear();
+			sortedSubstitutionGroups.addAll(plan.keySet());
+			Collections.sort(sortedSubstitutionGroups);
 			
 			notifyDataSetChanged();
 		}
@@ -135,34 +136,8 @@ public class SubstitutionsFragment extends Fragment {
 		@Override
 		public void onLoaderReset(Loader<List<Plan>> arg0) {
 			plan = new Plan();
-			sortedClasses.clear();
+			sortedSubstitutionGroups.clear();
 			notifyDataSetChanged();
-		}
-	}
-	
-	private class ClassComparator implements Comparator<Class> {
-
-		@Override
-		public int compare(Class lhs, Class rhs) {
-			int difference;
-			if (areBothOberstufe(lhs, rhs) && isOnlyOneALetterGrader(lhs, rhs)) {
-				difference = lhs.isLetterGrader() ? -1 : 1;
-			} else {
-				difference = lhs.getGrade() - rhs.getGrade();
-			}
-			if (difference != 0) {
-				return difference;
-			} else {
-				return lhs.getName().compareTo(rhs.getName());
-			}
-		}
-		
-		private boolean areBothOberstufe(Class x, Class y) {
-			return x.isOberstufe() && y.isOberstufe();
-		}
-		
-		private boolean isOnlyOneALetterGrader(Class x, Class y) {
-			return x.isLetterGrader() ^ y.isLetterGrader();
 		}
 	}
 }

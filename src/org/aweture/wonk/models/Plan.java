@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class Plan extends HashMap<Class, List<Substitution>> {
+public class Plan extends HashMap<SubstitutionsGroup, List<Substitution>> {
 	
 	private Date date;
 	private Date created;

@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Queue;
 
 import org.aweture.wonk.R;
-import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Substitution;
+import org.aweture.wonk.models.SubstitutionsGroup;
+import org.aweture.wonk.models.Teachers.Teacher;
+import org.aweture.wonk.storage.SimpleData;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -18,31 +20,33 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ClassView extends LinearLayout implements Comparator<Substitution> {
+import static org.aweture.wonk.substitutions.SubstitutionPresentation.PresentationFor;
+
+public class SubstGroupView extends LinearLayout implements Comparator<Substitution> {
 
 	private static final Queue<SubstitutionView> itemOverflow = new LinkedList<SubstitutionView>();
 	
 	private Queue<SubstitutionView> items;
 	private TextView classNameTextView;
 	
-	private Class currentClass;
+	private SubstitutionsGroup currentGroup;
 	private List<Substitution> substitutions;
 	
 
-	public ClassView(Context context) {
+	public SubstGroupView(Context context) {
 		super(context);
 		init(context);
 	}
-	public ClassView(Context context, AttributeSet attrs) {
+	public SubstGroupView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
 	}
-	public ClassView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public SubstGroupView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		init(context);
 	}
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public ClassView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+	public SubstGroupView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 		init(context);
 	}
@@ -56,8 +60,8 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 		classNameTextView = (TextView) findViewById(R.id.className);
 	}
 	
-	public void setSubstitutions(Class currentClass, List<Substitution> substitutions) {
-		this.currentClass = currentClass;
+	public void setSubstitutions(SubstitutionsGroup currentGroup, List<Substitution> substitutions) {
+		this.currentGroup = currentGroup;
 		this.substitutions = substitutions;
 		Collections.sort(substitutions, this);
 
@@ -68,7 +72,7 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	}
 	
 	private void showClassName() {
-		String className = currentClass.getName();
+		String className = currentGroup.getName();
 		classNameTextView.setText(className);
 	}
 	
@@ -81,9 +85,21 @@ public class ClassView extends LinearLayout implements Comparator<Substitution> 
 	}
 	
 	private void applySubstitutionsToItems() {
+		SimpleData simpleData = SimpleData.getInstance(getContext());
+		boolean student = simpleData.isStudent();
 		for (Substitution substitution : substitutions) {
 			SubstitutionView nextItem = getUndisplayedSubstitutionView();
-			nextItem.setSubstitution(substitution);
+			if (student) {
+				nextItem.setSubstitution(substitution, PresentationFor.Student);
+			} else {
+				Teacher substTeacher = substitution.getSubstTeacher();
+				String potentTialGroupName = substTeacher.getName() + " (" + substTeacher.getShortName() + ")";
+				if (currentGroup.getName().equals(potentTialGroupName)) {
+					nextItem.setSubstitution(substitution, PresentationFor.Substitute);
+				} else {
+					nextItem.setSubstitution(substitution, PresentationFor.TaskProvider);
+				}
+			}
 			items.add(nextItem);
 		}
 	}

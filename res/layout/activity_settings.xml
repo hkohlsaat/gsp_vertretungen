@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_margin"
+    android:orientation="vertical" >
+
+    <RadioGroup
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+	    
+	    <RadioButton android:id="@+id/radio_student"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/student"
+	        android:onClick="onRadioButtonClicked"/>
+	    <RadioButton android:id="@+id/radio_teacher"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/teacher"
+	        android:onClick="onRadioButtonClicked"/>
+	</RadioGroup>
+
+    <EditText
+        android:id="@+id/edit_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:visibility="gone" >
+    </EditText>
+
+</LinearLayout>

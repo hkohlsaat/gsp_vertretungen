@@ -11,6 +11,11 @@
         android:showAsAction="never"
         android:title="@string/licenses"/>
     <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="1"
+        android:showAsAction="never"
+        android:title="@string/settings"/>
+    <item
         android:id="@+id/action_see_queries"
         android:orderInCategory="1"
         android:showAsAction="never"

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.aweture.wonk"
-    android:versionCode="3"
-    android:versionName="1.1" >
+    android:versionCode="5"
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -22,6 +22,8 @@
         
         <activity android:name="org.aweture.wonk.landing.Activity" />
         <activity android:name="org.aweture.wonk.log.Activity" />
+        <activity android:name="org.aweture.wonk.settings.Activity"
+            android:label="@string/settings" />
         <activity android:name="org.aweture.wonk.substitutions.Activity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

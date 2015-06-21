@@ -25,4 +25,14 @@
     <string name="substitution_details">Vertretungsdetails</string>
     <string name="instead_of">statt</string>
     <string name="info">Info</string>
+    <string name="in1">in der</string>
+    <string name="in2">in</string>
+    
+    <!-- Strings regarding settings -->
+    <string name="settings">Einstellungen</string>
+    <string name="student">SchülerIn</string>
+    <string name="teacher">LehrerIn</string>
+    <string name="filter_hint_student">Klassenname als Filter</string>
+    <string name="filter_hint_teacher">Kürzel als Filter</string>
+    
 </resources>

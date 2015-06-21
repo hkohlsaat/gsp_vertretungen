@@ -18,6 +18,8 @@ import org.aweture.wonk.models.Class;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
+import org.aweture.wonk.models.Teachers.Teacher;
+import org.aweture.wonk.models.Subjects.Subject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -168,9 +170,9 @@ public class IServHtmlUtil {
 				for (int period : periods) {
 					Substitution substitution = new Substitution();
 					substitution.setPeriodNumber(period);
-					substitution.setSubstTeacher(substTeacher);
-					substitution.setInstdTeacher(instdTeacher);
-					substitution.setInstdSubject(instdSubject);
+					substitution.setSubstTeacher(new Teacher(substTeacher));
+					substitution.setInstdTeacher(new Teacher(instdTeacher));
+					substitution.setInstdSubject(new Subject(instdSubject));
 					substitution.setKind(kind);
 					substitution.setText(text);
 					substitutions.add(substitution);

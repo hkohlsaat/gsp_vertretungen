@@ -1,6 +1,7 @@
 package org.aweture.wonk.models;
 
-public class Class {
+
+public class Class implements SubstitutionsGroup {
 	
 	private String name;
 
@@ -10,6 +11,11 @@ public class Class {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	@Override
+	public boolean isStudentMode() {
+		return true;
 	}
 	
 	public boolean isLetterGrader() {
@@ -65,5 +71,28 @@ public class Class {
 		return true;
 	}
 	
+	@Override
+	public int compareTo(SubstitutionsGroup another) {
+		Class other = (Class) another;
+		
+		int difference;
+		if (areBothOberstufe(other) && isOnlyOneALetterGrader(other)) {
+			difference = isLetterGrader() ? -1 : 1;
+		} else {
+			difference = getGrade() - other.getGrade();
+		}
+		if (difference != 0) {
+			return difference;
+		} else {
+			return getName().compareTo(other.getName());
+		}
+	}
 	
+	private boolean areBothOberstufe(Class other) {
+		return isOberstufe() && other.isOberstufe();
+	}
+	
+	private boolean isOnlyOneALetterGrader(Class other) {
+		return isLetterGrader() ^ other.isLetterGrader();
+	}
 }
