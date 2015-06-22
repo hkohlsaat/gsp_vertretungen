@@ -2,10 +2,12 @@ package org.aweture.wonk.storage;
 
 import org.aweture.wonk.storage.DataContract.LogColumns;
 import org.aweture.wonk.storage.DataContract.SubjectsColumns;
+import org.aweture.wonk.storage.DataContract.SubstitutionColumns;
 import org.aweture.wonk.storage.DataContract.TableColumns;
 import org.aweture.wonk.storage.DataContract.TeachersColumns;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -56,6 +58,23 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		db.execSQL(createSubjects.toString());
 	}
 	
+	public void resetDatabase(SQLiteDatabase db) {
+		String tableName = TableColumns.TABLE_NAME;
+		Cursor plansCursor = db.query(tableName, null, null, null, null, null, null);
+		
+		final int dateIndex = plansCursor.getColumnIndexOrThrow(TableColumns.DATE.name());
+		
+		while (plansCursor.moveToNext()) {
+			String substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + SubstitutionColumns.STUDENT_SUFIX + "\"";
+			db.execSQL("DROP TABLE IF EXISTS " + substitutionsTableName);
+			substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + SubstitutionColumns.TEACHER_SUFIX + "\"";
+			db.execSQL("DROP TABLE IF EXISTS " + substitutionsTableName);
+		}
+		
+		plansCursor.close();
+		db.delete(tableName, null, null);
+	}
+	
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -65,7 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		} else if (oldVersion == 3) {
 			createTeachersTable(db);
 			createSubjectsTable(db);
-			new DataStore(context).resetDatabase(db);
+			resetDatabase(db);
 		} else {
 			throwBecauseOldVersionNotHandled(oldVersion);
 		}

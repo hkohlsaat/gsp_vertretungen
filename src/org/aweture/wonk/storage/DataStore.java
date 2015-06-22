@@ -274,7 +274,7 @@ public class DataStore {
 	private void insertPlans(List<Plan> plans) {
 		DatabaseHelper dbHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
-		resetDatabase(database);
+		dbHelper.resetDatabase(database);
 		
 		synchronized (LOCK_OBJECT) {
 			
@@ -356,25 +356,6 @@ public class DataStore {
 		substitutionValues.put(SubstitutionColumns.CLASS.name(), className);
 		substitutionValues.put(SubstitutionColumns.TASK_PROVIDER.name(), taskProvider);
 		db.insert(tableName, null, substitutionValues);
-	}
-	
-	public void resetDatabase(SQLiteDatabase database) {
-		synchronized (LOCK_OBJECT) {
-			String tableName = TableColumns.TABLE_NAME;
-			Cursor plansCursor = database.query(tableName, null, null, null, null, null, null);
-			
-			final int dateIndex = plansCursor.getColumnIndexOrThrow(TableColumns.DATE.name());
-			
-			while (plansCursor.moveToNext()) {
-				String substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + SubstitutionColumns.STUDENT_SUFIX + "\"";
-				database.execSQL("DROP TABLE IF EXISTS " + substitutionsTableName);
-				substitutionsTableName = "\"" + plansCursor.getString(dateIndex) + SubstitutionColumns.TEACHER_SUFIX + "\"";
-				database.execSQL("DROP TABLE IF EXISTS " + substitutionsTableName);
-			}
-			
-			plansCursor.close();
-			database.delete(tableName, null, null);
-		}
 	}
 	
 	private void fireNewPlansBroadcast() {
