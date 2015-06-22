@@ -3,7 +3,6 @@ package org.aweture.wonk.landing;
 import org.aweture.wonk.Application;
 import org.aweture.wonk.R;
 import org.aweture.wonk.background.UpdateScheduler;
-import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManager.LoginResult;
 import org.aweture.wonk.internet.IServManagerImpl;
@@ -48,9 +47,7 @@ public class Activity extends android.app.Activity {
 		String username = usernameInput.getText().toString();
 		String password = passwordInput.getText().toString();
 		
-		Application application = (Application) getApplication();
-		
-		if (application.hasConnectivity()) {
+		if (Application.hasConnectivity(this)) {
 			LoginJob login = new LoginJob();
 			login.execute(new String[]{username, password});
 		} else {
@@ -68,8 +65,8 @@ public class Activity extends android.app.Activity {
 	private void loginSuccess() {
 		SimpleData data = new SimpleData(this);
 		data.setUserdataInserted();
-		startService(new Intent(this, UpdateService.class));
 		UpdateScheduler updateScheduler = new UpdateScheduler(this);
+		updateScheduler.updateNow();
 		updateScheduler.schedule();
 		Intent intent = new Intent(this, org.aweture.wonk.substitutions.Activity.class);
 		startActivity(intent);

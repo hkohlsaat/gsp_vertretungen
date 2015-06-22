@@ -3,10 +3,13 @@ package org.aweture.wonk.settings;
 import org.aweture.wonk.R;
 import org.aweture.wonk.storage.SimpleData;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 public class Activity extends android.support.v7.app.ActionBarActivity {
 	
@@ -30,6 +33,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		
 		setUpRadioButtons();
 		setUpFilterEditText();
+		setUpVersionNumper();
 	}
 	
 	@Override
@@ -53,6 +57,15 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		filterEditText = (EditText) findViewById(R.id.edit_filter);
 		hintFilter();
 		setText();
+	}
+	
+	private void setUpVersionNumper() {
+		PackageInfo pInfo;
+		try {
+			pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			TextView versionTextView = (TextView) findViewById(R.id.versionTextView);
+			versionTextView.setText("Version " + pInfo.versionCode);
+		} catch (NameNotFoundException e) {}
 	}
 	
 	private void hintFilter() {

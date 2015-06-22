@@ -36,7 +36,7 @@ public class Activity extends android.app.Activity {
 		
 		UpdateScheduler scheduler = new UpdateScheduler(this);
 		boolean isScheduled = scheduler.isScheduled();
-		writeNewLine("scheduled = " + Boolean.toString(isScheduled));
+		writeNewLine("\nGeneral info: scheduled = " + Boolean.toString(isScheduled));
 	}
 	
 	private void writeCursor(Cursor c) {

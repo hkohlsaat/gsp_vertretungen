@@ -5,8 +5,8 @@ import java.util.List;
 import org.aweture.wonk.Application;
 import org.aweture.wonk.LicensesDialogFragment;
 import org.aweture.wonk.R;
+import org.aweture.wonk.background.UpdateProcedure;
 import org.aweture.wonk.background.UpdateScheduler;
-import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.storage.PlansLoader;
@@ -79,9 +79,8 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_update:
-			startService(new Intent(this, UpdateService.class));
 			UpdateScheduler scheduler = new UpdateScheduler(this);
-			scheduler.schedule();
+			scheduler.updateNow();
 			return true;
 		case R.id.action_show_licenses:
 			LicensesDialogFragment fragment = new LicensesDialogFragment();
@@ -155,7 +154,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 				plans = data;
 				notifyDataSetChanged();
 			}
-			if (count == 0 && !UpdateService.isUpdating()) {
+			if (count == 0 && !UpdateProcedure.isUpdating()) {
 				findViewById(R.id.progressBar).setVisibility(View.GONE);
 				findViewById(R.id.progressPlaceholder).setVisibility(View.VISIBLE);
 				findViewById(R.id.noData).setVisibility(View.VISIBLE);

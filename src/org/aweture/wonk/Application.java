@@ -4,16 +4,22 @@ import org.aweture.wonk.models.Subjects;
 import org.aweture.wonk.models.Teachers;
 import org.aweture.wonk.storage.SimpleData;
 
+import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 
 public class Application extends android.app.Application {
 	
-	public static boolean IN_DEBUG_MODE = false;
+	public final static boolean IN_DEBUG_MODE = true;
 	
-	public boolean hasConnectivity() {
-		ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+	public static boolean lollipopOrAbove() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+	}
+	
+	public static boolean hasConnectivity(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = cm.getActiveNetworkInfo();
 		return networkInfo != null && networkInfo.isConnected();
 	}
