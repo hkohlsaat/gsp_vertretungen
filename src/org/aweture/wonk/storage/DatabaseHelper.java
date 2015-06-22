@@ -1,5 +1,6 @@
 package org.aweture.wonk.storage;
 
+import org.aweture.wonk.background.UpdateService;
 import org.aweture.wonk.storage.DataContract.LogColumns;
 import org.aweture.wonk.storage.DataContract.SubjectsColumns;
 import org.aweture.wonk.storage.DataContract.SubstitutionColumns;
@@ -7,6 +8,7 @@ import org.aweture.wonk.storage.DataContract.TableColumns;
 import org.aweture.wonk.storage.DataContract.TeachersColumns;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -85,6 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			createTeachersTable(db);
 			createSubjectsTable(db);
 			resetDatabase(db);
+			context.startService(new Intent(context, UpdateService.class));
 		} else {
 			throwBecauseOldVersionNotHandled(oldVersion);
 		}
