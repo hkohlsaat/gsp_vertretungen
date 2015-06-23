@@ -8,6 +8,7 @@
     
     <!-- Strings regarding actions -->
     <string name="action_update">Aktualisieren</string>
+    <string name="action_show_filtered">Gefilterte Vertretungen</string>
     <string name="action_see_queries">See queries</string>
     
     <!-- Strings regarding landing section -->
@@ -26,8 +27,11 @@
     
     <!-- Strings regarding settings -->
     <string name="settings">Einstellungen</string>
-    <string name="student">SchülerIn</string>
-    <string name="teacher">LehrerIn</string>
+    <string name="mode_explanation">Wähle Deinen Anzeigemodus</string>
+    <string name="student">Schülermodus</string>
+    <string name="teacher">Lehrermodus</string>
+    <string name="filter_explanation">Wähle Deinen Filter</string>
+    <string name="filter_explanation_extended">Entdeckt die App Deinen Filter während des Herunterladens im Vertretungsplan, wirst Du sofort benachrichtigt.</string>
     <string name="filter_hint_student">Klassenname als Filter</string>
     <string name="filter_hint_teacher">Kürzel als Filter</string>
     

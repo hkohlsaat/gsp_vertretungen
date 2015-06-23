@@ -64,7 +64,7 @@ public class SimpleData {
 		return !filter.isEmpty();
 	}
 	public String getFilter(String defaultFilter) {
-		return sharedPreferences.getString(KEY_FILTER, "");
+		return sharedPreferences.getString(KEY_FILTER, defaultFilter);
 	}
 	public void setFilter(String filter) {
 		Editor editor = sharedPreferences.edit();

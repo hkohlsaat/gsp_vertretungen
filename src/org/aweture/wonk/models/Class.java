@@ -5,10 +5,21 @@ public class Class implements SubstitutionsGroup {
 	
 	private Object base;
 	private String name;
+	private String baseString = "";
 	
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	@Override
+	public void setBaseInData(String baseString) {
+		this.baseString = baseString;
+	}
+	
+	@Override
+	public String getBaseInData() {
+		return baseString;
 	}
 	
 	@Override
@@ -20,11 +31,6 @@ public class Class implements SubstitutionsGroup {
 	@Override
 	public boolean isBasedUppon(Object potentialBase) {
 		return base.equals(base);
-	}
-	
-	@Override
-	public boolean isStudentMode() {
-		return true;
 	}
 	
 	public boolean isLetterGrader() {

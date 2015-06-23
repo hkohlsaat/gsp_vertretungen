@@ -76,7 +76,7 @@ public class UpdateScheduler {
 	public void updateNow() {
 		new AsyncTask<Void, Void, Void>() {
 			protected Void doInBackground(Void... params) {
-				new UpdateProcedure(context);
+				new UpdateProcedure(context).run();
 				return null;
 			}
 		}.execute();

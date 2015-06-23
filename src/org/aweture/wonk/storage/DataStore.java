@@ -156,6 +156,7 @@ public class DataStore {
 					
 					List<Substitution> substitutions = plan.get(currentClass);
 					if(substitutions == null) {
+						currentClass.setBaseInData(className);
 						substitutions = new ArrayList<Substitution>();
 						plan.put(currentClass, substitutions);
 					}
@@ -239,8 +240,10 @@ public class DataStore {
 					Substitute substitute = new Substitute();
 					if (taskProviderShort.isEmpty()) {
 						substitute.baseUppon(substTeacher);
+						substitute.setBaseInData(substTeacherShort);
 					} else {
 						substitute.baseUppon(taskProvider);
+						substitute.setBaseInData(taskProviderShort);
 					}
 					
 					List<Substitution> substitutions = plan.get(substitute);
@@ -274,7 +277,7 @@ public class DataStore {
 	private void insertPlans(List<Plan> plans) {
 		DatabaseHelper dbHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
-		dbHelper.resetDatabase(database);
+		dbHelper.resetSubstitutionKnowlege(database);
 		
 		synchronized (LOCK_OBJECT) {
 			

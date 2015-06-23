@@ -2,6 +2,7 @@ package org.aweture.wonk.storage;
 
 import org.aweture.wonk.background.UpdateScheduler;
 import org.aweture.wonk.storage.DataContract.LogColumns;
+import org.aweture.wonk.storage.DataContract.NotifiedSubstitutionColumns;
 import org.aweture.wonk.storage.DataContract.SubjectsColumns;
 import org.aweture.wonk.storage.DataContract.SubstitutionColumns;
 import org.aweture.wonk.storage.DataContract.TableColumns;
@@ -16,7 +17,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper{
 	
 	private static final String DATABASE_NAME = "wonk.db";
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 	
 	private Context context;
 	
@@ -27,20 +28,27 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		createTablesTable(db);
+		createLogTable(db);
+		createTeachersTable(db);
+		createSubjectsTable(db);
+		createNotifiedSubstitutionsTable(db);
+	}
+	
+	private void createTablesTable(SQLiteDatabase db) {
 		CreateQuery createTables = new CreateQuery(TableColumns.TABLE_NAME);
 		for (TableColumns column : TableColumns.values()) {
 			createTables.addColumn(column.name(), column.type());
 		}
 		db.execSQL(createTables.toString());
-		
+	}
+	
+	private void createLogTable(SQLiteDatabase db) {
 		CreateQuery createLog = new CreateQuery(LogColumns.TABLE_NAME);
 		for (LogColumns column : LogColumns.values()) {
 			createLog.addColumn(column.name(), column.type());
 		}
 		db.execSQL(createLog.toString());
-
-		createTeachersTable(db);
-		createSubjectsTable(db);
 	}
 	
 	private void createTeachersTable(SQLiteDatabase db) {
@@ -59,7 +67,15 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		db.execSQL(createSubjects.toString());
 	}
 	
-	public void resetDatabase(SQLiteDatabase db) {
+	private void createNotifiedSubstitutionsTable(SQLiteDatabase db) {
+		CreateQuery createNotifiedSubstitutions = new CreateQuery(NotifiedSubstitutionColumns.TABLE_NAME);
+		for (NotifiedSubstitutionColumns column : NotifiedSubstitutionColumns.values()) {
+			createNotifiedSubstitutions.addColumn(column.name(), column.type());
+		}
+		db.execSQL(createNotifiedSubstitutions.toString());
+	}
+	
+	public void resetSubstitutionKnowlege(SQLiteDatabase db) {
 		String tableName = TableColumns.TABLE_NAME;
 		Cursor plansCursor = db.query(tableName, null, null, null, null, null, null);
 		
@@ -82,13 +98,25 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		if (oldVersion < 3) {
 			dropPreVersion3Tables(db);
 			onCreate(db);
-		} else if (oldVersion == 3) {
-			createTeachersTable(db);
-			createSubjectsTable(db);
-			resetDatabase(db);
-			new UpdateScheduler(context).updateNow();
 		} else {
-			throwBecauseOldVersionNotHandled(oldVersion);
+			boolean updateNeeded = false;
+			if (oldVersion < 4) {
+				createTeachersTable(db);
+				createSubjectsTable(db);
+				resetSubstitutionKnowlege(db);
+				updateNeeded = true;
+			}
+			if (oldVersion < 5) {
+				createNotifiedSubstitutionsTable(db);
+			}
+			if (oldVersion >= 5) {
+				throwBecauseOldVersionNotHandled(oldVersion);
+			}
+			if (updateNeeded) {
+				// Running an update has to get done after DB upgrade, because
+				// updating is demanding a DB connection for itself.
+				new UpdateScheduler(context).updateNow();
+			}
 		}
 	}
 	

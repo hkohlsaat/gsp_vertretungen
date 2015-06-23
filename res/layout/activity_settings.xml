@@ -2,46 +2,72 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_margin"
+    android:paddingLeft="@dimen/activity_margin"
     android:paddingRight="@dimen/activity_margin"
-    android:paddingLeft="@dimen/activity_margin" >
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical"
-	    android:layout_alignParentTop="true" >
-	
-	    <RadioGroup
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:orientation="vertical" >
-		    
-		    <RadioButton android:id="@+id/radio_student"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/student"
-		        android:onClick="onRadioButtonClicked"/>
-		    <RadioButton android:id="@+id/radio_teacher"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/teacher"
-		        android:onClick="onRadioButtonClicked"/>
-		</RadioGroup>
-	
-	    <EditText
-	        android:id="@+id/edit_filter"
+    android:paddingTop="@dimen/activity_margin" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
+        
+        <TextView
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:ems="10"
-	        android:visibility="gone" >
-	    </EditText>
-	
-	</LinearLayout>
-	
-	<TextView
-	    android:id="@+id/versionTextView"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:gravity="center_horizontal"
-	    android:layout_alignParentBottom="true" />
+	        android:textSize="@dimen/text_size"
+	        android:textColor="@color/accent"
+	        android:text="@string/mode_explanation" />
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <RadioButton
+                android:id="@+id/radio_student"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="@string/student" />
+
+            <RadioButton
+                android:id="@+id/radio_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="@string/teacher" />
+        </RadioGroup>
+		
+        <TextView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/accent"
+            android:layout_marginTop="@dimen/activity_margin"
+	        android:textSize="@dimen/text_size"
+	        android:text="@string/filter_explanation" />
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_small"
+            android:text="@string/filter_explanation_extended" />
+
+        <EditText
+            android:id="@+id/edit_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ems="10" >
+        </EditText>
+    </LinearLayout>
+        
+    <TextView
+        android:id="@+id/versionTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal" />
+    
 </RelativeLayout>

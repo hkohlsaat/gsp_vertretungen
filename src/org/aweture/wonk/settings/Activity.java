@@ -88,7 +88,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 	}
 	
 	private void saveFilter() {
-		String filter = filterEditText.getText().toString();
+		String filter = filterEditText.getText().toString().trim();
 		SimpleData simpleData = new SimpleData(this);
 		simpleData.setFilter(filter);
 	}

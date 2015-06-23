@@ -5,11 +5,17 @@ public class Substitute implements SubstitutionsGroup {
 	
 	private Object base;
 	private String name = "";
+	private String baseString = "";
 
 	@Override
 	public void baseUppon(Object base) {
 		this.base = base;
 		name = base.toString();
+	}
+	
+	@Override
+	public void setBaseInData(String baseString) {
+		this.baseString = baseString;
 	}
 	
 	@Override
@@ -23,10 +29,10 @@ public class Substitute implements SubstitutionsGroup {
 	}
 	
 	@Override
-	public boolean isStudentMode() {
-		return false;
+	public String getBaseInData() {
+		return baseString;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

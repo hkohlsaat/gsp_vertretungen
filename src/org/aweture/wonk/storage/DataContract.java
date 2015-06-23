@@ -1,5 +1,7 @@
 package org.aweture.wonk.storage;
 
+import android.database.sqlite.SQLiteDatabase;
+
 
 public final class DataContract {
 	
@@ -105,6 +107,27 @@ public final class DataContract {
 		private final String TYPE;
 		
 		private SubjectsColumns(String type) {
+			this.TYPE = type;
+		}
+		
+		public String type() {
+			return TYPE;
+		}
+	}
+	
+	public enum NotifiedSubstitutionColumns {
+
+		_ID("INTEGER PRIMARY KEY AUTOINCREMENT"),
+		DATE("TEXT"),
+		PERIOD("INTEGER"),
+		FILTER("TEXT");
+		
+		public static final String TABLE_NAME = "notified_substitutions";
+		
+		
+		private final String TYPE;
+		
+		private NotifiedSubstitutionColumns(String type) {
 			this.TYPE = type;
 		}
 		

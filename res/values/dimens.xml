@@ -3,8 +3,9 @@
     <!-- Default screen margin, per the Android Design guidelines. -->
     <dimen name="activity_margin">16dp</dimen>
     
-    <!-- Default text size -->
+    <!-- Default text sizes -->
     <dimen name="text_size">18sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
     
     <!-- Dimens regarding landing section -->
     <dimen name="margin_bottom_headline">16dp</dimen>
