@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.aweture.wonk.R;
+import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.SubstitutionsGroup;
@@ -61,6 +62,7 @@ class Notifier {
 							Int notifiedSubstitutionCount = notifiedSubstCounts.get(date);
 							if (notifiedSubstitutionCount == null) {
 								notifiedSubstitutionCount = new Int();
+								notifiedSubstCounts.put(date, notifiedSubstitutionCount);
 							}
 							notifiedSubstitutionCount.value++;
 							saveAsNotificated(database, date, filter, period);
@@ -72,29 +74,34 @@ class Notifier {
 		
 		cursor.close();
 		database.close();
-		
-		StringBuilder message = new StringBuilder();
+
 		Set<String> dates = notifiedSubstCounts.keySet();
-		for (String date : dates) {
-			int substCount = notifiedSubstCounts.get(date).value;
-			message.append(substCount + " Einträge am " + date + ",\n");
+		if (dates.size() > 0) {
+			StringBuilder message = new StringBuilder();
+			for (String date : dates) {
+				int substCount = notifiedSubstCounts.get(date).value;
+				message.append(substCount + " ");
+				message.append((substCount == 1 ? "Eintrag" : "Einträge")
+						+ " am " + date + ",\n");
+			}
+			int length = message.length();
+			if (length >= 2) {
+				message.delete(length - 2, length);
+			}
+			String title = "Neue Vertretungen für \"" + filter + "\"";
+			Intent resultIntent = new Intent(context, Activity.class);
+			PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			NotificationCompat.Builder notificationBuilder =
+				    new NotificationCompat.Builder(context)
+				    .setSmallIcon(R.drawable.ic_notification)
+				    .setContentTitle(title)
+				    .setContentText(message)
+				    .setContentIntent(pendingIntent)
+				    .setAutoCancel(true);
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(1, notificationBuilder.build());
+			LogUtil.logToDB(context, "Notification: " + title + " -- " + message);
 		}
-		int length = message.length();
-		if (length >= 2) {
-			message.delete(length - 2, length);
-		}
-		String title = "Neue Einträge für \"" + filter + "\"";
-		Intent resultIntent = new Intent(context, Activity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		NotificationCompat.Builder notificationBuilder =
-			    new NotificationCompat.Builder(context)
-			    .setSmallIcon(R.drawable.ic_launcher)
-			    .setContentTitle(title)
-			    .setContentText(message)
-			    .setContentIntent(pendingIntent);
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(1, notificationBuilder.build());
-		
 	}
 	
 	private boolean isAlreadyNotificated(Cursor cursor, int dateIndex, int periodIndex, String date, int period) {

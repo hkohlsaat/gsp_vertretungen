@@ -34,6 +34,9 @@ public class UpdateJobService extends JobService {
 		@Override
 		protected JobParameters doInBackground(JobParameters... params) {
 			updateProcedure.run();
+
+			Notifier notifier = new Notifier();
+			notifier.notifyIfNecessary(getApplicationContext());
 			return params[0];
 		}
 		

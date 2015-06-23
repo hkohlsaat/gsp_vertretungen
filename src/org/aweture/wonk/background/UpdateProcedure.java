@@ -62,8 +62,7 @@ public class UpdateProcedure implements Runnable {
 		
 		isUpdating = false;
 		
-		Notifier notifier = new Notifier();
-		notifier.notifyIfNecessary(context);
+		new Notifier().notifyIfNecessary(context);
 	}
 	
 	private void tryUpdate() {

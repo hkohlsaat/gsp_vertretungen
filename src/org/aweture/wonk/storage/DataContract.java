@@ -1,6 +1,5 @@
 package org.aweture.wonk.storage;
 
-import android.database.sqlite.SQLiteDatabase;
 
 
 public final class DataContract {
