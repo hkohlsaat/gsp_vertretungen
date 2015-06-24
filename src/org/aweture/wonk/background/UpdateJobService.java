@@ -1,5 +1,8 @@
 package org.aweture.wonk.background;
 
+import org.aweture.wonk.log.LogUtil;
+import org.aweture.wonk.models.Date;
+
 import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
@@ -34,6 +37,7 @@ public class UpdateJobService extends JobService {
 		@Override
 		protected JobParameters doInBackground(JobParameters... params) {
 			updateProcedure.run();
+			LogUtil.logToDB(getApplicationContext(), new Date().toDateTimeString() + "New scheduled update done");
 
 			Notifier notifier = new Notifier();
 			notifier.notifyIfNecessary(getApplicationContext());

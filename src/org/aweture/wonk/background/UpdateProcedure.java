@@ -7,7 +7,6 @@ import org.aweture.wonk.Application;
 import org.aweture.wonk.internet.IServManager;
 import org.aweture.wonk.internet.IServManagerImpl;
 import org.aweture.wonk.log.LogUtil;
-import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.storage.DataStore;
 import org.aweture.wonk.storage.SimpleData;
@@ -52,10 +51,8 @@ public class UpdateProcedure implements Runnable {
 				break;
 			case WrongData:
 				simpleData.setUserdataInserted(false);
-				LogUtil.logToDB(context, new Date().toDateTimeString() + "\tLogin fail: wrong data");
 				new UpdateScheduler(context).unschedule();
 			default:
-				LogUtil.logToDB(context, new Date().toDateTimeString() + "\tNetwork fail while login");
 				break;
 			}
 		}
@@ -68,15 +65,11 @@ public class UpdateProcedure implements Runnable {
 	private void tryUpdate() {
 		try {
 			downloadedPlan = iServManager.downloadSubstitutionPlan();
-			LogUtil.logToDB(context, new Date().toDateTimeString() + "\tDowload success");
 			saveSubstitutionsPlan();
-			LogUtil.logToDB(context, new Date().toDateTimeString() + "\tSaving success");
 		} catch (IOException ioe) {
 			LogUtil.e(ioe);
-			LogUtil.logToDB(context, new Date().toDateTimeString() + "\tDowload fail");
 		} catch (Exception e) {
 			LogUtil.e(e);
-			LogUtil.logToDB(context, new Date().toDateTimeString() + "\tSaving fail");
 		}
 	}
 	

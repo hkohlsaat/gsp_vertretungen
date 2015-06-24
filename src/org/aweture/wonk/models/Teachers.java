@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.storage.DataContract;
@@ -59,7 +60,7 @@ public class Teachers {
 			teacher.setAbbreviation(abbreviation);
 			teacher.setName(name);
 			teacher.setCompellation(compellation);
-			prefetchTeachers.put(abbreviation, teacher);
+			prefetchTeachers.put(abbreviation.toLowerCase(Locale.GERMANY), teacher);
 		}
 		
 		cursor.close();
@@ -76,7 +77,7 @@ public class Teachers {
 	
 	public Teacher getTeacherOrNull(String abbreviation) {
 		if (prefetchTeachers != null) {
-			return prefetchTeachers.get(abbreviation);
+			return prefetchTeachers.get(abbreviation.toLowerCase(Locale.GERMANY));
 		} else {
 			return querySingleTeacher(abbreviation);
 		}

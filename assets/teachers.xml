@@ -16,10 +16,11 @@
 <teacher short="Fz" name="Fritz" compellation="Frau" />
 <teacher short="Go" name="Gongoll" compellation="Frau" />
 <teacher short="Gr" name="Griebel" compellation="Frau" />
-<teacher short="Ha" name="Hamann" compellation="Herr" />
-<teacher short="Hd" name="Herden" compellation="Frau" />
 <teacher short="Hf" name="Haltenhof" compellation="Frau" />
+<teacher short="Ha" name="Hamann" compellation="Herr" />
 <teacher short="Hg" name="Hartwig" compellation="Herr" />
+<teacher short="Hs" name="Hemsoth" compellation="Herr" />
+<teacher short="Hd" name="Herden" compellation="Frau" />
 <teacher short="In" name="Ingwersen" compellation="Frau" />
 <teacher short="Kb" name="Kubitza" compellation="Herr" />
 <teacher short="Ke" name="Klee" compellation="Frau" />
@@ -30,7 +31,9 @@
 <teacher short="Kr" name="Kraack" compellation="Herr" />
 <teacher short="Ks" name="Kasselmann" compellation="Frau" />
 <teacher short="Lj" name="Lütjohann" compellation="Herr" />
+<teacher short="Mk" name="Mackenberg" compellation="Frau" />
 <teacher short="MB" name="Mushold-Burg" compellation="Herr" />
+<teacher short="Ml" name="Müller" compellation="Frau" />
 <teacher short="Ne" name="Nentwig" compellation="Herr" />
 <teacher short="Ng" name="Nieschlag" compellation="Frau" />
 <teacher short="Or" name="Ortuño" compellation="Herr" />
@@ -48,6 +51,7 @@
 <teacher short="Su" name="Surkau" compellation="Herr" />
 <teacher short="Te" name="Tensing" compellation="Herr" />
 <teacher short="Ts" name="Tensing" compellation="Frau" />
+<teacher short="Tr" name="Traeger" compellation="Frau" />
 <teacher short="Wi" name="Wilker" compellation="Frau" />
 <teacher short="ZS" name="Zick-Stojan" compellation="Frau" />
 </teachers>

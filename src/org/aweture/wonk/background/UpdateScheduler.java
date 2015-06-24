@@ -5,6 +5,7 @@ import java.util.List;
 import org.aweture.wonk.Application;
 import org.aweture.wonk.R;
 import org.aweture.wonk.log.LogUtil;
+import org.aweture.wonk.models.Date;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
@@ -77,6 +78,10 @@ public class UpdateScheduler {
 		new AsyncTask<Void, Void, Void>() {
 			protected Void doInBackground(Void... params) {
 				new UpdateProcedure(context).run();
+				LogUtil.logToDB(context, new Date().toDateTimeString() + "New unscheduled update done");
+
+				Notifier notifier = new Notifier();
+				notifier.notifyIfNecessary(context);
 				return null;
 			}
 		}.execute();

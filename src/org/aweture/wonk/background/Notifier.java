@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.aweture.wonk.R;
 import org.aweture.wonk.log.LogUtil;
+import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.SubstitutionsGroup;
@@ -25,13 +26,22 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NotificationCompat;
 
 class Notifier {
+	
+	private Context context;
+	private Date now = new Date();
 
 	public void notifyIfNecessary(Context context) {
+		this.context = context;
 		SimpleData simpleData = new SimpleData(context);
 		String filter = simpleData.getFilter("");
 		if (!filter.isEmpty()) {
 			DataStore ds = new DataStore(context);
-			List<Plan> plans = ds.getStudentPlans();
+			List<Plan> plans = null;
+			if (simpleData.isStudent()) {
+				plans = ds.getStudentPlans();
+			} else {
+				plans = ds.getTeacherPlans();
+			}
 			notify(filter, plans, context);
 		}
 	}
@@ -55,17 +65,19 @@ class Notifier {
 					String date = plan.getDate().toDateString();
 					List<Substitution> substitutions = plan.get(sg);
 					
-					for (Substitution substitution : substitutions) {
-						int period = substitution.getPeriodNumber();
-						
-						if (!isAlreadyNotificated(cursor, dateIndex, periodIndex, date, period)) {
-							Int notifiedSubstitutionCount = notifiedSubstCounts.get(date);
-							if (notifiedSubstitutionCount == null) {
-								notifiedSubstitutionCount = new Int();
-								notifiedSubstCounts.put(date, notifiedSubstitutionCount);
+					if (dateIsRelevant(date)) {
+						for (Substitution substitution : substitutions) {
+							int period = substitution.getPeriodNumber();
+							
+							if (!isAlreadyNotificated(cursor, dateIndex, periodIndex, date, period)) {
+								Int notifiedSubstitutionCount = notifiedSubstCounts.get(date);
+								if (notifiedSubstitutionCount == null) {
+									notifiedSubstitutionCount = new Int();
+									notifiedSubstCounts.put(date, notifiedSubstitutionCount);
+								}
+								notifiedSubstitutionCount.value++;
+								saveAsNotificated(database, date, filter, period);
 							}
-							notifiedSubstitutionCount.value++;
-							saveAsNotificated(database, date, filter, period);
 						}
 					}
 				}
@@ -73,6 +85,8 @@ class Notifier {
 		}
 		
 		cursor.close();
+		
+		deleteOldNotifications(database);
 		database.close();
 
 		Set<String> dates = notifiedSubstCounts.keySet();
@@ -104,6 +118,36 @@ class Notifier {
 		}
 	}
 	
+	private void deleteOldNotifications(SQLiteDatabase db) {
+		Cursor cursor = db.query(NotifiedSubstitutionColumns.TABLE_NAME,
+				new String[]{NotifiedSubstitutionColumns._ID.name(),
+				NotifiedSubstitutionColumns.DATE.name()},
+				null, null, null, null, null);
+		
+		final int dateIndex = cursor.getColumnIndexOrThrow(NotifiedSubstitutionColumns.DATE.name());
+		final int idIndex = cursor.getColumnIndexOrThrow(NotifiedSubstitutionColumns._ID.name());
+		
+		while (cursor.moveToNext()) {
+			String date = cursor.getString(dateIndex);
+			if (!dateIsRelevant(date)) {
+				int id = cursor.getInt(idIndex);
+				int count = db.delete(NotifiedSubstitutionColumns.TABLE_NAME, NotifiedSubstitutionColumns._ID.name() + " = " + id, null);
+				if (count == 1) {
+					LogUtil.logToDB(context, "Deleted notification id=" + id + " from " + date);
+				} else {
+					LogUtil.logToDB(context, "Failed to delete notification id=" + id + " from " + date);
+				}
+			}
+		}
+		cursor.close();
+	}
+	
+	private boolean dateIsRelevant(String date) {
+		Date then = Date.fromStringDate(date);
+		then.add(Date.HOUR_OF_DAY, 14);
+		return now.before(then);
+	}
+
 	private boolean isAlreadyNotificated(Cursor cursor, int dateIndex, int periodIndex, String date, int period) {
 		boolean isAlreadyNotificated = false;
 		while ((!isAlreadyNotificated) && cursor.moveToNext()) {
