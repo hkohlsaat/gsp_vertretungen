@@ -21,7 +21,7 @@ import android.util.Xml;
 
 public class Teachers {
 	
-	public static final int VERSION = 0;
+	public static final int VERSION = 1;
 
 	private static final String ATTRIBUTE_SHORT= "short";
 	private static final String ATTRIBUTE_NAME = "name";
