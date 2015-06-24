@@ -111,6 +111,7 @@ class Notifier {
 				    .setContentTitle(title)
 				    .setContentText(message)
 				    .setContentIntent(pendingIntent)
+				    .setColor(context.getResources().getColor(R.color.accent))
 				    .setAutoCancel(true);
 			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(1, notificationBuilder.build());
