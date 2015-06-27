@@ -10,7 +10,7 @@ import org.aweture.wonk.R;
 import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.models.SubstitutionsGroup;
 import org.aweture.wonk.storage.SimpleData;
-import org.aweture.wonk.substitutions.SubstitutionPresentation.PresentationFor;
+import org.aweture.wonk.substitutions.Presentation.PresentationMode;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -89,12 +89,12 @@ public class SubstGroupView extends LinearLayout implements Comparator<Substitut
 		for (Substitution substitution : substitutions) {
 			SubstitutionView nextItem = getUndisplayedSubstitutionView();
 			if (student) {
-				nextItem.setSubstitution(substitution, PresentationFor.Student);
+				nextItem.setSubstitution(substitution, PresentationMode.StudentMode);
 			} else {
 				if (currentGroup.isBasedUppon(substitution.getTaskProvider())) {
-					nextItem.setSubstitution(substitution, PresentationFor.TaskProvider);
+					nextItem.setSubstitution(substitution, PresentationMode.TaskProviderMode);
 				} else {
-					nextItem.setSubstitution(substitution, PresentationFor.Substitute);
+					nextItem.setSubstitution(substitution, PresentationMode.SubstituteMode);
 				}
 			}
 			items.add(nextItem);

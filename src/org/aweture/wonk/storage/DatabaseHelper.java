@@ -1,6 +1,10 @@
 package org.aweture.wonk.storage;
 
+import java.util.List;
+
 import org.aweture.wonk.background.UpdateScheduler;
+import org.aweture.wonk.models.Subjects;
+import org.aweture.wonk.models.Teachers;
 import org.aweture.wonk.storage.DataContract.LogColumns;
 import org.aweture.wonk.storage.DataContract.NotifiedSubstitutionColumns;
 import org.aweture.wonk.storage.DataContract.SubjectsColumns;
@@ -17,7 +21,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper{
 	
 	private static final String DATABASE_NAME = "wonk.db";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	
 	private Context context;
 	
@@ -57,6 +61,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			createTeachers.addColumn(column.name(), column.type());
 		}
 		db.execSQL(createTeachers.toString());
+		Teachers teachers = new Teachers(context);
+		List<String> insertStatements = teachers.getInsertStatements();
+		for (String insertStatement : insertStatements) {
+			db.execSQL(insertStatement);
+		}
 	}
 	
 	private void createSubjectsTable(SQLiteDatabase db) {
@@ -65,6 +74,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			createSubjects.addColumn(column.name(), column.type());
 		}
 		db.execSQL(createSubjects.toString());
+		Subjects subjects = new Subjects(context);
+		List<String> insertStatements = subjects.getInsertStatements();
+		for (String insertStatement : insertStatements) {
+			db.execSQL(insertStatement);
+		}
 	}
 	
 	private void createNotifiedSubstitutionsTable(SQLiteDatabase db) {
@@ -109,7 +123,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			if (oldVersion < 5) {
 				createNotifiedSubstitutionsTable(db);
 			}
-			if (oldVersion >= 5) {
+			if (oldVersion < 6) {
+				db.execSQL("DROP TABLE " + SubjectsColumns.TABLE_NAME);
+				createSubjectsTable(db);
+			}
+			if (oldVersion >= 6) {
 				throwBecauseOldVersionNotHandled(oldVersion);
 			}
 			if (updateNeeded) {

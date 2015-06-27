@@ -17,4 +17,6 @@ public interface Expandable {
 	 * @param animate whether the expansion state change should be animated
 	 */
 	public void changeExpansionState(boolean animate);
+	
+	public View getView();
 }

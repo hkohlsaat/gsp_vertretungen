@@ -229,7 +229,7 @@ public class DataStore {
 					final String instdSubjectShort = substitutionsCursor.getString(instdSubjectIndex);
 					final String kind = substitutionsCursor.getString(kindIndex);
 					final String text = substitutionsCursor.getString(textIndex);
-					final String className = substitutionsCursor.getString(classIndex);
+					final String className = substitutionsCursor.getString(classIndex).replaceAll(",", ", ");
 					final String taskProviderShort = substitutionsCursor.getString(taskProviderIndex);
 					
 					Teacher instdTeacher = teachers.getTeacher(instdTeacherShort);

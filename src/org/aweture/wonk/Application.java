@@ -12,7 +12,7 @@ import android.os.Build;
 
 public class Application extends android.app.Application {
 	
-	public final static boolean IN_DEBUG_MODE = false;
+	public final static boolean IN_DEBUG_MODE = true;
 	
 	public static boolean lollipopOrAbove() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;

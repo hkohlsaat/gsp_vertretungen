@@ -2,14 +2,12 @@ package org.aweture.wonk.substitutions;
 
 import org.aweture.wonk.R;
 import org.aweture.wonk.models.Substitution;
-import org.aweture.wonk.substitutions.SubstitutionPresentation.PresentationFor;
+import org.aweture.wonk.substitutions.Presentation.PresentationMode;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -25,36 +23,38 @@ import android.widget.TextView;
 public class AbstractSubstitutionView extends ViewGroup implements Expandable, OnClickListener {
 	
 	private static final int MIDDLE_GAP_WIDTH_DIP = 8;
-	private static final int PADDING_LEFT_DIP = 16;
+	private static final int PADDING_HORIZONTAL_DIP = 16;
+	private static final int PADDING_VERTICAL_DIP = 12;
 	
 	private static final ExpansionCoordinator expansionCoordinator = new ExpansionCoordinator();
 	
 	private final ViewHolder viewHolder;
 	
-	private final int paddingLeft;
+	private final int horizontalPadding;
+	private final int verticalPadding;
 	private final int middleGapWidth;
-	private final int screenWidth;
-	
-	private Substitution substitution;
-	private boolean studentRepresentation = true;
-	private SubstitutionPresentation presentation;
+
+	private final TextView[] views;
+	private PresentationMode presentationMode;
+	private Presentation presentation;
 	
 	public AbstractSubstitutionView(Context context) {
 		super(context);
+
+		final Resources resources = getResources();
+		final float textSize = resources.getDimension(R.dimen.text_size);
 		
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
-		layoutInflater.inflate(R.layout.view_substitution, this, true);
-		
+		views = Presentation.createNewTextViews(getContext(), textSize);
+		for (int i = 0; i < views.length; i++) {
+			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			attachViewToParent(views[i], i, layoutParams);
+		}
 		viewHolder = new ViewHolder();
 		
-		Resources resources = getResources();
 		DisplayMetrics dm = resources.getDisplayMetrics();
-		paddingLeft = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_LEFT_DIP, dm);
+		horizontalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_HORIZONTAL_DIP, dm);
+		verticalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_VERTICAL_DIP, dm);
 		middleGapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MIDDLE_GAP_WIDTH_DIP, dm);
-		
-		Rect rect = new Rect();
-		getWindowVisibleDisplayFrame(rect);
-		screenWidth = rect.width();
 		
 		setOnClickListener(this);
 	}
@@ -63,13 +63,14 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		return viewHolder;
 	}
 	
-	boolean isStudentRepresentation() {
-		return studentRepresentation;
-	}
-	
 	@Override
 	public void changeExpansionState(boolean animate) {
 		applyVisibilityProperties();
+	}
+	
+	@Override
+	public View getView() {
+		return this;
 	}
 	
 	@Override
@@ -77,17 +78,22 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		expansionCoordinator.clicked(this);
 	}
 	
-	public void setSubstitution(Substitution substitution, PresentationFor presentationMode) {
-		this.substitution = substitution;
-		presentation = new SubstitutionPresentation(this, substitution, presentationMode);
+	public void setSubstitution(Substitution substitution, PresentationMode presentationMode) {
+		if (this.presentationMode != presentationMode) {
+			this.presentationMode = presentationMode;
+			presentation = Presentation.applyPresentation(substitution, views, presentationMode);
+		} else {
+			presentation.applyPresenation(substitution);
+		}
+		
 		applyVisibilityProperties();
 	}
 	
 	private void applyVisibilityProperties() {
 		if (isExpanded()) {
-			presentation.setExpandedVisibilities();
+			presentation.setExpandedStateVisibilities();
 		} else {
-			presentation.setCollapsedVisibilities();
+			presentation.setCollapsedStateVisibilities();
 		}
 	}
 	
@@ -110,7 +116,7 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int width = screenWidth;
+		int width = MeasureSpec.getSize(widthMeasureSpec);
 		int height = 0;
 		int state = 0;
 		
@@ -131,61 +137,85 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 	}
 	
 	private void measureChildrenExpanded(int widthMeasureSpec, int heightMeasureSpec) {
-		int childCount = getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			measureChild(getChildAt(i), widthMeasureSpec, heightMeasureSpec);
+		final int expandedChildCount = presentation.expandedStateChildCount();
+		for (int i = 0; i < expandedChildCount; i++) {
+			measureChild(presentation.getExpandedStateChild(i), widthMeasureSpec, heightMeasureSpec);
+		}
+		
+		int maxLeftChildWidth = 0;
+		int maxRightChildWidth = 0;
+		final int visibleChildCount = presentation.expandedStateChildCount();
+		for (int i = 0; i < visibleChildCount; i += 2) {
+			final int leftMeasuredWidth = presentation.getExpandedStateChild(i).getMeasuredWidth();
+			maxLeftChildWidth = Math.max(maxLeftChildWidth, leftMeasuredWidth);
+		}
+		for (int i = 1; i < visibleChildCount; i += 2) {
+			final int rightMeasuredWidth = presentation.getExpandedStateChild(i).getMeasuredWidth();
+			maxRightChildWidth = Math.max(maxRightChildWidth, rightMeasuredWidth);
+		}
+		
+		final int horizontalSpace = (horizontalPadding * 2) + middleGapWidth;
+		final int widthPrediction = horizontalSpace + maxLeftChildWidth + maxRightChildWidth;
+		final int widthRequirement = MeasureSpec.getSize(widthMeasureSpec);
+		if (widthRequirement < widthPrediction) {
+			final int maxRightWidth = widthRequirement - horizontalSpace - maxLeftChildWidth;
+			final int rightWidthSpec = MeasureSpec.makeMeasureSpec(maxRightWidth, MeasureSpec.AT_MOST);
+			for (int i = 1; i < expandedChildCount; i += 2) {
+				measureChild(presentation.getExpandedStateChild(i), rightWidthSpec, heightMeasureSpec);
+			}
 		}
 	}
 	
 	private int computeOwnHeightExpanded() {
-		int leftHeight = presentation.getExpanded(0).getMeasuredHeight();
-		int rightHeight = presentation.getExpanded(1).getMeasuredHeight();
-		int ownHeight = Math.max(leftHeight, rightHeight);
-		
-		leftHeight = presentation.getExpanded(2).getMeasuredHeight();
-		rightHeight = presentation.getExpanded(3).getMeasuredHeight();
-		ownHeight += Math.max(leftHeight, rightHeight);
-		
-		leftHeight = presentation.getExpanded(4).getMeasuredHeight();
-		rightHeight = presentation.getExpanded(5).getMeasuredHeight();
-		ownHeight += Math.max(leftHeight, rightHeight);
-		
-		if (substitution.hasText()) {
-			leftHeight = presentation.getExpanded(6).getMeasuredHeight();
-			rightHeight = presentation.getExpanded(7).getMeasuredHeight();
-			ownHeight += Math.max(leftHeight, rightHeight);
+		int rowHeightSums = 0;
+		final int padding = verticalPadding * 2;
+		final int expandedChildCount = presentation.expandedStateChildCount();
+		for (int i = 1; i < expandedChildCount; i += 2) {
+			final int leftHeight = presentation.getExpandedStateChild(i - 1).getMeasuredHeight();
+			final int rightHeight = presentation.getExpandedStateChild(i).getMeasuredHeight();
+			rowHeightSums += Math.max(leftHeight, rightHeight) + padding;
+		} if (expandedChildCount % 2 == 1) {
+			final int leftHeight = presentation.getExpandedStateChild(expandedChildCount - 1).getMeasuredHeight();
+			rowHeightSums += leftHeight + padding;
 		}
-		return ownHeight;
+		return rowHeightSums;
 	}
 	
 	private int computeChildrenMeasuredStateExpanded() {
 		int mode = 0;
-		int childCount = getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			mode = mode | getChildAt(i).getMeasuredState();
+		final int expandedChildCount = presentation.expandedStateChildCount();
+		for (int i = 0; i < expandedChildCount; i++) {
+			mode = mode | presentation.getExpandedStateChild(i).getMeasuredState();
 		}
 		return mode;
 	}
 	
 	private void measureChildrenCollapsed(int widthMeasureSpec, int heightMeasureSpec) {
-		measureChild(presentation.getCollapsedLeft(), widthMeasureSpec, heightMeasureSpec);
-		measureChild(presentation.getCollapsedMiddle(), widthMeasureSpec, heightMeasureSpec);
-		measureChild(presentation.getCollapsedRight(), widthMeasureSpec, heightMeasureSpec);
+		measureChild(presentation.getCollapsedStateChild(0), widthMeasureSpec, heightMeasureSpec);
+		measureChild(presentation.getCollapsedStateChild(1), widthMeasureSpec, heightMeasureSpec);
+		if (presentation.hasRightViewInCollapsedState()) {
+			measureChild(presentation.getCollapsedStateChild(2), widthMeasureSpec, heightMeasureSpec);
+		}
 	}
 	
 	private int computeOwnHeightCollapsed() {
-		int leftHeight = presentation.getCollapsedLeft().getMeasuredHeight();
-		int middleHeight = presentation.getCollapsedMiddle().getMeasuredHeight();
-		int rightHeight = presentation.getCollapsedRight().getMeasuredHeight();
-		int ownHeight = Math.max(leftHeight, rightHeight);
-		ownHeight = Math.max(ownHeight, middleHeight);
-		return ownHeight;
+		final int leftHeight = presentation.getCollapsedStateChild(0).getMeasuredHeight();
+		final int middleHeight = presentation.getCollapsedStateChild(1).getMeasuredHeight();
+		final int padding = verticalPadding * 2;
+		int height = Math.max(leftHeight, middleHeight) + padding;
+		if (presentation.hasRightViewInCollapsedState()) {
+			final int rightHeight = presentation.getCollapsedStateChild(2).getMeasuredHeight();
+			height = Math.max(height, rightHeight);
+		}
+		return height;
 	}
 	
 	private int computeChildrenMeasuredStateCollapsed() {
-		int mode = presentation.getCollapsedLeft().getMeasuredState();
-		mode = mode | presentation.getCollapsedMiddle().getMeasuredState();
-		mode = mode | presentation.getCollapsedRight().getMeasuredState();
+		int mode = presentation.getCollapsedStateChild(0).getMeasuredState();
+		mode = mode | presentation.getCollapsedStateChild(1).getMeasuredState();
+		if (presentation.hasRightViewInCollapsedState()) {
+			mode = mode | presentation.getCollapsedStateChild(2).getMeasuredState();
+		}
 		return mode;
 	}
 	
@@ -199,89 +229,86 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 	}
 	
 	private void onLayoutExpanded() {
-		int leftColumnWidth = presentation.getExpanded(0).getMeasuredWidth();
-		leftColumnWidth = Math.max(leftColumnWidth, presentation.getExpanded(2).getMeasuredWidth());
-		leftColumnWidth = Math.max(leftColumnWidth, presentation.getExpanded(4).getMeasuredWidth());
-		if (substitution.hasText()) {
-			leftColumnWidth = Math.max(leftColumnWidth, presentation.getExpanded(6).getMeasuredWidth());
+		int leftColumnWidth = 0;
+		final int expandedChildCount = presentation.expandedStateChildCount();
+		for (int i = 0; i < expandedChildCount; i += 2) {
+			final int width = presentation.getExpandedStateChild(i).getMeasuredWidth();
+			leftColumnWidth = Math.max(leftColumnWidth, width);
 		}
-		leftColumnWidth += paddingLeft;
+		leftColumnWidth += horizontalPadding;
 		
 		int top = 0;
-		int leftBottom = layoutLeftTextView(presentation.getExpanded(0), leftColumnWidth, top);
-		int rightBottom = layoutRightTextView(presentation.getExpanded(1), leftColumnWidth, top);
+		int leftBottom = 0;
+		int rightBottom = 0;
 		
-		top = Math.max(leftBottom, rightBottom);
-		leftBottom = layoutLeftTextView(presentation.getExpanded(2), leftColumnWidth, top);
-		rightBottom = layoutRightTextView(presentation.getExpanded(3), leftColumnWidth, top);
-		
-		top = Math.max(leftBottom, rightBottom);
-		leftBottom = layoutLeftTextView(presentation.getExpanded(4), leftColumnWidth, top);
-		rightBottom = layoutRightTextView(presentation.getExpanded(5), leftColumnWidth, top);
-		
-		if (substitution.hasText()) {
+		for (int i = 1; i < expandedChildCount; i += 2) {
+			leftBottom = layoutLeftTextView(presentation.getExpandedStateChild(i - 1), leftColumnWidth, top);
+			rightBottom = layoutRightTextView(presentation.getExpandedStateChild(i), leftColumnWidth, top);
 			top = Math.max(leftBottom, rightBottom);
-			layoutLeftTextView(presentation.getExpanded(6), leftColumnWidth, top);
-			layoutRightTextView(presentation.getExpanded(7), leftColumnWidth, top);
+		} if (expandedChildCount % 2 == 1) {
+			layoutLeftTextView(presentation.getExpandedStateChild(expandedChildCount - 1), leftColumnWidth, top);
 		}
 	}
 	
 	private void onLayoutCollapsed() {
-		int leftWidth = presentation.getCollapsedLeft().getMeasuredWidth() + paddingLeft;
-		int top = 0;
-		layoutLeftTextView(presentation.getCollapsedLeft(), leftWidth, top);
-		layoutRightTextView(presentation.getCollapsedMiddle(), leftWidth, top);
+		final int leftWidth = presentation.getCollapsedStateChild(0).getMeasuredWidth() + horizontalPadding;
+		final int top = 0;
+		layoutLeftTextView(presentation.getCollapsedStateChild(0), leftWidth, top);
+		layoutRightTextView(presentation.getCollapsedStateChild(1), leftWidth, top);
 		
-		// layout course info
-		int left = getMeasuredWidth() - presentation.getCollapsedRight().getMeasuredWidth() - paddingLeft;
-		int right = getMeasuredWidth() - paddingLeft;
-		int bottom = presentation.getCollapsedRight().getMeasuredHeight();
-		presentation.getCollapsedRight().layout(left, top, right, bottom);
+		if (presentation.hasRightViewInCollapsedState()) {
+			final int width = getMeasuredWidth();
+			final int left = width - presentation.getCollapsedStateChild(2).getMeasuredWidth() - horizontalPadding;
+			final int right = width - horizontalPadding;
+			final int bottom = presentation.getCollapsedStateChild(2).getMeasuredHeight() + verticalPadding;
+			presentation.getCollapsedStateChild(2).layout(left, verticalPadding, right, bottom);
+		}
 	}
 	
-	private int layoutLeftTextView(TextView view, int leftColumnWidth, int top) {
-		int left = leftColumnWidth - view.getMeasuredWidth();
-		int right = leftColumnWidth;
-		int bottom = top + view.getMeasuredHeight();
+	private int layoutLeftTextView(View view, final int right, int top) {
+		top += verticalPadding;
+		final int left = right - view.getMeasuredWidth();
+		final int height = view.getMeasuredHeight();
+		final int bottom = top + height;
 		view.layout(left, top, right, bottom);
-		return bottom;
+		return bottom + verticalPadding;
 	}
 	
-	private int layoutRightTextView(TextView view, int leftWidth, int top) {
-		int left = leftWidth + middleGapWidth;
-		int right = left + view.getMeasuredWidth();
-		int bottom = top + view.getMeasuredHeight();
+	private int layoutRightTextView(View view, final int leftWidth, int top) {
+		final int left = leftWidth + middleGapWidth;
+		final int right = left + view.getMeasuredWidth();
+		final int height = view.getMeasuredHeight();
+		top += verticalPadding;
+		final int bottom = top + height;
 		view.layout(left, top, right, bottom);
-		return bottom;
+		return bottom + verticalPadding;
 	}
 	
 	class ViewHolder {
 		public AppearanceAnimation[] appearanceAnimations;
 		
 		private ViewHolder() {
-			int childCount = getChildCount();
-			appearanceAnimations = new AppearanceAnimation[childCount];
-			for (int i = 0; i < childCount; i++) {
-				appearanceAnimations[i] = new AppearanceAnimation(getChildAt(i));
+			appearanceAnimations = new AppearanceAnimation[views.length];
+			for (int i = 0; i < views.length; i++) {
+				appearanceAnimations[i] = new AppearanceAnimation(views[i]);
 			}
 		}
 		
 		public void setAnimationDuration(long durationMillis) {
-			for (AppearanceAnimation aa : appearanceAnimations) {
-				aa.setDuration(durationMillis);
+			for (int i = 0; i < appearanceAnimations.length; i++) {
+				appearanceAnimations[i].setDuration(durationMillis);
 			}
 		}
 		
 		public void queryOldPositions() {
-			for (AppearanceAnimation aa : appearanceAnimations) {
-				aa.queryOldPosition();
+			for (int i = 0; i < appearanceAnimations.length; i++) {
+				appearanceAnimations[i].queryOldPosition();
 			}
 		}
 		
 		public void startAnimations() {
-			int childCount = getChildCount();
-			for (int i = 0; i < childCount; i++) {
-				getChildAt(i).startAnimation(appearanceAnimations[i]);
+			for (int i = 0; i < views.length; i++) {
+				views[i].startAnimation(appearanceAnimations[i]);
 			}
 		}
 	}

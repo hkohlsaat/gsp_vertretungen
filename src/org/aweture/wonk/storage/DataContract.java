@@ -98,7 +98,7 @@ public final class DataContract {
 		_ID("INTEGER PRIMARY KEY AUTOINCREMENT"),
 		ABBREVIATION("TEXT"),
 		NAME("TEXT"),
-		CONCURRENTLY_TAUGHT("BOOLEAN");
+		CONCURRENTLY_TAUGHT("INTEGER");
 		
 		public static final String TABLE_NAME = "subjects";
 		

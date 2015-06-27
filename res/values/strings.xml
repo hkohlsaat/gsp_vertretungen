@@ -24,6 +24,7 @@
     
     <!-- Strings regarding substitutions section -->
     <string name="no_data">Keine Daten</string>
+    <string name="no_substitutions">Keine Vertretungen</string>
     
     <!-- Strings regarding settings -->
     <string name="settings">Einstellungen</string>

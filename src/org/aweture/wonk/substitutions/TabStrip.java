@@ -54,7 +54,6 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 		setOrientation(HORIZONTAL);
 		
 		TypedArray a = context.obtainStyledAttributes(attrs, new int[]{R.attr.colorPrimary});
-		final int indicatorColor = 0xfff0f0f0;
 		final int backgroundColor = a.getColor(0, 0xff0000ff);
 		setBackgroundColor(backgroundColor);
 		a.recycle();
@@ -66,41 +65,55 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 		indicator = new Rect(0, 0, 0, indicatorHeight);
 		
 		indicatorPaint = new Paint();
-		indicatorPaint.setColor(indicatorColor);
+		indicatorPaint.setColor(0xfff0f0f0);
 	}
 	
 	
 	public void setViewPager(ViewPager pager) {
+		if (viewPager != null) {
+			viewPager.removeOnPageChangeListener(this);
+		}
 		viewPager = pager;
-		viewPager.setOnPageChangeListener(this);
+		viewPager.addOnPageChangeListener(this);
 		PagerAdapter adapter = viewPager.getAdapter();
 		setupFromAdapterInformation(adapter);
 	}
+	
+	public void notifyDataSetChanged() {
+		setupFromAdapterInformation(viewPager.getAdapter());
+	}
 
 	private void setupFromAdapterInformation(PagerAdapter pagerAdapter) {
-		removeAllViews();
-		tabs.clear();
-		
 		final int pages = pagerAdapter.getCount();
 		for (int i = 0; i < pages; i++) {
-			Tab tab = addTab(pagerAdapter.getPageTitle(i));
-			tabs.add(tab);
+			if (tabs.size() <= i) {
+				final Tab tab = newTab();
+				addTab(tab);
+				tab.setText(pagerAdapter.getPageTitle(i));
+				tabs.add(tab);
+			} else {
+				tabs.get(i).setText(pagerAdapter.getPageTitle(i));
+			}
 		}
 		
-		if (tabs.size() > 0) {
-			Tab tab = tabs.get(0);
-			tab.setVolume(1);
+		final int lastTabsIndex = tabs.size() - 1;
+		for (int i = lastTabsIndex; i >= pages; i--) {
+			removeView(tabs.get(i).getView());
+			tabs.remove(i);
 		}
+		
+		updateTabs();
 	}
 	
-	private Tab addTab(CharSequence tabText) {
-		Tab tab = new Tab(getContext(), tabText);
+	private Tab newTab() {
+		Tab tab = new Tab(getContext());
 		tab.setOnTabClickListener(this);
-		
+		return tab;
+	}
+	
+	private void addTab(Tab tab) {
 		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT, 1);
 		addView(tab.getView(), params);
-		
-		return tab;
 	}
 	
 	@Override
@@ -111,10 +124,8 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 		this.position = position;
 		this.positionOffset = positionOffset;
-		if (getChildCount() > 0) {
-			updateTabs();
-			invalidate();
-		}
+		updateTabs();
+		invalidate();
 	}
 	
 	@Override
@@ -122,21 +133,22 @@ public class TabStrip extends LinearLayout implements OnPageChangeListener, Tab.
 	}
 	
 	private void updateTabs() {
-		// update left tab
-		Tab tab = tabs.get(position);
-		tab.setVolume(1 - positionOffset);
-		
-		// update right tab
-		int rightPosition = position + 1;
-		if (tabs.size() > rightPosition) {
-			tab = tabs.get(rightPosition);
-			tab.setVolume(positionOffset);
+		final int tabsCount = tabs.size();
+		for (int i = 0; i < tabsCount; i++) {
+			final Tab tab = tabs.get(i);
+			if (i == position) {
+				tab.setVolume(1 - positionOffset);
+			} else if (i == position + 1) {
+				tab.setVolume(positionOffset);
+			} else {
+				tab.setVolume(0);
+			}
 		}
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (getChildCount() > position) {
+		if (tabs.size() > position) {
 			
 			setupInticator();
 			if (positionOffset != 0) {

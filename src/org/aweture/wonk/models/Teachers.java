@@ -38,7 +38,7 @@ public class Teachers {
 		DatabaseHelper dbHelper = new DatabaseHelper(context);
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		db.execSQL("DELETE FROM " + TeachersColumns.TABLE_NAME);
-		List<String> insertStatements = getInsetStatements();
+		List<String> insertStatements = getInsertStatements();
 		for (String statement : insertStatements) {
 			db.execSQL(statement);
 		}
@@ -106,7 +106,7 @@ public class Teachers {
 	}
 	
 	
-	private List<String> getInsetStatements() {
+	public List<String> getInsertStatements() {
 		List<String> sqlStatements = new ArrayList<String>();
 		InputStream inputStream = null;
 		try {
@@ -173,7 +173,8 @@ public class Teachers {
 			return name;
 		}
 		public String getNameWithCompellation() {
-			return compellation + " " + name;
+			
+			return (compellation + " " + name).trim();
 		}
 		public String getAccusative() {
 			return getNameWithCompellation().replace("Herr", "Herrn");

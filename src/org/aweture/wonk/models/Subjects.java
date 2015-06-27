@@ -104,7 +104,7 @@ public class Subjects {
 	}
 	
 	
-	private List<String> getInsertStatements() {
+	public List<String> getInsertStatements() {
 		List<String> sqlStatements = new ArrayList<String>();
 		InputStream inputStream = null;
 		try {
@@ -123,7 +123,7 @@ public class Subjects {
 	    		sqlStatements.add("INSERT INTO " + DataContract.SubjectsColumns.TABLE_NAME + " ("
 	    				+ SubjectsColumns.ABBREVIATION + ", " + SubjectsColumns.NAME + ", "
 	    				+ SubjectsColumns.CONCURRENTLY_TAUGHT + ") VALUES (\"" + abbreviation + "\", \""
-	    				+ name + "\", \"" + concurrentlyTaughtString + "\")");
+	    				+ name + "\", " + concurrentlyTaughtString + ")");
 	        	parser.nextText();
 	        }
 		} catch (IOException | XmlPullParserException e) {

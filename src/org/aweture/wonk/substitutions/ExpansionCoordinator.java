@@ -1,5 +1,6 @@
 package org.aweture.wonk.substitutions;
 
+
 public class ExpansionCoordinator {
 	
 	private Expandable expanded;
@@ -33,4 +34,5 @@ public class ExpansionCoordinator {
 	public boolean isExpanded(Expandable expandable) {
 		return expanded == expandable;
 	}
+	
 }

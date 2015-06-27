@@ -1,5 +1,6 @@
 package org.aweture.wonk.substitutions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.aweture.wonk.Application;
@@ -46,10 +47,10 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			setContentView(R.layout.activity_substitutions);
 			
 			viewPager = (ViewPager) findViewById(R.id.pager);
-			tabStrip = (TabStrip) findViewById(R.id.tabStrip);
 			adapter = new SubstitutionsFragmentAdapter();
-			
+			tabStrip = (TabStrip) findViewById(R.id.tabStrip);
 			viewPager.setAdapter(adapter);
+			tabStrip.setViewPager(viewPager);
 			
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 				tabStrip.setElevation(5);
@@ -57,6 +58,20 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			LoaderManager manager = getSupportLoaderManager();
 			manager.initLoader(R.id.substitutions_Activty_PlansLoader, null, adapter);
 		}
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		LoaderManager manager = getSupportLoaderManager();
+		manager.initLoader(R.id.substitutions_Activty_PlansLoader, null, adapter);
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		LoaderManager manager = getSupportLoaderManager();
+		manager.destroyLoader(R.id.substitutions_Activty_PlansLoader);
 	}
 	
 	private boolean shouldDisplayLanding() {
@@ -92,23 +107,15 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 		case R.id.action_see_queries:
 			startActivity(new Intent(this, org.aweture.wonk.log.Activity.class));
 			return true;
-
 		default:
 			return false;
 		}
 	}
 	
-	@Override
-	protected void onDestroy() {
-		LoaderManager manager = getSupportLoaderManager();
-		manager.destroyLoader(R.id.substitutions_Activty_PlansLoader);
-		super.onDestroy();
-	}
 	
 	private class SubstitutionsFragmentAdapter extends FragmentPagerAdapter implements LoaderCallbacks<List<Plan>> {
 		
-		private int count = -1;
-		private List<Plan> plans;
+		private List<Plan> plans = new ArrayList<Plan>();
 		
 		public SubstitutionsFragmentAdapter() {
 			super(getSupportFragmentManager());
@@ -128,7 +135,7 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		public int getCount() {
-			return count;
+			return plans.size();
 		}
 		
 		@Override
@@ -138,8 +145,9 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 			String relativeWord = date.resolveToRelativeWord();
 			if (relativeWord != null) {
 				return relativeWord;
+			} else {
+				return date.toDateString();
 			}
-			return date.toDateString();
 		}
 
 		@Override
@@ -149,29 +157,28 @@ public class Activity extends android.support.v7.app.ActionBarActivity {
 
 		@Override
 		public void onLoadFinished(Loader<List<Plan>> loader, List<Plan> data) {
-			if (count != data.size()) {
-				count = data.size();
-				plans = data;
+			
+			if (plans.isEmpty() || plans.size() != data.size()
+					|| plans.get(0).getCreation().before(data.get(0).getCreation())) {
+				plans.clear();
+				plans.addAll(data);
 				notifyDataSetChanged();
+				tabStrip.notifyDataSetChanged();
 			}
-			if (count == 0 && !UpdateProcedure.isUpdating()) {
+			
+			if (plans.isEmpty() && !UpdateProcedure.isUpdating()) {
+				// display no data message
 				findViewById(R.id.progressBar).setVisibility(View.GONE);
 				findViewById(R.id.progressPlaceholder).setVisibility(View.VISIBLE);
 				findViewById(R.id.noData).setVisibility(View.VISIBLE);
-			} else if (count != 0) {
+			} else if (!plans.isEmpty()) {
+				// hide ProgressBar etc.
 				findViewById(R.id.progressPlaceholder).setVisibility(View.GONE);
 			}
-			
-			tabStrip.setViewPager(viewPager);
 		}
 
 		@Override
 		public void onLoaderReset(Loader<List<Plan>> loader) {
-			count = -1;
-			notifyDataSetChanged();
-			
-			findViewById(R.id.progressPlaceholder).setVisibility(View.VISIBLE);
-			findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 		}
 	}
 }

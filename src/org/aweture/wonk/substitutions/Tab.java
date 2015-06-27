@@ -19,9 +19,8 @@ public class Tab implements OnClickListener {
 	
 	private OnTabClickListener clickListener;
 
-	public Tab(Context context, CharSequence text) {
+	public Tab(Context context) {
 		view = new TextView(context);
-		view.setText(text);
 		view.setGravity(Gravity.CENTER);
 		view.setTypeface(null, Typeface.BOLD);
 		view.setAllCaps(true);
@@ -32,6 +31,10 @@ public class Tab implements OnClickListener {
 	
 	public View getView() {
 		return view;
+	}
+	
+	public void setText(CharSequence text) {
+		view.setText(text);
 	}
 	
 	public void setVolume(float volume) {

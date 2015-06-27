@@ -26,6 +26,8 @@ public class SubstitutionsFragment extends Fragment {
 	private static final String PLAN_INDEX_ARGUMENT = "plan_index";
 	
 	private RecyclerView recyclerView;
+	private LinearLayoutManager llm;
+	private View noDataView;
 	private Adapter adapter;
 	
 	private int planIndex;
@@ -39,8 +41,6 @@ public class SubstitutionsFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		LoaderManager manager = getLoaderManager();
-		manager.initLoader(R.id.substitutions_Fragement_PlansLoader, null, adapter);
 
 		// Get the arguments and obtain the planIndex.
 		Bundle argumentBundle = getArguments();
@@ -53,18 +53,27 @@ public class SubstitutionsFragment extends Fragment {
 		
 		// Get the RecyclerView
 		recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+		noDataView = view.findViewById(R.id.noSubstitutions);
 		
 		// Set up the RecyclerView
 		Context context = inflater.getContext();
-		recyclerView.setLayoutManager(new LinearLayoutManager(context));
+		llm = new LinearLayoutManager(context);
+		recyclerView.setLayoutManager(llm);
 		recyclerView.setAdapter(adapter);
 
 		return view;
 	}
 	
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onStart() {
+		super.onStart();
+		LoaderManager manager = getLoaderManager();
+		manager.initLoader(R.id.substitutions_Fragement_PlansLoader, null, adapter);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
 		LoaderManager manager = getLoaderManager();
 		manager.destroyLoader(R.id.substitutions_Fragement_PlansLoader);
 	}
@@ -83,12 +92,11 @@ public class SubstitutionsFragment extends Fragment {
 		
 		public Adapter() {
 			sortedSubstitutionGroups = new ArrayList<SubstitutionsGroup>();
-			plan = new Plan();
 		}
 		
 		@Override
 		public int getItemCount() {
-			return plan.size();
+			return sortedSubstitutionGroups.size();
 		}
 
 		@Override
@@ -123,19 +131,21 @@ public class SubstitutionsFragment extends Fragment {
 		public void onLoadFinished(Loader<List<Plan>> loader, List<Plan> planList) {
 			plan = planList.get(planIndex);
 			
-			// Obtain a list with all classes sorted.
 			sortedSubstitutionGroups.clear();
 			sortedSubstitutionGroups.addAll(plan.keySet());
 			Collections.sort(sortedSubstitutionGroups);
 			
 			notifyDataSetChanged();
+			
+			if (plan.isEmpty()) {
+				noDataView.setVisibility(View.VISIBLE);
+			} else {
+				noDataView.setVisibility(View.GONE);
+			}
 		}
 
 		@Override
 		public void onLoaderReset(Loader<List<Plan>> arg0) {
-			plan = new Plan();
-			sortedSubstitutionGroups.clear();
-			notifyDataSetChanged();
 		}
 	}
 }
