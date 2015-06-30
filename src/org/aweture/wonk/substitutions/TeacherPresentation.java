@@ -34,7 +34,11 @@ public class TeacherPresentation extends Presentation {
 		if (displayText()) {
 			views[6].setText("Info");
 			views[7].setText(substitution.getText());
+		} else {
+			views[6].setText("");
+			views[7].setText("");
 		}
+		views[8].setText("");
 	}
 
 	@Override

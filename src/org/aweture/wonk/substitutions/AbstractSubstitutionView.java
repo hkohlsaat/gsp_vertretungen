@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -20,13 +19,13 @@ import android.widget.TextView;
  * @author Hannes Kohlsaat
  *
  */
-public class AbstractSubstitutionView extends ViewGroup implements Expandable, OnClickListener {
+public class AbstractSubstitutionView extends ViewGroup {
 	
 	private static final int MIDDLE_GAP_WIDTH_DIP = 8;
 	private static final int PADDING_HORIZONTAL_DIP = 16;
 	private static final int PADDING_VERTICAL_DIP = 12;
 	
-	private static final ExpansionCoordinator expansionCoordinator = new ExpansionCoordinator();
+	private boolean isExpanded;
 	
 	private final ViewHolder viewHolder;
 	
@@ -55,30 +54,20 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		horizontalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_HORIZONTAL_DIP, dm);
 		verticalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, PADDING_VERTICAL_DIP, dm);
 		middleGapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MIDDLE_GAP_WIDTH_DIP, dm);
-		
-		setOnClickListener(this);
 	}
 	
 	ViewHolder getViewHolder() {
 		return viewHolder;
 	}
 	
-	@Override
-	public void changeExpansionState(boolean animate) {
+	public void changeExpansionState(boolean expanded) {
+		isExpanded = expanded;
 		applyVisibilityProperties();
 	}
 	
-	@Override
-	public View getView() {
-		return this;
-	}
-	
-	@Override
-	public void onClick(View v) {
-		expansionCoordinator.clicked(this);
-	}
-	
 	public void setSubstitution(Substitution substitution, PresentationMode presentationMode) {
+		isExpanded = false;
+		setBackgroundColor(0x00eeeeee);
 		if (this.presentationMode != presentationMode) {
 			this.presentationMode = presentationMode;
 			presentation = Presentation.applyPresentation(substitution, views, presentationMode);
@@ -97,22 +86,14 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 		}
 	}
 	
-	private boolean isExpanded() {
-		return expansionCoordinator.isExpanded(this);
+	boolean isExpanded() {
+		return isExpanded;
 	}
 	
 	@Override
     public boolean shouldDelayChildPressedState() {
         return false;
     }
-	
-	@Override
-	protected void onDetachedFromWindow() {
-		super.onDetachedFromWindow();
-		if (expansionCoordinator.isExpanded(this)) {
-			expansionCoordinator.removeAsExpanded(this);
-		}
-	}
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -128,6 +109,12 @@ public class AbstractSubstitutionView extends ViewGroup implements Expandable, O
 			measureChildrenCollapsed(widthMeasureSpec, heightMeasureSpec);
 			height = computeOwnHeightCollapsed();
 			state = computeChildrenMeasuredStateCollapsed();
+		}
+		
+		if (MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.UNSPECIFIED) {
+			height = MeasureSpec.getSize(heightMeasureSpec);
+			setMeasuredDimension(width, height);
+			return;
 		}
 		
 		int measuredWidth = resolveSizeAndState(width, widthMeasureSpec, state);
