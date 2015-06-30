@@ -8,27 +8,30 @@ import org.aweture.wonk.R;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.SubstitutionsGroup;
 import org.aweture.wonk.storage.PlansLoader;
+import org.aweture.wonk.substitutions.ExpandableLayoutManager.ExpandableViewHolder;
+import org.aweture.wonk.substitutions.SubstitutionsFragment.Adapter.ViewHolder;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
 
 public class SubstitutionsFragment extends Fragment {
 	
 	private static final String PLAN_INDEX_ARGUMENT = "plan_index";
 	
 	private RecyclerView recyclerView;
-	private LinearLayoutManager llm;
+	private ExpandableLayoutManager expandableLayoutManager = new ExpandableLayoutManager();
+	private Adapter adapter = new Adapter();
 	private View noDataView;
-	private Adapter adapter;
 	
 	private int planIndex;
 	
@@ -50,17 +53,14 @@ public class SubstitutionsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.layout_recycler_view, container, false);
-		
-		// Get the RecyclerView
-		recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-		noDataView = view.findViewById(R.id.noSubstitutions);
-		
+
 		// Set up the RecyclerView
-		Context context = inflater.getContext();
-		llm = new LinearLayoutManager(context);
-		recyclerView.setLayoutManager(llm);
+		recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+		recyclerView.setLayoutManager(expandableLayoutManager);
 		recyclerView.setAdapter(adapter);
 
+		noDataView = view.findViewById(R.id.noSubstitutions);
+		
 		return view;
 	}
 	
@@ -85,10 +85,12 @@ public class SubstitutionsFragment extends Fragment {
 		setArguments(argumentBundle);
 	}
 	
-	private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements LoaderCallbacks<List<Plan>> {
+	class Adapter extends RecyclerView.Adapter<ViewHolder> implements LoaderCallbacks<List<Plan>> {
 		
 		private List<SubstitutionsGroup> sortedSubstitutionGroups;
 		private Plan plan;
+		
+		private ViewHolder expanded = null;
 		
 		public Adapter() {
 			sortedSubstitutionGroups = new ArrayList<SubstitutionsGroup>();
@@ -112,13 +114,56 @@ public class SubstitutionsFragment extends Fragment {
 			vh.classView.setSubstitutions(currentGroup, plan.get(currentGroup));
 		}
 		
-		public class ViewHolder extends RecyclerView.ViewHolder{
+		public class ViewHolder extends ExpandableViewHolder implements OnClickListener {
 			
-			public SubstGroupView classView;
+			private SubstGroupView classView;
+			private SubstitutionView substitutionView;
 
 			public ViewHolder(SubstGroupView itemView) {
-				super(itemView);
+				expandableLayoutManager.super(itemView);
 				classView = itemView;
+				classView.setOnSubstitutionsClickListener(this);
+			}
+			
+			@Override
+			public void onClick(View v) {
+				substitutionView = (SubstitutionView) v;
+				substitutionView.changeExpansionState(!substitutionView.isExpanded());
+				animateItemSizeChange();
+			}
+
+			@Override
+			public RecyclerView getRecyclerView() {
+				return recyclerView;
+			}
+
+			@Override
+			public int getHeight() {
+				return substitutionView.getHeight();
+			}
+
+			@Override
+			public void setHeight(int height) {
+				LayoutParams lp = substitutionView.getLayoutParams();
+				lp.height = height;
+				classView.requestLayout();
+			}
+
+			@Override
+			public int getTop() {
+				return classView.getTop() + substitutionView.getTop();
+			}
+
+			@Override
+			public int getBottom() {
+				return classView.getTop() + substitutionView.getBottom();
+			}
+			
+			@Override
+			public void startAnimation(Animation animation) {
+				classView.clearAnimation();
+				classView.startAnimation(animation);
+				substitutionView.onPreDraw();
 			}
 		}
 
