@@ -196,7 +196,7 @@ public class IServHtmlUtil {
 		List<String> classNames = new ArrayList<String>();
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"5", "6", "7", "8", "9", "10"}, "a?b?c?d?e?");
 		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"11", "12", "13"}, "g?n?s?");
-		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?N?S?L?W?");
+		compactClassName = filterClassNames(classNames, compactClassName, new String[]{"E", "Q1", "Q2", "Q3", "Q4"}, "(Bi)?(Ch)?F?G?N?S?L?W?g?n?s?");
 		if (!compactClassName.isEmpty()) {
 			LogUtil.w("Class names not fully solved: " + compactClassName);
 		}
