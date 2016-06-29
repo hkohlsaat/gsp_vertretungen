@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Strings regarding the app in general -->
+    <string name="app_name">Vertretungen</string>
+    <string name="substitutions_plan">Vertretungsplan</string>
+    <string name="licenses">Licenses</string>
+
+    <!-- Strings regarding actions -->
+    <string name="action_update">Aktualisieren</string>
+    <string name="action_show_filtered">Gefilterte Vertretungen</string>
+    <string name="action_see_queries">See queries</string>
+
+    <!-- Strings regarding landing section -->
+    <string name="welcome">Willkommen</string>
+    <string name="intro">Diese App zeigt Dir den aktuellen Vertretungsplan des Gymnasiums Schloss Plön.</string>
+    <string name="data_insert">Der Vertretungsplan wird neu geladen, sobald es eine neue Version gibt. Bitte gib das Passwort ein, das Du bei Herrn Aulke erfährst.</string>
+    <string name="password">Passwort</string>
+    <string name="login">Login</string>
+    <string name="login_fail">Leider sind die eingegebenen Daten falsch. Bitte gib Dein Passwort noch einmal ein.</string>
+    <string name="no_network">Das Gerät hat momentan keine Netzwerkverbindung. Bitte versuche es bei Netzwerkzugang erneut.</string>
+
+    <!-- Strings regarding substitutions section -->
+    <string name="no_data">Keine Daten</string>
+    <string name="no_substitutions">Keine Vertretungen</string>
+
+    <!-- Strings regarding settings -->
+    <string name="settings">Einstellungen</string>
+    <string name="mode_explanation">Wähle Deinen Anzeigemodus</string>
+    <string name="student">Schülermodus</string>
+    <string name="teacher">Lehrermodus</string>
+    <string name="filter_explanation">Wähle Deinen Filter</string>
+    <string name="filter_explanation_extended">Entdeckt die App Deinen Filter während des Herunterladens im Vertretungsplan, wirst Du sofort benachrichtigt.</string>
+    <string name="filter_hint_student">Klassenname als Filter</string>
+    <string name="filter_hint_teacher">Kürzel als Filter</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

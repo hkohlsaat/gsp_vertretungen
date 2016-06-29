@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="SUBSTITUTIONS_ACTIVTY_PLAN_LOADER" type="id" ></item>
+    <item name="substitutions_Fragement_PlansLoader" type="id" ></item>
+    <item name="update_scheduler_job" type="id" ></item>
+</resources>

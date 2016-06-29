@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- app main colors -->
+    <color name="primary">@android:color/holo_orange_dark</color>
+    <color name="primary_dark">#ea8000</color>
+    <color name="accent">@android:color/white</color>
+    <color name="colorBackground">#ffffff</color>
+
+</resources>
