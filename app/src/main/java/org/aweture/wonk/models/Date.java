@@ -59,6 +59,10 @@ public class Date extends GregorianCalendar {
 		java.util.Date date = getTime();
 		return date.toString();
 	}
+
+	public boolean isInLastWeek() {
+		return new GregorianCalendar().getTimeInMillis() - getTimeInMillis() < 604800000;
+	}
 	
 	public String resolveToRelativeWord() {
 		Calendar yesterday = GregorianCalendar.getInstance();

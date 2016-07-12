@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,13 +25,7 @@ public class PlanStorage {
 
     private static final String FILENAME = "plan.json";
 
-    private Context context;
-
-    public PlanStorage(Context context) {
-        this.context = context;
-    }
-
-    public void savePlan(String planJSON) {
+    public static void savePlan(Context context, String planJSON) {
         synchronized (FILENAME) {
             try {
                 FileOutputStream outputStream = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
@@ -42,14 +37,16 @@ public class PlanStorage {
         }
     }
 
-    public Plan readPlan() throws IOException {
+    public static Plan readPlan(Context context, boolean student) throws IOException {
         synchronized (FILENAME) {
             FileInputStream inputStream = context.openFileInput(FILENAME);
             JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
             try {
                 Plan plan = readPlan(reader);
-                for (Plan.Part part : plan.parts) {
-                    Arrays.sort(part.substitutions);
+                if (student) {
+                    prepareForStudent(plan);
+                } else {
+                    prepareForTeacher(plan);
                 }
                 return plan;
             } finally {
@@ -58,7 +55,46 @@ public class PlanStorage {
         }
     }
 
-    private Plan readPlan(JsonReader reader) throws IOException {
+    private static void prepareForStudent(Plan plan) {
+        Comparator<Substitution> comparator = new Substitution.ClassComparator();
+        for (int i = 0; i < plan.parts.length; i++) {
+            ArrayList<Substitution> subs = new ArrayList<Substitution>(plan.parts[i].substitutions.length);
+            for (int j = 0; j < plan.parts[i].substitutions.length; j++) {
+                Substitution s = plan.parts[i].substitutions[j];
+                String[] classNames = decomposeClassNames(s.className);
+                for (int k = 0; k < classNames.length; k++) {
+                    Substitution copy = s.copy();
+                    copy.className = classNames[k];
+                    subs.add(copy);
+                }
+            }
+            plan.parts[i].substitutions = subs.toArray(new Substitution[subs.size()]);
+            Arrays.sort(plan.parts[i].substitutions, comparator);
+        }
+    }
+
+    private static void prepareForTeacher(Plan plan) {
+        Comparator<Substitution> comparator = new Substitution.TeacherComparator();
+        for (int i = 0; i < plan.parts.length; i++) {
+            ArrayList<Substitution> subs = new ArrayList<Substitution>(plan.parts[i].substitutions.length);
+            for (int j = 0; j < plan.parts[i].substitutions.length; j++) {
+                Substitution s = plan.parts[i].substitutions[j];
+                if (s.substTeacher.abbr.length() > 0) {
+                    subs.add(s);
+
+                    if (s.taskProvider.getName().length() > 0 && !s.substTeacher.abbr.equals(s.taskProvider.abbr)) {
+                        s = s.copy();
+                        s.modeTaskProvider = true;
+                        subs.add(s);
+                    }
+                }
+            }
+            plan.parts[i].substitutions = subs.toArray(new Substitution[subs.size()]);
+            Arrays.sort(plan.parts[i].substitutions, comparator);
+        }
+    }
+
+    private static Plan readPlan(JsonReader reader) throws IOException {
         reader.beginObject();
 
         Plan plan = new Plan();
@@ -79,7 +115,7 @@ public class PlanStorage {
         return plan;
     }
 
-    private Plan.Part[] readPartsArray(JsonReader reader) throws IOException {
+    private static Plan.Part[] readPartsArray(JsonReader reader) throws IOException {
         reader.beginArray();
 
         ArrayList<Plan.Part> parts = new ArrayList<Plan.Part>();
@@ -92,7 +128,7 @@ public class PlanStorage {
         return (Plan.Part[]) parts.toArray(new Plan.Part[parts.size()]);
     }
 
-    private Plan.Part readPart(JsonReader reader) throws IOException {
+    private static Plan.Part readPart(JsonReader reader) throws IOException {
         reader.beginObject();
 
         Plan.Part part = new Plan.Part();
@@ -113,23 +149,20 @@ public class PlanStorage {
         return part;
     }
 
-    private Substitution[] readSubstitutionsArray(JsonReader reader) throws IOException {
+    private static Substitution[] readSubstitutionsArray(JsonReader reader) throws IOException {
         reader.beginArray();
 
         ArrayList<Substitution> substitutions = new ArrayList<Substitution>();
 
         while (reader.hasNext()) {
-            Substitution[] s = readSubstitution(reader);
-            for (int i = 0; i < s.length; i++) {
-                substitutions.add(s[i]);
-            }
+            substitutions.add(readSubstitution(reader));
         }
 
         reader.endArray();
         return (Substitution[]) substitutions.toArray(new Substitution[substitutions.size()]);
     }
 
-    private Substitution[] readSubstitution(JsonReader reader) throws IOException {
+    private static Substitution readSubstitution(JsonReader reader) throws IOException {
         reader.beginObject();
 
         Substitution substitution = new Substitution();
@@ -157,19 +190,11 @@ public class PlanStorage {
             }
         }
 
-        String[] classNames = decomposeClassNames(substitution.className);
-        Substitution[] substitutions = new Substitution[classNames.length];
-        for (int i = 0; i < substitutions.length; i++) {
-            Substitution s = substitution.copy();
-            s.className = classNames[i];
-            substitutions[i] = s;
-        }
-
         reader.endObject();
-        return substitutions;
+        return substitution;
     }
 
-    private Teacher readTeacher(JsonReader reader) throws IOException {
+    private static Teacher readTeacher(JsonReader reader) throws IOException {
         reader.beginObject();
 
         String teacherAbbr = "";
@@ -193,7 +218,7 @@ public class PlanStorage {
         return new Teacher(teacherAbbr, teacherName, teacherSex);
     }
 
-    private Subject readSubject(JsonReader reader) throws IOException {
+    private static Subject readSubject(JsonReader reader) throws IOException {
         reader.beginObject();
 
         String subjectAbbr = "";
@@ -217,7 +242,7 @@ public class PlanStorage {
         return new Subject(subjectAbbr, subjectName, splitClass);
     }
 
-    private String[] decomposeClassNames(String compactClassName) {
+    private static String[] decomposeClassNames(String compactClassName) {
         List<String> classNames = new ArrayList<String>();
         compactClassName = decomposeClassNames(classNames, compactClassName, new String[]{"5", "6", "7", "8", "9", "10"}, "a?b?c?d?e?");
         compactClassName = decomposeClassNames(classNames, compactClassName, new String[]{"11", "12", "13"}, "g?n?s?");
@@ -228,7 +253,7 @@ public class PlanStorage {
         return classNames.toArray(new String[classNames.size()]);
     }
 
-    private String decomposeClassNames(List<String> classNames, String compactClassName, String[] prefixes, String sufixes) {
+    private static String decomposeClassNames(List<String> classNames, String compactClassName, String[] prefixes, String sufixes) {
         for (String prefix : prefixes) {
 
             Pattern pattern = Pattern.compile(prefix + sufixes);

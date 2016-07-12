@@ -12,6 +12,10 @@ public class Teacher {
 		this.sex = sex;
 	}
 
+	public String getName() {
+		return name.isEmpty() ? abbr : name + " (" + abbr + ")";
+	}
+
 	public Teacher copy() {
 		return new Teacher(abbr, name, sex);
 	}

@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.storage.PlanStorage;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -16,30 +14,37 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class PlanDownloader {
 
-	public static final String PLAN_DOWNLOADER_FINISHED_DOWNLOADING = "plan_downloader_finished_downloading";
+	public static final String ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED = "new_plan_downloaded_and_saved";
 
-	private URL planURL;
+	public static final String SERVER_URL_OF_PLAN = "https://vtr.aweture.org/plan";
 
-	public PlanDownloader() {
-		try {
-			planURL = new URL("https://vtr.aweture.org/plan");
-		} catch (MalformedURLException e) {
-			LogUtil.e(e);
-		}
-	}
-
-	public void downloadAndSave(Context context) throws IOException {
+	/**
+	 * downloadAndSave() downloads the current plan from the server and saves it to an instance of
+	 * {@link PlanStorage}. After saving, an Intent with the action
+	 * {@link #ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED} is broadcasted via {@link LocalBroadcastManager}.
+	 *
+	 * @throws IOException
+     */
+	public static void downloadAndSave(Context context) throws IOException {
+		// Download the plan as json.
 		String json = download();
-		PlanStorage storage = new PlanStorage(context);
-		storage.savePlan(json);
+		// Save the plan to the storage.
+		PlanStorage.savePlan(context, json);
 
-		Intent intent = new Intent(PLAN_DOWNLOADER_FINISHED_DOWNLOADING);
+		// Fire an intent, because a download was successfully saved.
+		Intent intent = new Intent(ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-		LogUtil.d("Saved new plan, send informing intent.");
 	}
 
-	private String download() throws IOException {
+	/**
+	 * download() downloads the plan in json format and returns it as String.
+	 *
+	 * @return Plan in json format.
+	 * @throws IOException if an error occurs while downloading.
+     */
+	public static String download() throws IOException {
 		// Open the connection and then connect to the plan location.
+		URL planURL = new URL(SERVER_URL_OF_PLAN);
 		HttpsURLConnection conn = (HttpsURLConnection) planURL.openConnection();
 		conn.connect();
 
@@ -49,6 +54,7 @@ public class PlanDownloader {
 		while (scanner.hasNextLine()) {
 			plan.append(scanner.nextLine() + "\n");
 		}
+
 		// Close all things having to be closed.
 		scanner.close();
 		conn.disconnect();

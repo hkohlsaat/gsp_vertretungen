@@ -10,7 +10,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import org.aweture.wonk.background.PlanDownloader;
 import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.settings.Activity;
 import org.aweture.wonk.storage.PlanStorage;
+import org.aweture.wonk.storage.SimpleData;
 
 public class PlanLoader extends AsyncTaskLoader<Plan> {
 
@@ -40,8 +42,7 @@ public class PlanLoader extends AsyncTaskLoader<Plan> {
     public Plan loadInBackground() {
         Plan plan = null;
         try {
-            PlanStorage planStorage = new PlanStorage(getContext());
-            plan = planStorage.readPlan();
+            plan = PlanStorage.readPlan(getContext(), new SimpleData(getContext()).isStudent());
             LogUtil.d("Finished loading sucessfully.");
         } catch (Exception e) {
             LogUtil.w(e.getMessage());
@@ -58,7 +59,9 @@ public class PlanLoader extends AsyncTaskLoader<Plan> {
     private class PlanDownloaderFinishedReveiver extends BroadcastReceiver {
 
         public IntentFilter getIntentFilter() {
-            return new IntentFilter(PlanDownloader.PLAN_DOWNLOADER_FINISHED_DOWNLOADING);
+            IntentFilter intentFilter = new IntentFilter(PlanDownloader.ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED);
+            intentFilter.addAction(Activity.STUDENT_TEACHER_MODE_CHANGED);
+            return intentFilter;
         }
 
         @Override

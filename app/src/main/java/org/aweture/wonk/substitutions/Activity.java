@@ -35,9 +35,11 @@ import org.aweture.wonk.background.PlanUpdateService;
 import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Plan;
 import org.aweture.wonk.models.Substitution;
+import org.aweture.wonk.models.Teacher;
 import org.aweture.wonk.storage.SimpleData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Activity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Plan> {
 
@@ -46,29 +48,30 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
     private View progessBar;
 
     private PartAdapter adapter;
+    private List<RecyclerView> recyclerViews = new ArrayList<RecyclerView>();
     private Plan plan;
 
     private PlanUpdateReceiver receiver;
+
+    private boolean isStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (shouldDisplayLanding()) {
-            Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
-            startActivity(intent);
-            finish();
+            displayLandingActivity();
             return;
         }
 
+        // Set content view and toolbar
         setContentView(R.layout.activity_substitutions);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
+        // Set up ViewPager with an adapter and tabs.
         adapter = new PartAdapter();
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -87,14 +90,36 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
         return !data.isPasswordEntered();
     }
 
+    private void displayLandingActivity() {
+        Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showLoadingLayout() {
+        feedbackContainer.setVisibility(View.VISIBLE);
+        noDataText.setVisibility(View.GONE);
+        progessBar.setVisibility(View.VISIBLE);
+    }
+
+    private void showNoDataLayout() {
+        feedbackContainer.setVisibility(View.VISIBLE);
+        noDataText.setVisibility(View.VISIBLE);
+        progessBar.setVisibility(View.GONE);
+    }
+
+    private void showNormalLayout() {
+        feedbackContainer.setVisibility(View.GONE);
+        noDataText.setVisibility(View.GONE);
+        progessBar.setVisibility(View.GONE);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu according to IN_DEBUG_MODE flag.
         MenuInflater inflater = getMenuInflater();
-        if (Application.IN_DEBUG_MODE) {
-            inflater.inflate(R.menu.substitutes_debug_mode, menu);
-        } else {
-            inflater.inflate(R.menu.substitutes, menu);
-        }
+        int menuId = Application.IN_DEBUG_MODE ? R.menu.substitutes_debug_mode : R.menu.substitutes;
+        inflater.inflate(menuId, menu);
         return true;
     }
 
@@ -125,9 +150,7 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
             return;
         }
 
-        feedbackContainer.setVisibility(View.VISIBLE);
-        noDataText.setVisibility(View.GONE);
-        progessBar.setVisibility(View.VISIBLE);
+        showLoadingLayout();
 
         Intent intent = new Intent(this, PlanUpdateService.class);
         startService(intent);
@@ -136,25 +159,27 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
             @Override
             public void handleEvent(final Intent intent) {
                 LogUtil.d("Processing intent form PlanUpdateService.");
-                if (!intent.getBooleanExtra(PlanUpdateService.EXTRA_FINISHED_SUCCESSFULLY, false)) {
-                    LogUtil.d("PlanUpdateService finished with exception. Showing pre update UI.");
-                    feedbackContainer.setVisibility(View.GONE);
-                    noDataText.setVisibility(View.GONE);
-                    progessBar.setVisibility(View.GONE);
 
-                    Toast.makeText(Activity.this, "Fehler beim Herunterladen", Toast.LENGTH_SHORT).show();
-                } else {
+                if (intent.getBooleanExtra(PlanUpdateService.EXTRA_FINISHED_SUCCESSFULLY, true)) {
+                    // The update was successfull.
                     LogUtil.d("PlanUpdateService finished successfully. Loader will update UI.");
+                } else {
+                    // The update failed.
+                    LogUtil.d("PlanUpdateService finished with exception. Showing pre update UI.");
+                    showNormalLayout();
+                    Toast.makeText(Activity.this, "Fehler beim Herunterladen", Toast.LENGTH_SHORT).show();
                 }
 
+                // Unregister the receiver when this broadcast is handled.
                 LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(Activity.this);
                 broadcastManager.unregisterReceiver(receiver);
                 receiver = null;
-                LogUtil.d("Unregister PlanUpdateReceiver.");
+                LogUtil.d("Unregistered PlanUpdateReceiver.");
             }
 
         });
 
+        // Register the receiver.
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(receiver, receiver.getIntentFilter());
     }
@@ -166,43 +191,39 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Plan> loader, Plan data) {
-        LogUtil.currentMethod();
+        // Set the new display mode.
+        SimpleData sd = new SimpleData(this);
+        isStudent = sd.isStudent();
+
+        // Set the now
         plan = data;
-        if (plan == null || plan.parts.length == 0) {
+        adapter.notifyDataSetChanged();
+
+        if (plan.parts.length == 0) {
             // No plan or exception while reading.
-            feedbackContainer.setVisibility(View.VISIBLE);
-            noDataText.setVisibility(View.VISIBLE);
-            progessBar.setVisibility(View.GONE);
+            showNoDataLayout();
         } else {
             // There is a new plan. Update UI.
-            feedbackContainer.setVisibility(View.GONE);
-            noDataText.setVisibility(View.GONE);
-            progessBar.setVisibility(View.GONE);
+            showNormalLayout();
 
-            adapter.notifyDataSetChanged();
+            // Inform all RecyclerViews about the new data.
+            for (RecyclerView r : recyclerViews) {
+                r.getAdapter().notifyDataSetChanged();
+            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Plan> loader) {
-        //onLoadFinished(loader, null);
     }
 
     private class PartAdapter extends PagerAdapter {
 
-        private SubstitutionsAdapter[] adapters;
-
-        public PartAdapter() {
-            adapters = new SubstitutionsAdapter[2];
-        }
-
         @Override
         public int getCount() {
-            if (plan == null) {
+            if (plan == null)
                 return 0;
-            } else {
-                return plan.parts.length;
-            }
+            return plan.parts.length;
         }
 
         @Override
@@ -211,50 +232,32 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
         }
 
         @Override
-        public void notifyDataSetChanged() {
-            // Adjust array size if necessary.
-            if (getCount() > adapters.length) {
-                SubstitutionsAdapter[] adapters = new SubstitutionsAdapter[getCount()];
-                for (int i = 0; i < this.adapters.length; i++) {
-                    adapters[i] = this.adapters[i];
-                }
-                this.adapters = adapters;
-            }
-
-            // Call super to inform super class.
-            super.notifyDataSetChanged();
-
-            // Inform the views.
-            for (SubstitutionsAdapter a : adapters) {
-                if (a != null) {
-                    a.notifyDataSetChanged();
-                }
-            }
-        }
-
-        @Override
         public Object instantiateItem(ViewGroup collection, int position) {
-            // Create the RecyclerView.
-            RecyclerView rv = new RecyclerView(Activity.this);
-            rv.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
-                    RecyclerView.LayoutParams.MATCH_PARENT));
+            // Create the item.
+            View v = getLayoutInflater().inflate(R.layout.view_part, collection, false);
+            RecyclerView rv = (RecyclerView) v.findViewById(R.id.recyclerView);
+            recyclerViews.add(rv);
             rv.setLayoutManager(new LinearLayoutManager(Activity.this));
             rv.addItemDecoration(new DividerItemDecoration());
 
             // Create an Adapter.
-            adapters[position] = new SubstitutionsAdapter(position);
-            rv.setAdapter(adapters[position]);
+            rv.setAdapter(new SubstitutionsAdapter(position));
 
-            // Add the RecyclerView to the ViewPager.
-            collection.addView(rv);
+            // Add the item to the ViewPager.
+            collection.addView(v);
 
-            return rv;
+            if (plan.parts[position].substitutions.length == 0) {
+                rv.setVisibility(View.GONE);
+            }
+
+            return v;
         }
 
         @Override
         public void destroyItem(ViewGroup collection, int position, Object view) {
-            ((ViewPager) collection).removeView((TextView) view);
-            adapters[position] = null;
+            ((ViewPager) collection).removeView((View) view);
+            RecyclerView rv = (RecyclerView) ((View) view).findViewById(R.id.recyclerView);
+            recyclerViews.remove(rv);
         }
 
         @Override
@@ -308,7 +311,6 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
     }
 
 
-
     private class SubstitutionsAdapter extends RecyclerView.Adapter<MyViewHolder> {
         private int part;
         private ViewInfo[] viewInfos;
@@ -335,8 +337,16 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
         public void onBindViewHolder(MyViewHolder holder, int position) {
             ViewInfo vi = viewInfos[position];
             Substitution s = plan.parts[part].substitutions[vi.reference];
+            if (isStudent) {
+                holder.view.setText(textForStudent(vi, s));
+            } else {
+                holder.view.setText(textForTeacher(vi, s));
+            }
+        }
+
+        private String textForStudent(ViewInfo vi, Substitution s) {
             if (vi.type == 0) {
-                holder.view.setText(s.className);
+                return s.className;
             } else {
                 StringBuilder sb = new StringBuilder();
                 sb.append(s.period);
@@ -366,30 +376,69 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
                     sb.append("\n");
                     sb.append(s.text);
                 }
-                holder.view.setText(sb.toString());
+                return sb.toString();
+            }
+        }
+
+        private String textForTeacher(ViewInfo vi, Substitution s) {
+            if (vi.type == 0) {
+                return s.modeTaskProvider ? s.taskProvider.getName() : s.substTeacher.getName();
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(s.period);
+                sb.append(". Stunde: ");
+                if (s.modeTaskProvider) {
+                    sb.append("Aufgabe stellen");
+                } else if (s.substTeacher.abbr.equals(s.taskProvider.abbr)) {
+                    sb.append(s.kind);
+                    sb.append("/Aufgabe stellen");
+                } else {
+                    sb.append(s.kind);
+                }
+                sb.append("\n");
+                sb.append(s.className);
+                sb.append(", statt ");
+                sb.append(s.instdSubject.name);
+                sb.append(" (");
+                sb.append(s.instdTeacher.abbr);
+                sb.append(")");
+                if (s.text.length() > 0) {
+                    sb.append("\n");
+                    sb.append(s.text);
+                }
+                return sb.toString();
             }
         }
 
         @Override
         public int getItemCount() {
-            if (plan == null) {
-                return 0;
-            } else {
-                ArrayList<ViewInfo> viewInfos = new ArrayList<ViewInfo>(plan.parts[part].substitutions.length);
-                for (int i = 0; i < plan.parts[part].substitutions.length; i++) {
-                    if (i == 0) {
-                        viewInfos.add(new ViewInfo(0, 0));
-                        viewInfos.add(new ViewInfo(1, 0));
-                    } else if (plan.parts[part].substitutions[i].className.equals(plan.parts[part].substitutions[i - 1].className)) {
+            ArrayList<ViewInfo> viewInfos = new ArrayList<ViewInfo>(plan.parts[part].substitutions.length);
+            for (int i = 0; i < plan.parts[part].substitutions.length; i++) {
+                if (i == 0) {
+                    viewInfos.add(new ViewInfo(0, 0));
+                    viewInfos.add(new ViewInfo(1, 0));
+                } else if (isStudent) {
+                    if (plan.parts[part].substitutions[i].className.equals(plan.parts[part].substitutions[i - 1].className)) {
+                        viewInfos.add(new ViewInfo(1, i));
+                    } else {
+                        viewInfos.add(new ViewInfo(0, i));
+                        viewInfos.add(new ViewInfo(1, i));
+                    }
+                } else {
+                    Substitution s = plan.parts[part].substitutions[i];
+                    Teacher thisTeacher = s.modeTaskProvider ? s.taskProvider : s.substTeacher;
+                    s = plan.parts[part].substitutions[i - 1];
+                    Teacher prevTeacher = s.modeTaskProvider ? s.taskProvider : s.substTeacher;
+                    if (thisTeacher.abbr.equals(prevTeacher.abbr)) {
                         viewInfos.add(new ViewInfo(1, i));
                     } else {
                         viewInfos.add(new ViewInfo(0, i));
                         viewInfos.add(new ViewInfo(1, i));
                     }
                 }
-                this.viewInfos = viewInfos.toArray(new ViewInfo[viewInfos.size()]);
-                return viewInfos.size();
             }
+            this.viewInfos = viewInfos.toArray(new ViewInfo[viewInfos.size()]);
+            return viewInfos.size();
         }
 
         private class ViewInfo {

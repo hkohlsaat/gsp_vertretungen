@@ -1,8 +1,10 @@
 package org.aweture.wonk.settings;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -12,7 +14,9 @@ import org.aweture.wonk.R;
 import org.aweture.wonk.storage.SimpleData;
 
 public class Activity extends android.support.v7.app.AppCompatActivity {
-	
+
+	public static final String STUDENT_TEACHER_MODE_CHANGED = "student_teacher_mode_changed";
+
 	private RadioButton studentButton;
 	private RadioButton teacherButton;
 	private EditText filterEditText;
@@ -84,6 +88,8 @@ public class Activity extends android.support.v7.app.AppCompatActivity {
 		SimpleData simpleData = new SimpleData(this);
 		simpleData.setWhetherStudent(isStudent);
 		hintFilter();
+		Intent intent = new Intent(STUDENT_TEACHER_MODE_CHANGED);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 	
 	private void saveFilter() {
