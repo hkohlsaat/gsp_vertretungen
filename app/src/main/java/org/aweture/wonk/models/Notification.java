@@ -12,7 +12,7 @@ public class Notification {
     }
 
     public Notification(String notificationString) {
-        String[] values = notificationString.split(" ");
+        String[] values = notificationString.split("#");
         filter = values[0];
         period = values[1];
         date = values[2];
@@ -20,7 +20,7 @@ public class Notification {
 
     @Override
     public String toString() {
-        return filter + " " + period + " " + date;
+        return filter + "#" + period + "#" + date;
     }
 
     @Override

@@ -6,7 +6,7 @@ import android.net.NetworkInfo;
 
 public class Application extends android.app.Application {
 	
-	public final static boolean IN_DEBUG_MODE = true;
+	public final static boolean IN_DEBUG_MODE = false;
 
 	public static boolean hasConnectivity(Context context) {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);

@@ -60,6 +60,8 @@ public class FcmListenerService extends FirebaseMessagingService {
     }
 
     private void getNewPlan() throws IOException {
+        LogUtil.currentMethod();
+
         // Download the plan.
         String planJSON = PlanDownloader.download();
         // Save the plan.
@@ -122,7 +124,7 @@ public class FcmListenerService extends FirebaseMessagingService {
             counter++;
             if (dates.size() > 1) {
                 if (dates.size() - 1 == counter) {
-                    message.append("und ");
+                    message.append(" und ");
                 } else if (dates.size() > counter) {
                     message.append(", ");
                 }
@@ -143,7 +145,7 @@ public class FcmListenerService extends FirebaseMessagingService {
                         .setContentTitle(title)
                         .setContentText(message)
                         .setContentIntent(pendingIntent)
-                        .setColor(this.getResources().getColor(R.color.accent))
+                        .setColor(this.getResources().getColor(R.color.primary))
                         .setAutoCancel(true);
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, notificationBuilder.build());
