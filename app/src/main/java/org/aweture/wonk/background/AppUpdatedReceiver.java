@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import org.aweture.wonk.log.LogUtil;
+import org.aweture.wonk.storage.SimpleData;
 
 public class AppUpdatedReceiver extends BroadcastReceiver {
 
@@ -26,6 +27,9 @@ public class AppUpdatedReceiver extends BroadcastReceiver {
                 // Also some SharedPreferences values aren't used any more.
                 String name = this.getClass().getName();
                 SharedPreferences sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+                if (sharedPreferences.getBoolean("userdata_inserted", false)) {
+                    new SimpleData(context).setPasswordEntered();
+                }
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.remove("userdata_inserted");
                 editor.remove("username");

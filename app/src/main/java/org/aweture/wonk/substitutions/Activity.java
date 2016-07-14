@@ -415,24 +415,35 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
             ArrayList<ViewInfo> viewInfos = new ArrayList<ViewInfo>(plan.parts[part].substitutions.length);
             for (int i = 0; i < plan.parts[part].substitutions.length; i++) {
                 if (i == 0) {
+                    // The first shown item is always a header.
+                    // Make a header pointing to 0.
                     viewInfos.add(new ViewInfo(0, 0));
+                    // Make a subtitution item showing the content of 0.
                     viewInfos.add(new ViewInfo(1, 0));
                 } else if (isStudent) {
-                    if (plan.parts[part].substitutions[i].className.equals(plan.parts[part].substitutions[i - 1].className)) {
+                    if (plan.parts[part].substitutions[i].className.equalsIgnoreCase(plan.parts[part].substitutions[i - 1].className)) {
+                        // If this class name equals the previous one, the next item shows the content of i.
                         viewInfos.add(new ViewInfo(1, i));
                     } else {
+                        // If this class name does not equal the previous one, the next item is a header.
                         viewInfos.add(new ViewInfo(0, i));
+                        // Then the actual i'th content is shown.
                         viewInfos.add(new ViewInfo(1, i));
                     }
                 } else {
+                    // Get this teacher and the previous one.
                     Substitution s = plan.parts[part].substitutions[i];
                     Teacher thisTeacher = s.modeTaskProvider ? s.taskProvider : s.substTeacher;
                     s = plan.parts[part].substitutions[i - 1];
                     Teacher prevTeacher = s.modeTaskProvider ? s.taskProvider : s.substTeacher;
-                    if (thisTeacher.abbr.equals(prevTeacher.abbr)) {
+
+                    if (thisTeacher.abbr.equalsIgnoreCase(prevTeacher.abbr)) {
+                        // If the teacher names are equal, the next item shows the content of i.
                         viewInfos.add(new ViewInfo(1, i));
                     } else {
+                        // If the teacher names are not equal, the next item is a header of i.
                         viewInfos.add(new ViewInfo(0, i));
+                        // Then the actual i'th content is shown.
                         viewInfos.add(new ViewInfo(1, i));
                     }
                 }

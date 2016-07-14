@@ -32,8 +32,7 @@ public class PlanDownloader {
 		PlanStorage.savePlan(context, json);
 
 		// Fire an intent, because a download was successfully saved.
-		Intent intent = new Intent(ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+		informAboutNewPlan(context);
 	}
 
 	/**
@@ -60,5 +59,17 @@ public class PlanDownloader {
 		conn.disconnect();
 
 		return plan.toString();
+	}
+
+	/**
+	 * informAboutNewPlan() sends an Intent with the action
+	 * {@link #ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED} via {@link LocalBroadcastManager} and informs
+	 * receivers about a new plan. This method should be called after {@link #download()} and after
+	 * the downloaded plan has been saved by the caller. When calling {@link #downloadAndSave(Context)}
+	 * recievers are automatically informed.
+     */
+	public static void informAboutNewPlan(Context context) {
+		Intent intent = new Intent(ACTION_NEW_PLAN_DOWNLOADED_AND_SAVED);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 }

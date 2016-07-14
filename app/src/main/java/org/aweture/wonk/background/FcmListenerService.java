@@ -60,8 +60,6 @@ public class FcmListenerService extends FirebaseMessagingService {
     }
 
     private void getNewPlan() throws IOException {
-        LogUtil.currentMethod();
-
         // Download the plan.
         String planJSON = PlanDownloader.download();
         // Save the plan.
@@ -78,6 +76,9 @@ public class FcmListenerService extends FirebaseMessagingService {
         if (!unknownNotifications.isEmpty()) {
             showNotifications(unknownNotifications);
         }
+
+        // Inform interested BroadcastReceivers about the new plan.
+        PlanDownloader.informAboutNewPlan(this);
     }
 
     private ArrayList<Notification> notifications(Plan plan, boolean student) {
@@ -99,7 +100,8 @@ public class FcmListenerService extends FirebaseMessagingService {
                         notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
                     }
                 } else {
-                    if ((s.modeTaskProvider && s.taskProvider.abbr.equals(filter)) || (s.modeTaskProvider ^ s.substTeacher.abbr.equals(filter))) {
+                    if ((s.modeTaskProvider && s.taskProvider.abbr.equalsIgnoreCase(filter))
+                            || (s.modeTaskProvider ^ s.substTeacher.abbr.equalsIgnoreCase(filter))) {
                         notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
                     }
                 }

@@ -39,9 +39,9 @@ public class Substitution {
 				int comp = g1 < g2 ? -1 : 1;
 				return comp;
 			} else {
-				int comp = lhs.className.compareTo(rhs.className);
+				int comp = lhs.className.compareToIgnoreCase(rhs.className);
 				if (comp == 0) {
-					return lhs.period.compareTo(rhs.period);
+					return lhs.period.compareToIgnoreCase(rhs.period);
 				}
 				return comp;
 			}
@@ -58,7 +58,7 @@ public class Substitution {
 					return Integer.parseInt(name.substring(0, 1));
 				}
 				// ...or a letter.
-			} else if (firstChar == 'E') {
+			} else if (firstChar == 'E' || firstChar == 'e') {
 				return 11;
 			} else {
 				int plus = Integer.parseInt(name.substring(1, 2));
@@ -72,9 +72,9 @@ public class Substitution {
 		public int compare(Substitution lhs, Substitution rhs) {
 			String lname = lhs.modeTaskProvider ? lhs.taskProvider.getName() : lhs.substTeacher.getName();
 			String rname = rhs.modeTaskProvider ? rhs.taskProvider.getName() : rhs.substTeacher.getName();
-			int comp = lname.compareTo(rname);
+			int comp = lname.compareToIgnoreCase(rname);
 			if (comp == 0) {
-				comp = lhs.period.compareTo(rhs.period);
+				comp = lhs.period.compareToIgnoreCase(rhs.period);
 			}
 			return comp;
 		}
