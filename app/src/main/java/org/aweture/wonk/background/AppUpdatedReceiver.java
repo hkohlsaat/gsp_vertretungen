@@ -20,7 +20,7 @@ public class AppUpdatedReceiver extends BroadcastReceiver {
             PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
             final int versionCode = packageInfo.versionCode;
 
-            if (versionCode == 13) {
+            if (versionCode == 13 || versionCode == 14) {
                 // In this version the database is dropped and the plan is saved in an extra
                 // file in json format.
                 context.deleteDatabase("wonk.db");

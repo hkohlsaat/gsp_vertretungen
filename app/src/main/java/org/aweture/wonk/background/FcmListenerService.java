@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -18,7 +19,6 @@ import org.aweture.wonk.R;
 import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Notification;
 import org.aweture.wonk.models.Plan;
-import org.aweture.wonk.models.Substitution;
 import org.aweture.wonk.storage.NotificationLog;
 import org.aweture.wonk.storage.PlanStorage;
 import org.aweture.wonk.storage.SimpleData;
@@ -68,9 +68,9 @@ public class FcmListenerService extends FirebaseMessagingService {
         boolean student = new SimpleData(this).isStudent();
         Plan plan = PlanStorage.readPlan(this, student);
         // Create notifications for the filter.
-        ArrayList<Notification> allNotifications = notifications(plan, student);
+        ArrayList<Notification> allNotifications = NotificationLog.allNotificationsOfPlan(this, plan);
         // Unknown notifications are saved. Only the unknown ones are returned to be shown.
-        ArrayList<Notification> unknownNotifications = NotificationLog.saveUnkonwNotifications(this, allNotifications);
+        ArrayList<Notification> unknownNotifications = NotificationLog.saveUnknownNotifications(this, allNotifications);
 
         // If there are notifications to be shown, fire them.
         if (!unknownNotifications.isEmpty()) {
@@ -79,36 +79,6 @@ public class FcmListenerService extends FirebaseMessagingService {
 
         // Inform interested BroadcastReceivers about the new plan.
         PlanDownloader.informAboutNewPlan(this);
-    }
-
-    private ArrayList<Notification> notifications(Plan plan, boolean student) {
-        String filter = new SimpleData(this).getFilter(null);
-
-        ArrayList<Notification> notifications = new ArrayList<Notification>();
-
-        if (filter == null) {
-            return notifications;
-        }
-
-        for (int i = 0; i < plan.parts.length; i++) {
-            Plan.Part part = plan.parts[i];
-            for (int j = 0; j < part.substitutions.length; j++) {
-                Substitution s = part.substitutions[j];
-
-                if (student) {
-                    if (s.className.equalsIgnoreCase(filter)) {
-                        notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
-                    }
-                } else {
-                    if ((s.modeTaskProvider && s.taskProvider.abbr.equalsIgnoreCase(filter))
-                            || (s.modeTaskProvider ^ s.substTeacher.abbr.equalsIgnoreCase(filter))) {
-                        notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
-                    }
-                }
-            }
-        }
-
-        return notifications;
     }
 
     private void showNotifications(ArrayList<Notification> notifications) {
@@ -147,7 +117,7 @@ public class FcmListenerService extends FirebaseMessagingService {
                         .setContentTitle(title)
                         .setContentText(message)
                         .setContentIntent(pendingIntent)
-                        .setColor(this.getResources().getColor(R.color.primary))
+                        .setColor(ContextCompat.getColor(this, R.color.primary))
                         .setAutoCancel(true);
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, notificationBuilder.build());

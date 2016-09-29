@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
@@ -59,6 +60,9 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // This Activity is in every case the landing activity. But that doesn't mean that the
+        // users should be shown this Activity. Maybe they should be redirected to the
+        // landing Activity.
         if (shouldDisplayLanding()) {
             displayLandingActivity();
             return;
@@ -75,44 +79,70 @@ public class Activity extends AppCompatActivity implements LoaderManager.LoaderC
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
+        // Set up the member variables.
         feedbackContainer = findViewById(R.id.feedbackContainer);
         noDataText = findViewById(R.id.noDataText);
         progessBar = findViewById(R.id.progressBar);
 
-        ((ProgressBar) progessBar).getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+        // The ProgressBar might have a color that makes it hard to distinguish.
+        // So it is set to the primary color to make sure everything is laid out properly.
+        int primaryColor = ContextCompat.getColor(this, R.color.primary);
+        ((ProgressBar) progessBar).getIndeterminateDrawable().setColorFilter(primaryColor, PorterDuff.Mode.SRC_IN);
 
+        // Init the LoaderManager to load the content.
         LoaderManager loaderManager = getSupportLoaderManager();
         loaderManager.initLoader(R.id.SUBSTITUTIONS_ACTIVTY_PLAN_LOADER, null, this);
     }
 
+    /**
+     * shouldDisplayLanding() determines whether the users should be shown the landing Activity
+     * before interacting with this Activity.
+     * @return true in the case that the user should be redirected
+     */
     private boolean shouldDisplayLanding() {
         SimpleData data = new SimpleData(this);
         return !data.isPasswordEntered();
     }
 
+    /**
+     * displayLandingActivity() redirects the user to the landing Activity and finishes
+     * this Activity.
+     */
     private void displayLandingActivity() {
         Intent intent = new Intent(this, org.aweture.wonk.landing.Activity.class);
         startActivity(intent);
         finish();
     }
 
+    /**
+     * showLoadingLayout() displays a progressbar and is intended to be used in loading
+     * situations, as the name suggests.
+     */
     private void showLoadingLayout() {
         feedbackContainer.setVisibility(View.VISIBLE);
         noDataText.setVisibility(View.GONE);
         progessBar.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * showNoDataLayout() shows a text which acknowleges that the Activity has no data to show.
+     */
     private void showNoDataLayout() {
         feedbackContainer.setVisibility(View.VISIBLE);
         noDataText.setVisibility(View.VISIBLE);
         progessBar.setVisibility(View.GONE);
     }
 
+    /**
+     * showNormalLayout() reverses the changes made by {@link #showLoadingLayout()}
+     * and {@link #showNoDataLayout()}.
+     */
     private void showNormalLayout() {
         feedbackContainer.setVisibility(View.GONE);
         noDataText.setVisibility(View.GONE);
         progessBar.setVisibility(View.GONE);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

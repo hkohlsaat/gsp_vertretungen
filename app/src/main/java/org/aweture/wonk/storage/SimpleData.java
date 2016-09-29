@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+/**
+ * SimpleData is a wrapper class to capture all SharedPreferences use cases in one place.
+ */
 public class SimpleData {
 
 	private static final String KEY_PASSWORD_ENTERED = "password_entered";

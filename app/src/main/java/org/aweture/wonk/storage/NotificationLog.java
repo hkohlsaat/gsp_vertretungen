@@ -5,6 +5,8 @@ import android.content.Context;
 import org.aweture.wonk.log.LogUtil;
 import org.aweture.wonk.models.Date;
 import org.aweture.wonk.models.Notification;
+import org.aweture.wonk.models.Plan;
+import org.aweture.wonk.models.Substitution;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -21,7 +23,57 @@ import java.util.ArrayList;
 public class NotificationLog {
     public static final String FILENAME = "notifications.txt";
 
-    public static ArrayList<Notification> saveUnkonwNotifications(Context context, ArrayList<Notification> notifications) {
+    /**
+     * allNotificationsOfPlan() forms all {@link Notification}s from the specified {@link Plan}.
+     * It is aware of the current teacher/student configuration so only notifications
+     * fitting the current settings are returned.
+     * @param context current {@link Context}
+     * @param plan {@link Plan} to decompose
+     * @return all {@link Notification}s implied by the plan
+     */
+    public static ArrayList<Notification> allNotificationsOfPlan(Context context, Plan plan) {
+        SimpleData sd = new SimpleData(context);
+        String filter = sd.getFilter(null);
+        boolean student = sd.isStudent();
+
+        ArrayList<Notification> notifications = new ArrayList<Notification>();
+
+        if (filter == null) {
+            return notifications;
+        }
+
+        for (int i = 0; i < plan.parts.length; i++) {
+            Plan.Part part = plan.parts[i];
+            for (int j = 0; j < part.substitutions.length; j++) {
+                Substitution s = part.substitutions[j];
+
+                if (student) {
+                    if (s.className.equalsIgnoreCase(filter)) {
+                        notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
+                    }
+                } else {
+                    if ((s.modeTaskProvider && s.taskProvider.abbr.equalsIgnoreCase(filter))
+                            || (s.modeTaskProvider ^ s.substTeacher.abbr.equalsIgnoreCase(filter))) {
+                        notifications.add(new Notification(filter, s.className, s.period, part.day.toDateString()));
+                    }
+                }
+            }
+        }
+
+        return notifications;
+    }
+
+    /**
+     * saveUnknownNotifications() takes a list of all possible new notifications that emerge
+     * out of a {@link org.aweture.wonk.models.Plan}. Only those being really unknown to
+     * the user are returned so the calling method can choose to display them. The returned
+     * {@link Notification}s are saved as known so subsequent calls to this method wouldn't
+     * return them again, if they appear in the next version of the plan also.
+     * @param context
+     * @param notifications
+     * @return A list of notifications the user does not know about.
+     */
+    public static ArrayList<Notification> saveUnknownNotifications(Context context, ArrayList<Notification> notifications) {
         // Create the list of notifications unknown to the user and therefore to be shown.
         ArrayList<Notification> unknownNotifications = new ArrayList<Notification>();
 

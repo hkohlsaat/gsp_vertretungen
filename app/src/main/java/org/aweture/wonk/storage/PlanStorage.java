@@ -55,43 +55,69 @@ public class PlanStorage {
         }
     }
 
-    private static void prepareForStudent(Plan plan) {
-        Comparator<Substitution> comparator = new Substitution.ClassComparator();
-        for (int i = 0; i < plan.parts.length; i++) {
-            ArrayList<Substitution> subs = new ArrayList<Substitution>(plan.parts[i].substitutions.length);
-            for (int j = 0; j < plan.parts[i].substitutions.length; j++) {
-                Substitution s = plan.parts[i].substitutions[j];
-                String[] classNames = decomposeClassNames(s.className);
-                for (int k = 0; k < classNames.length; k++) {
-                    Substitution copy = s.copy();
-                    copy.className = classNames[k];
-                    subs.add(copy);
+    public static Plan.Part readPlanPart(Context context, int partIndex, boolean student) throws IOException {
+        synchronized (FILENAME) {
+            FileInputStream inputStream = context.openFileInput(FILENAME);
+            JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
+            try {
+                Plan.Part part = onlyReadPart(reader, partIndex);
+                if (student) {
+                    prepareForStudent(part);
+                } else {
+                    prepareForTeacher(part);
                 }
+                return part;
+            } finally {
+                reader.close();
             }
-            plan.parts[i].substitutions = subs.toArray(new Substitution[subs.size()]);
-            Arrays.sort(plan.parts[i].substitutions, comparator);
         }
     }
 
-    private static void prepareForTeacher(Plan plan) {
-        Comparator<Substitution> comparator = new Substitution.TeacherComparator();
+    private static void prepareForStudent(Plan plan) {
         for (int i = 0; i < plan.parts.length; i++) {
-            ArrayList<Substitution> subs = new ArrayList<Substitution>(plan.parts[i].substitutions.length);
-            for (int j = 0; j < plan.parts[i].substitutions.length; j++) {
-                Substitution s = plan.parts[i].substitutions[j];
-                if (s.substTeacher.abbr.length() > 0) {
-                    subs.add(s);
+            prepareForStudent(plan.parts[i]);
+        }
+    }
 
-                    if (s.taskProvider.getName().length() > 0 && !s.substTeacher.abbr.equals(s.taskProvider.abbr)) {
-                        s = s.copy();
-                        s.modeTaskProvider = true;
-                        subs.add(s);
-                    }
+    private static void prepareForStudent(Plan.Part part) {
+        Comparator<Substitution> comparator = new Substitution.ClassComparator();
+        ArrayList<Substitution> subs = new ArrayList<Substitution>(part.substitutions.length);
+        for (int i = 0; i < part.substitutions.length; i++) {
+            Substitution s = part.substitutions[i];
+            String[] classNames = decomposeClassNames(s.className);
+            for (int j = 0; j < classNames.length; j++) {
+                Substitution copy = s.copy();
+                copy.className = classNames[j];
+                subs.add(copy);
+            }
+        }
+        part.substitutions = subs.toArray(new Substitution[subs.size()]);
+        Arrays.sort(part.substitutions, comparator);
+    }
+
+    private static void prepareForTeacher(Plan plan) {
+        for (int i = 0; i < plan.parts.length; i++) {
+            prepareForTeacher(plan.parts[i]);
+        }
+    }
+
+    private static void prepareForTeacher(Plan.Part part) {
+        Comparator<Substitution> comparator = new Substitution.TeacherComparator();
+        ArrayList<Substitution> subs = new ArrayList<Substitution>(part.substitutions.length);
+        for (int i = 0; i < part.substitutions.length; i++) {
+            Substitution s = part.substitutions[i];
+            if (s.substTeacher.abbr.length() > 0) {
+                subs.add(s);
+
+                if (s.taskProvider.getName().length() > 0 && !s.substTeacher.abbr.equals(s.taskProvider.abbr)) {
+                    s = s.copy();
+                    s.modeTaskProvider = true;
+                    subs.add(s);
                 }
             }
-            plan.parts[i].substitutions = subs.toArray(new Substitution[subs.size()]);
-            Arrays.sort(plan.parts[i].substitutions, comparator);
         }
+        part.substitutions = subs.toArray(new Substitution[subs.size()]);
+        Arrays.sort(part.substitutions, comparator);
     }
 
     private static Plan readPlan(JsonReader reader) throws IOException {
@@ -115,6 +141,24 @@ public class PlanStorage {
         return plan;
     }
 
+    private static Plan.Part onlyReadPart(JsonReader reader, int partIndex) throws IOException {
+        reader.beginObject();
+
+        Plan.Part part = null;
+
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("Parts")) {
+                part = readPartsArray(reader, partIndex);
+            } else {
+                reader.skipValue();
+            }
+        }
+
+        reader.endObject();
+        return part;
+    }
+
     private static Plan.Part[] readPartsArray(JsonReader reader) throws IOException {
         reader.beginArray();
 
@@ -126,6 +170,26 @@ public class PlanStorage {
 
         reader.endArray();
         return (Plan.Part[]) parts.toArray(new Plan.Part[parts.size()]);
+    }
+
+    private static Plan.Part readPartsArray(JsonReader reader, int partIndex) throws IOException {
+        reader.beginArray();
+
+        Plan.Part part = null;
+        int i = 0;
+
+        while (reader.hasNext()) {
+            if (partIndex == i) {
+                part = readPart(reader);
+            } else {
+                reader.beginObject();
+                reader.endObject();
+            }
+            i++;
+        }
+
+        reader.endArray();
+        return part;
     }
 
     private static Plan.Part readPart(JsonReader reader) throws IOException {
